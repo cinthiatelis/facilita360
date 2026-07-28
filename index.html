@@ -1272,7 +1272,7 @@ function atualizarSelectResp(){
    ============================================================ */
 /* A Planilha Consolidada é derivada das demandas CONCLUÍDAS do Kanban */
 function renderAtividades(){
-  const concluidas=DB.demandas.filter(d=>d.coluna===&quot;concluido&quot;);
+  const concluidas=demandasVisiveis().filter(d=>d.coluna===&quot;concluido&quot;);
   document.getElementById(&quot;cntAtiv&quot;).textContent=concluidas.length;
   // filtros dinâmicos
   const resps=[...new Set(concluidas.map(d=>d.resp).filter(Boolean))].sort();
@@ -1318,7 +1318,7 @@ function fillSelect(id,arr,label){const sel=document.getElementById(id);if(!sel)
 function desenharGraficos(){
   const porStatus={backlog:0,andamento:0,revisao:0,concluido:0};
   const porCat={};
-  DB.demandas.forEach(d=>{
+  demandasVisiveis().forEach(d=>{
     if(porStatus[d.coluna]!==undefined)porStatus[d.coluna]++;
     const c=d.categoria||&quot;Sem categoria&quot;;porCat[c]=(porCat[c]||0)+1;
   });
@@ -1341,14 +1341,15 @@ function desenharGraficos(){
    ============================================================ */
 function exportarExcel(){
   const wb=XLSX.utils.book_new();
+  const _dem=demandasVisiveis();   /* 🔒 exporta só o que está visível (respeita perfil + &quot;Ver dados de&quot;) */
   // Demandas
-  const dem=DB.demandas.map(d=>({Titulo:d.titulo,Descricao:d.desc,Responsavel:d.resp,Coluna:colNome(d.coluna),Prioridade:d.prio,Categoria:d.categoria,Horas:d.horas,Prazo:d.prazo,Subatividades:(d.subs||[]).length,Tags:(d.tags||[]).join(&quot;, &quot;)}));
+  const dem=_dem.map(d=>({Titulo:d.titulo,Descricao:d.desc,Responsavel:d.resp,Coluna:colNome(d.coluna),Prioridade:d.prio,Categoria:d.categoria,Horas:d.horas,Prazo:d.prazo,Subatividades:(d.subs||[]).length,Tags:(d.tags||[]).join(&quot;, &quot;)}));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(dem.length?dem:[{}]),&quot;Demandas&quot;);
   // Subatividades
-  const subs=[];DB.demandas.forEach(d=>{(d.subs||[]).forEach(s=>subs.push({Demanda:d.titulo,Subatividade:s.nome,Data:s.data,Status:s.status}));});
+  const subs=[];_dem.forEach(d=>{(d.subs||[]).forEach(s=>subs.push({Demanda:d.titulo,Subatividade:s.nome,Data:s.data,Status:s.status}));});
   if(subs.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(subs),&quot;Subatividades&quot;);
   // Atividades Concluídas (derivadas do Kanban)
-  const at=DB.demandas.filter(d=>d.coluna===&quot;concluido&quot;).map(d=>({Atividade:d.titulo,Responsavel:d.resp,Prazo:d.prazo,Horas:d.horas,Categoria:d.categoria,Tags:(d.tags||[]).join(&quot;, &quot;)}));
+  const at=_dem.filter(d=>d.coluna===&quot;concluido&quot;).map(d=>({Atividade:d.titulo,Responsavel:d.resp,Prazo:d.prazo,Horas:d.horas,Categoria:d.categoria,Tags:(d.tags||[]).join(&quot;, &quot;)}));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(at.length?at:[{}]),&quot;Atividades Concluídas&quot;);
   // Atas
   const atas=[];DB.atas.forEach(a=>{(a.pendencias&amp;&amp;a.pendencias.length?a.pendencias:[{}]).forEach(p=>atas.push({Data:a.data,Tipo:a.tipo,Participantes:a.participantes,Pauta:a.pauta,Pendencia:p.desc||&quot;&quot;,Responsavel:p.resp||&quot;&quot;,Prazo:p.data||&quot;&quot;,Status:p.status||&quot;&quot;}))});
@@ -1801,7 +1802,7 @@ async function iniciarOrg(){
   renderAtas();renderKanban();
   if(typeof renderAtividades===&quot;function&quot;)renderAtividades();
   if(typeof renderAnotacoes===&quot;function&quot;)renderAnotacoes();
-  const ci=document.getElementById(&quot;cntAtiv&quot;);if(ci)ci.textContent=DB.demandas.filter(d=>d.coluna===&quot;concluido&quot;).length;
+  const ci=document.getElementById(&quot;cntAtiv&quot;);if(ci)ci.textContent=demandasVisiveis().filter(d=>d.coluna===&quot;concluido&quot;).length;
 }
 /* 🔑 o shell chama isto ao injetar o usuário no iframe: fixa ME e recarrega */
 let _orgIniciado=false;
@@ -14300,19 +14301,33 @@ async function carregarAlertas(){
       pla.push({id:a.id,titulo:a.what||"(sem descrição)",prazo:pz,resp:a.who||a.dono||""});
     });
   }catch(e){console.warn("[alertas] plano:",e);}
-  /* 🆕 Governança: frentes com Data Limite ou Prazo em Foco vencido (estado_app 'governanca') */
+  /* 🆕 Governança: lê da tabela NOVA (gov_frentes) e respeita dono/delegação/perfil */
   try{
-    const {data}=await sb.from("estado_app").select("dados_json").eq("chave","governanca").maybeSingle();
-    const projs=(data&&data.dados_json&&data.dados_json.projects)||{};
-    Object.values(projs).forEach(p=>{
-      (p&&p.frentes||[]).forEach(f=>{
-        const st=(f.status||"").toLowerCase();if(st.includes("conclu"))return;
-        [["Data Limite",f.dataLimite],["Prazo em Foco",f.prazoFoco]].forEach(([rot,val])=>{
-          const pz=val?String(val).slice(0,10):"";
-          if(!pz||pz>=hoje)return;
-          if(soMeu&&!((f.resp||"").indexOf(eu)>=0))return;
-          gov.push({id:f.id,titulo:(f.frente||"(sem nome)")+" · "+rot,prazo:pz,resp:f.resp||""});
-        });
+    const _norm=s=>String(s==null?"":s).trim().toLowerCase();
+    const meusIds=[_norm(CURRENT&&CURRENT.nome),_norm(CURRENT&&CURRENT.login)].filter(Boolean);
+    const ehAdmin=CURRENT&&CURRENT.perfil==="admin";
+    /* time do gestor (para "gestor vê o time") */
+    let timeGestor=null;
+    if(CURRENT&&CURRENT.perfil==="gestor"){
+      try{ const {data:tm}=await sb.from("usuarios").select("nome,login").eq("gestor",CURRENT.nome);
+        timeGestor=(tm||[]).map(x=>_norm(x.nome)).concat((tm||[]).map(x=>_norm(x.login))).concat(meusIds); }catch(e){}
+    }
+    const {data}=await sb.from("gov_frentes").select("id,frente,status,prazo_foco,data_limite,resp,dono,dados_json").or("excluido.is.null,excluido.eq.false");
+    (data||[]).forEach(f=>{
+      const st=(f.status||"").toLowerCase();if(st.includes("conclu"))return;
+      /* visibilidade: admin vê tudo; senão precisa ser dono / delegado / (gestor) do time */
+      if(!ehAdmin){
+        const dono=_norm(f.dono);
+        const dj=f.dados_json||{};
+        const comp=(dj.compartilhado||[]).map(_norm);
+        const ehMeu=meusIds.indexOf(dono)>=0 || comp.some(x=>meusIds.indexOf(x)>=0);
+        const ehTime=timeGestor?timeGestor.indexOf(dono)>=0:false;
+        if(!ehMeu&&!ehTime)return;
+      }
+      [["Data Limite",f.data_limite],["Prazo em Foco",f.prazo_foco]].forEach(([rot,val])=>{
+        const pz=val?String(val).slice(0,10):"";
+        if(!pz||pz>=hoje)return;
+        gov.push({id:f.id,titulo:(f.frente||"(sem nome)")+" · "+rot,prazo:pz,resp:f.resp||""});
       });
     });
   }catch(e){console.warn("[alertas] governanca:",e);}
