@@ -102,11 +102,62 @@ button,input{font-family:inherit}
       <form onsubmit="fazerLogin(event)">
         <div class="f-group"><label>Usuário</label><div class="f-input"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><input id="loginUser" placeholder="Usuário" autocomplete="username" autofocus/></div></div>
         <div class="f-group"><label>Senha</label><div class="f-input"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"/><button type="button" class="toggle-pass" onclick="togglePass()"><svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
-        <div class="lb-row"><label class="lb-check"><input type="checkbox" id="loginRemember"/> Manter conectada</label><button type="button" class="lb-link" onclick="toast('Contate o administrador para redefinir a senha.','')">Esqueci a senha</button></div>
+        <div class="lb-row"><label class="lb-check"><input type="checkbox" id="loginRemember"/> Manter conectada</label><button type="button" class="lb-link" onclick="abrirEsqueciSenha()">Esqueci a senha</button></div>
         <button type="submit" class="btn-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Entrar</button>
       </form>
       <div class="lb-hint">🔒 Acesso restrito. Em caso de dúvida sobre seu login, contate o administrador do sistema.</div>
-      <div class="lb-foot">FACILITA 360 · Claro RCO · v1.0</div>
+      <div class="lb-foot">FACILITA 360 · v1.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔑 Modal: Esqueci a senha (reset com senha padrão + troca no 1º acesso) -->
+<div id="esqBg" onclick="if(event.target===this)fecharEsqueciSenha()" style="display:none;position:fixed;inset:0;background:rgba(11,20,38,.55);z-index:5000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:430px;max-width:94vw;box-shadow:0 24px 70px rgba(0,0,0,.35);overflow:hidden">
+    <div style="padding:18px 22px;border-bottom:1px solid #E5E9F0;display:flex;align-items:center;gap:10px">
+      <span style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#DA291C,#F97316);display:flex;align-items:center;justify-content:center;color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#1A1F36">Redefinir minha senha</div><div style="font-size:11.5px;color:#94A0B5">Enviaremos uma senha provisória para o seu e-mail cadastrado.</div></div>
+      <button onclick="fecharEsqueciSenha()" style="background:none;border:0;font-size:22px;color:#94A0B5;cursor:pointer">×</button>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
+      <div class="esq-err" id="esqErr" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;color:#B91C1C;font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px"></div>
+      <div class="esq-ok" id="esqOk" style="display:none;background:#DCFCE7;border:1px solid #86EFAC;color:#047857;font-size:12.5px;font-weight:600;padding:11px 12px;border-radius:8px;line-height:1.5"></div>
+      <div id="esqForm">
+        <div class="f-group"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Usuário</label>
+          <input id="esqUser" placeholder="Seu usuário corporativo" autocomplete="username" style="width:100%;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/></div>
+        <div class="f-group" style="margin-top:12px"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Verificação de segurança</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="esqCaptcha" style="font-size:14px;font-weight:800;color:#1A1F36;background:#F1F3F7;border:1px dashed #C7CEDB;border-radius:8px;padding:10px 12px;white-space:nowrap;user-select:none"></div>
+            <input id="esqResp" inputmode="numeric" placeholder="Resultado" style="flex:1;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/>
+            <button type="button" onclick="novoCaptchaEsq()" title="Gerar nova verificação" style="background:#fff;border:1px solid #E5E9F0;color:#5A6478;width:40px;height:40px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 6.7L3 16"/><path d="M3 21v-5h5"/></svg></button>
+          </div>
+          <div style="font-size:11px;color:#94A0B5;margin-top:6px">Confirme o cálculo acima para provar que não é um robô.</div>
+        </div>
+      </div>
+    </div>
+    <div id="esqFoot" style="padding:14px 22px;border-top:1px solid #E5E9F0;display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="fecharEsqueciSenha()" style="background:#fff;border:1px solid #E5E9F0;color:#5A6478;padding:9px 14px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600">Cancelar</button>
+      <button id="esqBtn" onclick="enviarResetSenha()" style="background:#DA291C;border:1px solid #DA291C;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔒 Modal: Troca obrigatória de senha no 1º acesso / após reset -->
+<div id="trocaBg" style="display:none;position:fixed;inset:0;background:rgba(11,20,38,.65);z-index:5100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:430px;max-width:94vw;box-shadow:0 24px 70px rgba(0,0,0,.35);overflow:hidden">
+    <div style="padding:18px 22px;border-bottom:1px solid #E5E9F0;display:flex;align-items:center;gap:10px">
+      <span style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#DA291C,#F97316);display:flex;align-items:center;justify-content:center;color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#1A1F36">Crie uma nova senha</div><div style="font-size:11.5px;color:#94A0B5">Por segurança, defina uma senha pessoal para continuar.</div></div>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
+      <div id="trocaErr" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;color:#B91C1C;font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px"></div>
+      <div class="f-group"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Nova senha</label>
+        <input id="trocaNova" type="password" placeholder="••••••••" style="width:100%;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/></div>
+      <div class="f-group"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Confirmar nova senha</label>
+        <input id="trocaConf" type="password" placeholder="••••••••" style="width:100%;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/></div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid #E5E9F0;display:flex;justify-content:flex-end;gap:8px">
+      <button id="trocaBtn" onclick="salvarTrocaObrigatoria()" style="background:#DA291C;border:1px solid #DA291C;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700">Salvar e entrar</button>
     </div>
   </div>
 </div>
@@ -1616,6 +1667,7 @@ function upPend(ataId,idx,campo,val){
    ============================================================ */
 let ANOTS=[];
 let ANOT_MIN=new Set();
+let ANOT_SEEN=new Set(); /* ids já renderizados: minimiza por padrão na 1ª aparição */
 function toggleAnot(id){
   const note=document.querySelector('#anList .an-note[data-id=&quot;'+id+'&quot;]');
   if(!note)return;
@@ -1657,6 +1709,7 @@ function anotacoesVisiveis(){
 function novaAnotacao(){
   const u=usuarioAtualOrg();
   const a={id:_uidA(),tema:&quot;&quot;,conteudo:&quot;&quot;,dono:u?u.nome:&quot;&quot;,pendencias:[]};
+  ANOT_SEEN.add(a.id);ANOT_MIN.delete(a.id); /* nova anotação nasce expandida p/ edição */
   ANOTS.unshift(a);cloudSalvarAnotacao(a);renderAnotacoes();
   setTimeout(()=>{const el=document.querySelector('#anList .an-note[data-id=&quot;'+a.id+'&quot;] input.tema');if(el)el.focus();},60);
 }
@@ -1693,6 +1746,8 @@ function renderAnotacoes(){
   const box=document.getElementById(&quot;anList&quot;);if(!box)return;
   const busca=(document.getElementById(&quot;anBusca&quot;).value||&quot;&quot;).toLowerCase();
   const lista=anotacoesVisiveis().filter(a=>!busca||((a.tema+&quot; &quot;+a.conteudo).toLowerCase().includes(busca)));
+  /* 🔽 minimizadas por padrão: toda anotação começa recolhida na 1ª vez que aparece */
+  lista.forEach(a=>{ if(!ANOT_SEEN.has(a.id)){ ANOT_SEEN.add(a.id); ANOT_MIN.add(a.id); } });
   if(lista.length===0){box.innerHTML='<div class=&quot;pa-empty&quot; style=&quot;padding:36px;text-align:center;color:var(--mute)&quot;>Nenhuma anotação. Clique em <b>+ Nova anotação</b> para começar.</div>';renderPendConsol();return;}
   const stcls={Aberta:&quot;st-a&quot;,&quot;Em andamento&quot;:&quot;st-and&quot;,Executada:&quot;st-e&quot;};
   box.innerHTML=lista.map(a=>{
@@ -13060,6 +13115,8 @@ function popularEscopoFer(){
   const wrap=document.getElementById(&quot;escopoFerWrap&quot;);
   const sel=document.getElementById(&quot;escopoFer&quot;);
   if(!wrap||!sel)return;
+  /* 🔒 Ferramentas privadas: sem visão de time/geral — seletor sempre oculto */
+  _escopoFer=&quot;&quot;;wrap.style.display=&quot;none&quot;;return;
   if(!u||(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)){wrap.style.display=&quot;none&quot;;return;}
   wrap.style.display=&quot;inline-flex&quot;;
   let opts=&quot;&quot;;
@@ -13079,9 +13136,8 @@ function mudarEscopoFer(v){_escopoFer=v;renderPlano();}
 function planoVisiveis(){
   const u=usuarioAtual();
   let base;
-  if(!u||u.perfil===&quot;admin&quot;){ base=PLANO.slice(); }
-  else if(u.perfil===&quot;gestor&quot;&amp;&amp;PLANO_TEAM){ base=PLANO.filter(a=>_naListaFer(PLANO_TEAM,a.who)||_naListaFer(PLANO_TEAM,a.dono)); }
-  else{ base=PLANO.filter(a=>_ehMeuFer(a.who)||_ehMeuFer(a.dono)); }
+  /* 🔒 Ferramentas privadas: cada usuário vê SOMENTE o que ele mesmo criou (dono), sem compartilhamento */
+  base=PLANO.filter(a=>_ehMeuFer(a.dono)||_ehMeuFer(a.who));
   const nomes=_nomesEscopoFer();
   if(nomes){ const alvo=nomes.map(_norm); const bate=v=>alvo.indexOf(_norm(v))>=0; base=base.filter(a=>bate(a.who)||bate(a.dono)); }
   return base;
@@ -13172,14 +13228,14 @@ let _indChart=null;
 async function carregarIndicadores(){
   if(!_sbP()){INDS=[];return;}
   try{
-    const {data,error}=await _sbP().from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,&quot;fer_indicadores&quot;).maybeSingle();
+    const {data,error}=await _sbP().from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,_chaveIndFer()).maybeSingle();
     if(error)throw error;
     INDS=(data&amp;&amp;data.dados_json&amp;&amp;Array.isArray(data.dados_json.lista))?data.dados_json.lista:[];
   }catch(e){console.warn(&quot;[ind] load:&quot;,e);INDS=[];}
 }
 function salvarIndicadoresCloud(){
   if(!_sbP())return;
-  try{ _sbP().from(&quot;estado_app&quot;).upsert({chave:&quot;fer_indicadores&quot;,dados_json:{lista:INDS},atualizado_em:new Date().toISOString()},{onConflict:&quot;chave&quot;}).then(r=>{if(r&amp;&amp;r.error)console.warn(r.error);}); }catch(e){console.warn(e);}
+  try{ _sbP().from(&quot;estado_app&quot;).upsert({chave:_chaveIndFer(),dados_json:{lista:INDS},atualizado_em:new Date().toISOString()},{onConflict:&quot;chave&quot;}).then(r=>{if(r&amp;&amp;r.error)console.warn(r.error);}); }catch(e){console.warn(e);}
 }
 function uidInd(){return &quot;ind_&quot;+Date.now()+&quot;_&quot;+Math.floor(Math.random()*10000);}
 const _MES_ABBR=[&quot;jan&quot;,&quot;fev&quot;,&quot;mar&quot;,&quot;abr&quot;,&quot;mai&quot;,&quot;jun&quot;,&quot;jul&quot;,&quot;ago&quot;,&quot;set&quot;,&quot;out&quot;,&quot;nov&quot;,&quot;dez&quot;];
@@ -13442,12 +13498,16 @@ function exportarPlanoExcel(){
 const SB_URL=&quot;https://eaynbqorhcscrdvlcrwp.supabase.co&quot;;
 const SB_KEY=&quot;sb_publishable_lRsJQj7OH4K6aiihmf6oDQ_1QyxxFDU&quot;;
 const SB_CHAVE=&quot;ferramentas&quot;;
+/* 🔒 isolamento por criador: cada usuário tem sua própria chave (nada é compartilhado) */
+function _loginFer(){ const u=(typeof usuarioAtual===&quot;function&quot;?usuarioAtual():null)||ME_FER; const w=(u&amp;&amp;(u.login||u.nome))||&quot;anon&quot;; return String(w).toLowerCase().trim(); }
+function _chaveFer(){ return SB_CHAVE+&quot;__&quot;+_loginFer(); }
+function _chaveIndFer(){ return &quot;fer_indicadores__&quot;+_loginFer(); }
 let sbF=null;
 try{ if(window.supabase&amp;&amp;window.supabase.createClient) sbF=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){}
 async function cloudCarregarFer(){
   if(!sbF)return false;
   try{
-    const {data,error}=await sbF.from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,SB_CHAVE).maybeSingle();
+    const {data,error}=await sbF.from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,_chaveFer()).maybeSingle();
     if(error)throw error;
     if(data&amp;&amp;data.dados_json){
       const d=data.dados_json;
@@ -13460,7 +13520,7 @@ async function cloudCarregarFer(){
 }
 function cloudSalvarFer(){
   if(!sbF)return;
-  try{ sbF.from(&quot;estado_app&quot;).upsert({chave:SB_CHAVE,dados_json:{prior:DB.prior,gut:DB.gut,farol:DB.farol},atualizado_em:new Date().toISOString()},{onConflict:&quot;chave&quot;}).then(function(r){if(r&amp;&amp;r.error)console.warn(&quot;[cloud fer] save:&quot;,r.error);}); }
+  try{ sbF.from(&quot;estado_app&quot;).upsert({chave:_chaveFer(),dados_json:{prior:DB.prior,gut:DB.gut,farol:DB.farol},atualizado_em:new Date().toISOString()},{onConflict:&quot;chave&quot;}).then(function(r){if(r&amp;&amp;r.error)console.warn(&quot;[cloud fer] save:&quot;,r.error);}); }
   catch(e){console.warn(&quot;[cloud fer] save:&quot;,e);}
 }
 /* saveDB local + envia à nuvem os 3 módulos compartilhados (debounce) */
@@ -13761,7 +13821,7 @@ tbody tr:hover{background:#FAFBFD}
         <button type=&quot;submit&quot; class=&quot;btn-login&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4&quot;/><polyline points=&quot;10 17 15 12 10 7&quot;/><line x1=&quot;15&quot; y1=&quot;12&quot; x2=&quot;3&quot; y2=&quot;12&quot;/></svg> Entrar</button>
       </form>
       <div class=&quot;lb-hint&quot;>🔒 Acesso restrito. Em caso de dúvida, contate o administrador do sistema.</div>
-      <div class=&quot;lb-foot&quot;>FACILITA 360 · Claro RCO · v1.0</div>
+      <div class=&quot;lb-foot&quot;>FACILITA 360 · v1.0</div>
     </div>
   </div>
 </div>
@@ -14774,6 +14834,8 @@ async function fazerLogin(e){
       try{ await sb.from("usuarios").update({ultimo_acesso:new Date().toISOString()}).eq("id",u.id);
            await sb.from("log_atividades").insert({tipo:"login",texto:u.nome+" entrou no sistema.",quem:u.nome}); }catch(_){}
       if(document.getElementById("loginRemember").checked){try{localStorage.setItem("facilita360_keep",u.login);}catch(_){}}
+      /* 🔒 senha resetada / 1º acesso: exige criar nova senha antes de entrar */
+      if(u.precisa_trocar){ exigirTrocaSenha("cloud"); return; }
       entrarApp();return;
     }catch(ex){ console.warn("[login] nuvem indisponível, tentando local:",ex); }
   }
@@ -14786,6 +14848,107 @@ async function fazerLogin(e){
   DB.log=DB.log||[];DB.log.unshift({tipo:"login",texto:"<b>"+u.nome+"</b> entrou no sistema.",quem:u.nome,ts:new Date().toISOString()});
   saveDB();
   if(document.getElementById("loginRemember").checked){try{localStorage.setItem("facilita360_keep",u.login)}catch(e){}}
+  /* 🔒 senha resetada / 1º acesso: exige criar nova senha antes de entrar */
+  if(u.precisa_trocar){ exigirTrocaSenha("local"); return; }
+  entrarApp();
+}
+/* ============================================================
+   🔑 RECUPERAÇÃO DE SENHA (reset com senha provisória + troca no 1º acesso)
+   ============================================================ */
+const SENHA_RESET_PADRAO="Facilita@360";  /* senha provisória enviada no reset */
+let _troca_ctx="cloud";                    /* de onde veio o login que exige troca */
+let _esqCaptcha={a:0,b:0};
+function _mascararEmail(em){ if(!em||em.indexOf("@")<0)return "seu e-mail cadastrado"; const p=em.split("@"); const nome=p[0]; const vis=nome.slice(0,Math.min(2,nome.length)); return vis+"•••@"+p[1]; }
+function novoCaptchaEsq(){ _esqCaptcha.a=Math.floor(Math.random()*8)+2; _esqCaptcha.b=Math.floor(Math.random()*8)+2; const el=document.getElementById("esqCaptcha"); if(el)el.textContent=_esqCaptcha.a+" + "+_esqCaptcha.b+" ="; const r=document.getElementById("esqResp"); if(r)r.value=""; }
+function abrirEsqueciSenha(){
+  document.getElementById("esqErr").style.display="none";
+  document.getElementById("esqOk").style.display="none";
+  document.getElementById("esqForm").style.display="block";
+  document.getElementById("esqFoot").style.display="flex";
+  const u=document.getElementById("esqUser"); u.value=(document.getElementById("loginUser").value||"").trim();
+  novoCaptchaEsq();
+  document.getElementById("esqBg").style.display="flex";
+  setTimeout(()=>{ if(!u.value)u.focus(); else document.getElementById("esqResp").focus(); },80);
+}
+function fecharEsqueciSenha(){ document.getElementById("esqBg").style.display="none"; }
+function _esqErro(msg){ const e=document.getElementById("esqErr"); e.textContent=msg; e.style.display="block"; }
+async function enviarResetSenha(){
+  const login=(document.getElementById("esqUser").value||"").trim().toLowerCase();
+  const resp=parseInt((document.getElementById("esqResp").value||"").trim(),10);
+  document.getElementById("esqErr").style.display="none";
+  if(!login){ _esqErro("Informe o seu usuário."); return; }
+  if(resp!==(_esqCaptcha.a+_esqCaptcha.b)){ _esqErro("Verificação de segurança incorreta. Tente novamente."); novoCaptchaEsq(); return; }
+  const btn=document.getElementById("esqBtn"); btn.disabled=true; btn.textContent="Enviando…";
+  const novoHash=hash(SENHA_RESET_PADRAO);
+  let emailUser=""; 
+  /* ☁️ nuvem primeiro */
+  if(sb){
+    try{
+      const {data}=await sb.from("usuarios").select("*").ilike("login",login).limit(1);
+      const u=(data&&data[0])||null;
+      if(u){
+        emailUser=u.email||"";
+        await sb.from("usuarios").update({senha_hash:novoHash,precisa_trocar:true}).eq("id",u.id);
+        try{ await sb.from("log_atividades").insert({tipo:"edit",texto:"Senha redefinida (esqueci a senha) para "+u.nome+".",quem:u.nome}); }catch(_){}
+        try{ await enviarEmailReset(u.email,u.nome,SENHA_RESET_PADRAO); }catch(_){}
+      }
+    }catch(ex){ console.warn("[reset] nuvem:",ex); }
+  }
+  /* 💾 fallback / espelho local */
+  try{
+    loadDB();
+    const ul=DB.users.find(x=>x.login.toLowerCase()===login);
+    if(ul){ ul.senha=novoHash; ul.precisa_trocar=true; if(!emailUser)emailUser=ul.email||""; saveDB(); }
+  }catch(e){}
+  btn.disabled=false; btn.textContent="Enviar";
+  /* 🔐 mensagem neutra: não revela se o usuário existe (boa prática de segurança) */
+  document.getElementById("esqForm").style.display="none";
+  document.getElementById("esqFoot").style.display="none";
+  const okBox=document.getElementById("esqOk");
+  okBox.innerHTML="✅ Se o usuário existir, enviamos uma <b>senha provisória</b> para "+_mascararEmail(emailUser)+".<br>Ao entrar com ela, o sistema pedirá que você crie uma senha pessoal.";
+  okBox.style.display="block";
+  setTimeout(fecharEsqueciSenha,6000);
+}
+/* 📧 gancho de envio de e-mail — chama uma Edge Function do Supabase, se configurada.
+   Sem backend de e-mail, a senha provisória fica registrada e o login já força a troca. */
+async function enviarEmailReset(email,nome,senha){
+  if(!email)return;
+  try{
+    if(sb&&sb.functions&&sb.functions.invoke){
+      await sb.functions.invoke("enviar-reset-senha",{body:{email:email,nome:nome,senha:senha}});
+    }
+  }catch(e){ console.warn("[reset] envio de e-mail indisponível (configure a Edge Function 'enviar-reset-senha'):",e); }
+}
+/* ---- Troca OBRIGATÓRIA de senha (1º acesso / após reset) ---- */
+function exigirTrocaSenha(ctx){
+  _troca_ctx=ctx||"cloud";
+  document.getElementById("trocaErr").style.display="none";
+  document.getElementById("trocaNova").value="";
+  document.getElementById("trocaConf").value="";
+  document.getElementById("trocaBg").style.display="flex";
+  setTimeout(()=>document.getElementById("trocaNova").focus(),80);
+}
+async function salvarTrocaObrigatoria(){
+  const nova=document.getElementById("trocaNova").value||"";
+  const conf=document.getElementById("trocaConf").value||"";
+  const errEl=document.getElementById("trocaErr");
+  const min=(DB&&DB.cfg&&DB.cfg.minSenha)||6;
+  const mostrar=(m)=>{errEl.textContent=m;errEl.style.display="block";};
+  if(nova.length<min){ mostrar("A senha deve ter pelo menos "+min+" caracteres."); return; }
+  if(nova!==conf){ mostrar("As senhas não conferem."); return; }
+  if(nova===SENHA_RESET_PADRAO){ mostrar("Escolha uma senha diferente da provisória."); return; }
+  const btn=document.getElementById("trocaBtn"); btn.disabled=true; btn.textContent="Salvando…";
+  const novoHash=hash(nova);
+  if(_troca_ctx==="cloud"&&sb&&CURRENT){
+    try{ await sb.from("usuarios").update({senha_hash:novoHash,precisa_trocar:false}).eq("id",CURRENT.id);
+         try{ await sb.from("log_atividades").insert({tipo:"edit",texto:CURRENT.nome+" definiu uma nova senha.",quem:CURRENT.nome}); }catch(_){} }
+    catch(ex){ console.warn("[troca] nuvem:",ex); }
+  }
+  /* espelho local */
+  try{ loadDB(); const ul=DB.users.find(x=>CURRENT&&(x.id===CURRENT.id||x.login===CURRENT.login)); if(ul){ ul.senha=novoHash; ul.precisa_trocar=false; saveDB(); } }catch(e){}
+  btn.disabled=false; btn.textContent="Salvar e entrar";
+  document.getElementById("trocaBg").style.display="none";
+  toast("Senha atualizada ✅","ok");
   entrarApp();
 }
 /* 🆕 #6 Preferência PESSOAL de módulos (cada usuário escolhe o que quer ver) */
@@ -15325,7 +15488,7 @@ function toast(msg,tipo){const t=document.getElementById("toast");t.textContent=
       try{
         const {data}=await sb.from("usuarios").select("*").ilike("login",keep).limit(1);
         const u=(data&&data[0])||null;
-        if(u&&u.ativo){CURRENT={id:u.id,nome:u.nome,login:u.login,email:u.email,area:u.area,perfil:u.perfil,gestor:u.gestor,ativo:1};CURRENT.modulos=await resolverModulos(u);entrarApp();return;}
+        if(u&&u.ativo){CURRENT={id:u.id,nome:u.nome,login:u.login,email:u.email,area:u.area,perfil:u.perfil,gestor:u.gestor,ativo:1};CURRENT.modulos=await resolverModulos(u);if(u.precisa_trocar){exigirTrocaSenha("cloud");return;}entrarApp();return;}
       }catch(_){}
     }
     /* 💾 fallback local */
