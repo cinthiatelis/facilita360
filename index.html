@@ -1000,7 +1000,27 @@ function salvarAta(){
    DEMANDAS · KANBAN
    ============================================================ */
 /* 🆕 visão por perfil: admin vê tudo; gestor vê o time; usuário vê os seus */
-function usuarioAtualOrg(){ try{ return parent.CURRENT||null; }catch(e){ return null; } }
+let ME_ORG=null; /* 🔒 usuário logado, capturado UMA vez e mantido estável */
+function _lerCurrentOrg(){
+  try{ if(window.CURRENT)return window.CURRENT; }catch(e){}
+  try{ if(parent&amp;&amp;parent.CURRENT)return parent.CURRENT; }catch(e){}
+  try{ if(top&amp;&amp;top.CURRENT)return top.CURRENT; }catch(e){}
+  return null;
+}
+async function capturarUsuarioOrg(){
+  for(let i=0;i<10;i++){
+    const u=_lerCurrentOrg();
+    if(u&amp;&amp;u.nome){ ME_ORG=u; return u; }
+    await new Promise(r=>setTimeout(r,120));
+  }
+  return ME_ORG;
+}
+function usuarioAtualOrg(){
+  if(ME_ORG)return ME_ORG;
+  const u=_lerCurrentOrg();
+  if(u&amp;&amp;u.nome)ME_ORG=u;
+  return ME_ORG;
+}
 let TIME_ORG=null;
 /* ===== FILTRO DE ESCOPO (gestor/admin) =====
    _escopoVer: &quot;&quot; = padrão do perfil · &quot;__meus&quot; = só os do próprio · &quot;<nome>&quot; = só daquela pessoa */
@@ -1752,7 +1772,8 @@ async function pendViraKanban(noteId,idx){
 
 /* ---------- init ---------- */
 loadDB();
-(async function(){
+/* carrega dados conforme o usuário atual e re-renderiza (reutilizável) */
+async function iniciarOrg(){
   if(sb){
     cloudBadge(&quot;Conectando à nuvem…&quot;,&quot;rgba(99,102,241,.1)&quot;);
     const okD=await cloudCarregarDemandas();
@@ -1776,7 +1797,26 @@ loadDB();
   renderAtas();renderKanban();
   if(typeof renderAtividades===&quot;function&quot;)renderAtividades();
   if(typeof renderAnotacoes===&quot;function&quot;)renderAnotacoes();
-  document.getElementById(&quot;cntAtiv&quot;).textContent=DB.demandas.filter(d=>d.coluna===&quot;concluido&quot;).length;
+  const ci=document.getElementById(&quot;cntAtiv&quot;);if(ci)ci.textContent=DB.demandas.filter(d=>d.coluna===&quot;concluido&quot;).length;
+}
+/* 🔑 o shell chama isto ao injetar o usuário no iframe: fixa ME e recarrega */
+let _orgIniciado=false;
+window.onFacilitaUser=function(u){
+  if(u&amp;&amp;u.nome){ ME_ORG=u; }
+  /* 🔧 recarrega SÓ na 1ª vez ou se o usuário MUDOU — nunca a cada troca de aba
+     (evita puxar versão antiga da nuvem e apagar o que acabou de ser criado) */
+  const nomeAtual=(u&amp;&amp;u.nome)||&quot;&quot;;
+  if(!_orgIniciado || _orgUltimoUser!==nomeAtual){
+    _orgUltimoUser=nomeAtual;
+    _orgIniciado=true;
+    iniciarOrg();
+  }
+};
+let _orgUltimoUser=null;
+/* ---------- init ---------- */
+(async function(){
+  try{ await capturarUsuarioOrg(); }catch(e){}
+  if(!_orgIniciado){ await iniciarOrg(); _orgIniciado=true; }
 })();
 </script>
 </body>
@@ -11142,18 +11182,10 @@ function saveDB(){
   const ind=document.getElementById(&quot;saveInd&quot;);ind.classList.add(&quot;flash&quot;);setTimeout(()=>ind.classList.remove(&quot;flash&quot;),400);
 }
 function seed(){
+  /* 🆕 inicia VAZIO (sem dados de exemplo). Cria só um projeto/visão em branco
+     para o app ter onde cadastrar as frentes. Nada aparece até o usuário criar. */
   const id=uid(&quot;p&quot;);
-  const cy=new Date().getFullYear();
-  const dAT1={};[3.2,3.15,3.1,3.05,3.0,2.95,2.9,2.85,2.8,2.75,2.7,2.65].forEach((v,m)=>{const cm=new Date().getMonth();dAT1[cy+&quot;-&quot;+String(m+1).padStart(2,&quot;0&quot;)]=(m<cm?{real:v,fc:null}:{fc:v,real:null});});
-  DB.projects[id]={meta:{name:&quot;VMO · Plano de Ação RCO&quot;},
-   indicadores:[{id:uid(&quot;ind&quot;),nome:&quot;AT1&quot;,area:&quot;Engenharia&quot;,unidade:&quot;p.p.&quot;,meta:2.5,direcao:&quot;menor&quot;,visao:&quot;fiscal&quot;,dados:dAT1}],
-   frentes:[
-    {id:uid(&quot;f&quot;),num:1,frente:&quot;Upgrade GPON Goiânia&quot;,
-     situacao:&quot;Migração iniciada\n3.200 clientes elegíveis\nComunicação prevista para 20/07&quot;,
-     resp:&quot;João Silva (Engenharia)&quot;,status:&quot;Em Andamento&quot;,prazoFoco:&quot;2026-07-22&quot;,dataLimite:&quot;2026-08-15&quot;,
-     ganho:&quot;34 p.p.&quot;,indicador:&quot;AT1&quot;,pilar:&quot;Infraestrutura, Energia e Modernização de Rede&quot;,
-     acoes:[{id:uid(&quot;a&quot;),area:&quot;Engenharia&quot;,pilar:&quot;Infraestrutura, Energia e Modernização de Rede&quot;,indicador:&quot;AT1&quot;,causaRaiz:&quot;Infra GPON legada&quot;,what:&quot;Migrar clientes para nova OLT&quot;,why:&quot;Reduzir falhas e melhorar AT1&quot;,who:&quot;João Silva&quot;,how:&quot;Cronograma por bairro&quot;,inicio:&quot;2026-07-10&quot;,fim:&quot;2026-08-15&quot;,where:&quot;Goiânia&quot;,howmuch:&quot;&quot;,status:&quot;Em andamento&quot;,ganho:&quot;34 p.p.&quot;,pct:40}]}
-  ]};
+  DB.projects[id]={meta:{name:&quot;Minha Governança&quot;},indicadores:[],frentes:[]};
   DB.currentId=id;
   saveDB();
 }
@@ -11170,7 +11202,7 @@ function renderProjSel(){
 function trocarProjeto(id){DB.currentId=id;saveDB();render()}
 function novoProjeto(){
   const nome=prompt(&quot;Nome do novo projeto:&quot;,&quot;Novo projeto&quot;);if(nome===null)return;
-  const id=uid(&quot;p&quot;);DB.projects[id]={meta:{name:nome.trim()||&quot;Novo projeto&quot;},frentes:[]};
+  const id=uid(&quot;p&quot;);DB.projects[id]={meta:{name:nome.trim()||&quot;Novo projeto&quot;},frentes:[],indicadores:GOV_INDS};
   DB.currentId=id;saveDB();renderProjSel();render();toast(&quot;Projeto criado.&quot;,&quot;ok&quot;);
 }
 function renomearProjeto(){
@@ -11216,7 +11248,28 @@ function setView(v){
    Regra: vê se for dono, delegado (compartilhado), gestor do dono ou admin.
    Itens antigos sem dono ficam visíveis a todos (compatibilidade).
    ============================================================ */
-function usuarioAtualGov(){ try{ return parent.CURRENT||null; }catch(e){ return null; } }
+let ME=null; /* 🔒 usuário logado, capturado UMA vez e mantido estável (evita leitura intermitente de parent.CURRENT) */
+function _lerCurrent(){
+  try{ if(parent&amp;&amp;parent.CURRENT)return parent.CURRENT; }catch(e){}
+  try{ if(window.CURRENT)return window.CURRENT; }catch(e){}
+  try{ if(top&amp;&amp;top.CURRENT)return top.CURRENT; }catch(e){}
+  return null;
+}
+/* tenta capturar o usuário (com algumas tentativas) e guarda em ME */
+async function capturarUsuario(){
+  for(let i=0;i<10;i++){
+    const u=_lerCurrent();
+    if(u&amp;&amp;u.nome){ ME=u; return u; }
+    await new Promise(r=>setTimeout(r,120));
+  }
+  return ME; /* pode continuar null se realmente não houver login */
+}
+function usuarioAtualGov(){
+  if(ME)return ME;               /* usa o valor estável já capturado */
+  const u=_lerCurrent();         /* fallback: tenta ler ao vivo e memoriza */
+  if(u&amp;&amp;u.nome)ME=u;
+  return ME;
+}
 let TIME_GOV=null; /* nomes cujo gestor é o usuário atual (para &quot;gestor vê o time&quot;) */
 async function carregarTimeGov(){
   const u=usuarioAtualGov();TIME_GOV=null;
@@ -11230,10 +11283,10 @@ function _compart(item){ return Array.isArray(item&amp;&amp;item.compartilhado)?
 /* pode ver este item (frente / indicador)? */
 function podeVerItem(item){
   const u=usuarioAtualGov();
-  if(!u)return true;                       /* sem contexto de login (modo local) */
+  if(!u)return !sb;                        /* 🔒 sem login: modo local mostra; modo nuvem ESCONDE (evita vazamento) */
   if(u.perfil===&quot;admin&quot;)return true;       /* admin vê tudo */
   const dono=(item&amp;&amp;item.dono)||&quot;&quot;;
-  if(!dono)return true;                     /* itens antigos sem dono: visíveis (compat) */
+  if(!dono)return false;                    /* item sem dono: usuário comum NÃO vê (só admin, tratado acima) */
   if(dono===u.nome)return true;             /* é o dono */
   if(_compart(item).indexOf(u.nome)>=0)return true; /* foi delegado a mim */
   if(u.perfil===&quot;gestor&quot;&amp;&amp;TIME_GOV&amp;&amp;TIME_GOV.indexOf(dono)>=0)return true; /* gestor vê o time */
@@ -11550,8 +11603,11 @@ function salvarFrente(){
 }
 function excluirFrente(){
   const id=document.getElementById(&quot;frId&quot;).value;if(!id)return;
+  const f=proj().frentes.find(x=>x.id===id);
+  if(f&amp;&amp;!podeEditarItem(f)){toast(&quot;Você não tem permissão para excluir esta frente.&quot;,&quot;err&quot;);return;}
   if(!confirm(&quot;Excluir esta frente e todas as suas ações 5W2H?&quot;))return;
   const p=proj();p.frentes=p.frentes.filter(x=>x.id!==id);
+  cloudExcluirFrente(id);                 /* 🆕 remove a linha na nuvem */
   saveDB();fecharModal(&quot;modalFrente&quot;);render();toast(&quot;Frente excluída.&quot;,&quot;ok&quot;);
 }
 
@@ -11594,20 +11650,89 @@ const SB_KEY=&quot;sb_publishable_lRsJQj7OH4K6aiihmf6oDQ_1QyxxFDU&quot;;
 const SB_CHAVE=&quot;governanca&quot;;
 let sb=null;
 try{ if(window.supabase&amp;&amp;window.supabase.createClient) sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){}
+/* ============================================================
+   ☁️ PERSISTÊNCIA NORMALIZADA (v2) — cada FRENTE e cada INDICADOR é UMA LINHA
+   com &quot;dono&quot;. O carregamento traz só o que o usuário pode ver (dono /
+   delegado / gestor-do-time / admin). Isolamento real por linha.
+   ============================================================ */
+let GOV_INDS=[];   /* indicadores do usuário (globais na governança, com dono) */
+
+/* monta a linha da tabela gov_frentes a partir do objeto em memória */
+function _frenteRow(f,projeto,u){
+  return {
+    id:f.id, projeto:projeto||&quot;Minha Governança&quot;, num:(f.num||null),
+    frente:f.frente||&quot;&quot;, situacao:f.situacao||&quot;&quot;, resp:f.resp||&quot;&quot;,
+    status:f.status||&quot;&quot;, prazo_foco:(f.prazoFoco||null), data_limite:(f.dataLimite||null),
+    ganho:f.ganho||&quot;&quot;, indicador:f.indicador||&quot;&quot;, pilar:f.pilar||&quot;&quot;,
+    dono:(f.dono||(u?u.nome:&quot;&quot;)),
+    dados_json:{obj:f, compartilhado:(f.compartilhado||[])},
+    excluido:false, atualizado_em:new Date().toISOString()
+  };
+}
+/* monta a linha da tabela gov_indicadores */
+function _indRow(it,u){
+  return {
+    id:it.id, nome:it.nome||&quot;&quot;, area:it.area||&quot;&quot;, unidade:it.unidade||&quot;&quot;,
+    meta:(it.meta==null?null:it.meta), direcao:it.direcao||&quot;menor&quot;, visao:it.visao||&quot;fiscal&quot;,
+    dono:(it.dono||(u?u.nome:&quot;&quot;)),
+    dados_json:{meses:(it.dados||{}), compartilhado:(it.compartilhado||[])}
+  };
+}
 async function cloudCarregar(){
   if(!sb)return false;
   try{
-    const {data,error}=await sb.from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,SB_CHAVE).maybeSingle();
-    if(error)throw error;
-    if(data&amp;&amp;data.dados_json){DB=data.dados_json;try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}return true;}
-    return &quot;vazio&quot;;
+    const [rf,ri]=await Promise.all([
+      sb.from(&quot;gov_frentes&quot;).select(&quot;*&quot;).or(&quot;excluido.is.null,excluido.eq.false&quot;),
+      sb.from(&quot;gov_indicadores&quot;).select(&quot;*&quot;)
+    ]);
+    if(rf.error)throw rf.error; if(ri.error)throw ri.error;
+    /* ---- indicadores (filtra visibilidade) ---- */
+    GOV_INDS=(ri.data||[]).map(r=>{
+      const dj=r.dados_json||{};
+      return {id:r.id,nome:r.nome||&quot;&quot;,area:r.area||&quot;&quot;,unidade:r.unidade||&quot;&quot;,
+        meta:(r.meta==null?null:r.meta),direcao:r.direcao||&quot;menor&quot;,visao:r.visao||&quot;fiscal&quot;,
+        dados:(dj.meses||{}),dono:r.dono||&quot;&quot;,compartilhado:(dj.compartilhado||[])};
+    }).filter(podeVerItem);
+    /* ---- frentes agrupadas por projeto (filtra visibilidade) ---- */
+    DB={currentId:null,projects:{}};
+    (rf.data||[]).forEach(r=>{
+      const dj=r.dados_json||{};
+      const f=(dj.obj&amp;&amp;typeof dj.obj===&quot;object&quot;)?dj.obj:{};
+      f.id=r.id; f.dono=r.dono||f.dono||&quot;&quot;; f.compartilhado=(dj.compartilhado||f.compartilhado||[]);
+      if(!Array.isArray(f.acoes))f.acoes=[];
+      if(!podeVerItem(f))return;
+      const pn=r.projeto||&quot;Minha Governança&quot;;
+      if(!DB.projects[pn])DB.projects[pn]={meta:{name:pn},frentes:[],indicadores:GOV_INDS};
+      DB.projects[pn].frentes.push(f);
+    });
+    if(Object.keys(DB.projects).length===0){
+      DB.projects[&quot;Minha Governança&quot;]={meta:{name:&quot;Minha Governança&quot;},frentes:[],indicadores:GOV_INDS};
+    }
+    Object.values(DB.projects).forEach(p=>{p.indicadores=GOV_INDS;});
+    DB.currentId=Object.keys(DB.projects)[0];
+    try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}
+    return true;
   }catch(e){console.warn(&quot;[cloud gov] load:&quot;,e);return false;}
 }
+/* grava (upsert) só as linhas que o usuário PODE EDITAR — nunca sobrescreve as dos outros */
 async function cloudSalvar(){
   if(!sb)return;
-  try{ await sb.from(&quot;estado_app&quot;).upsert({chave:SB_CHAVE,dados_json:DB,atualizado_em:new Date().toISOString()},{onConflict:&quot;chave&quot;}); }
-  catch(e){console.warn(&quot;[cloud gov] save:&quot;,e);}
+  const u=usuarioAtualGov();
+  try{
+    const rows=[];
+    Object.values(DB.projects||{}).forEach(p=>{
+      (p.frentes||[]).forEach(f=>{ if(podeEditarItem(f)){ if(!f.dono&amp;&amp;u)f.dono=u.nome; rows.push(_frenteRow(f,p.meta.name,u)); } });
+    });
+    if(rows.length){ const {error}=await sb.from(&quot;gov_frentes&quot;).upsert(rows,{onConflict:&quot;id&quot;}); if(error)console.warn(&quot;[gov frentes]&quot;,error); }
+    const irows=(GOV_INDS||[]).filter(podeEditarItem).map(it=>{ if(!it.dono&amp;&amp;u)it.dono=u.nome; return _indRow(it,u); });
+    if(irows.length){ const {error}=await sb.from(&quot;gov_indicadores&quot;).upsert(irows,{onConflict:&quot;id&quot;}); if(error)console.warn(&quot;[gov inds]&quot;,error); }
+  }catch(e){console.warn(&quot;[cloud gov] save:&quot;,e);}
 }
+/* exclusões vão direto à nuvem (por linha) */
+async function cloudExcluirFrente(id){ if(!sb)return; try{ await sb.from(&quot;gov_frentes&quot;).delete().eq(&quot;id&quot;,id); }catch(e){console.warn(e);} }
+async function cloudExcluirInd(id){ if(!sb)return; try{ await sb.from(&quot;gov_indicadores&quot;).delete().eq(&quot;id&quot;,id); }catch(e){console.warn(e);} }
+/* remove indicador da lista global (mantém a referência compartilhada entre projetos) */
+function removerIndicador(id){ const i=GOV_INDS.findIndex(x=>x.id===id); if(i>=0)GOV_INDS.splice(i,1); }
 /* saveDB local + envia para a nuvem (com pequeno atraso) */
 const _saveLocalGov=saveDB;
 saveDB=function(){ _saveLocalGov(); clearTimeout(window._cg); window._cg=setTimeout(cloudSalvar,500); };
@@ -11799,8 +11924,11 @@ function salvarInd(){
 }
 function excluirInd(){
   const id=document.getElementById(&quot;indId&quot;).value;if(!id)return;
+  const it=GOV_INDS.find(x=>x.id===id);
+  if(it&amp;&amp;!podeEditarItem(it)){toast(&quot;Você não tem permissão para excluir este indicador.&quot;,&quot;err&quot;);return;}
   if(!confirm(&quot;Excluir este indicador?&quot;))return;
-  const p=proj();p.indicadores=indicadores().filter(x=>x.id!==id);
+  removerIndicador(id);                   /* 🆕 remove da lista global (mantém referência) */
+  cloudExcluirInd(id);                    /* 🆕 remove a linha na nuvem */
   saveDB();fecharModal(&quot;modalInd&quot;);renderInd();toast(&quot;Indicador excluído.&quot;,&quot;ok&quot;);
 }
 function _spark(it){
@@ -11828,7 +11956,7 @@ function renderInd(){
       <td>${dirLbl(it.direcao)}</td>
       <td>${visLbl(it.visao)}</td>
       <td>${_spark(it)}</td>
-      <td><button class=&quot;btn-del&quot; onclick=&quot;event.stopPropagation();(function(){if(confirm('Excluir este indicador?')){proj().indicadores=indicadores().filter(x=>x.id!=='${it.id}');saveDB();renderInd();}})()&quot;>🗑</button></td>
+      <td><button class=&quot;btn-del&quot; onclick=&quot;event.stopPropagation();(function(){if(confirm('Excluir este indicador?')){removerIndicador('${it.id}');cloudExcluirInd('${it.id}');saveDB();renderInd();}})()&quot;>🗑</button></td>
     </tr>`).join(&quot;&quot;);
   }
   const optSel=inds.map(i=>`<option value=&quot;${esc(i.nome)}&quot; ${i.nome===_wfSel?&quot;selected&quot;:&quot;&quot;}>${esc(i.nome)}</option>`).join(&quot;&quot;);
@@ -11959,16 +12087,41 @@ function desenharWaterfall(){
 }
 
 /* ---------- init ---------- */
-(async function(){
+/* carrega os dados conforme o usuário atual e re-renderiza (reutilizável) */
+async function iniciarGov(){
   if(sb){
-    const r=await cloudCarregar();
-    if(r===true){ /* dados vieram da nuvem */ }
-    else if(r===&quot;vazio&quot;){ loadDB(); await cloudSalvar(); } /* 1ª vez: sobe o exemplo */
-    else { loadDB(); } /* nuvem falhou: usa local */
     try{ await carregarUsuariosGov(); }catch(e){}
-    try{ await carregarTimeGov(); }catch(e){}   /* 🆕 gestor: carrega o time p/ visibilidade */
-  }else{ loadDB(); }
+    try{ await carregarTimeGov(); }catch(e){}
+    const r=await cloudCarregar();          /* traz só o que posso ver (linha a linha) */
+    if(r!==true){
+      /* 🔒 nuvem falhou: começa VAZIO (não usa cache de outro usuário) */
+      DB={currentId:&quot;p_local&quot;,projects:{&quot;p_local&quot;:{meta:{name:&quot;Minha Governança&quot;},frentes:[],indicadores:[]}}};
+      GOV_INDS=[];
+      Object.values(DB.projects).forEach(p=>p.indicadores=GOV_INDS);
+    }
+  }else{ loadDB(); GOV_INDS=(proj()&amp;&amp;proj().indicadores)||[]; Object.values(DB.projects).forEach(p=>p.indicadores=GOV_INDS); }
   render();
+}
+/* 🔑 o shell chama isto ao injetar o usuário no iframe: fixa ME e recarrega */
+let _govIniciado=false;
+window.onFacilitaUser=function(u){
+  if(u&amp;&amp;u.nome){ ME=u; }
+  /* 🔧 recarrega SÓ na 1ª vez ou se o usuário MUDOU — nunca a cada troca de aba
+     (evita puxar versão antiga da nuvem e apagar o que acabou de ser criado) */
+  const nomeAtual=(u&amp;&amp;u.nome)||&quot;&quot;;
+  if(!_govIniciado || _govUltimoUser!==nomeAtual){
+    _govUltimoUser=nomeAtual;
+    _govIniciado=true;
+    iniciarGov();
+  }
+};
+let _govUltimoUser=null;
+/* ---------- init ---------- */
+(async function(){
+  /* captura o usuário (tentativas) antes de tudo */
+  try{ await capturarUsuario(); }catch(e){}
+  /* se o shell ainda não disparou onFacilitaUser, inicia por conta própria */
+  if(!_govIniciado){ await iniciarGov(); _govIniciado=true; }
 })();
 </script>
 </body>
@@ -14727,6 +14880,8 @@ function injectSubtabs(doc,key){
 function injectSwitcher(frame,key){
   let doc;try{doc=frame.contentDocument;}catch(e){return;}
   if(!doc)return;
+  /* 🔑 injeta o usuário logado DENTRO do iframe (confiável) — usado pelo isolamento por perfil/dono */
+  try{ if(frame.contentWindow){ frame.contentWindow.CURRENT=CURRENT; if(typeof frame.contentWindow.onFacilitaUser==="function")frame.contentWindow.onFacilitaUser(CURRENT); } }catch(e){}
   const aside=doc.querySelector("aside");if(!aside)return;
   aplicarTemaClaro(doc);aplicarLogoFacilita(aside,doc);
   if(!SUB_ATUAL[key]){
