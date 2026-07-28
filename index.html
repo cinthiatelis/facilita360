@@ -1611,13 +1611,17 @@ function toggleAnot(id){
 function _uidA(){return &quot;an_&quot;+Date.now()+&quot;_&quot;+Math.floor(Math.random()*10000);}
 async function cloudCarregarAnotacoes(){
   if(!sb)return;
+  const _map=a=>({
+    id:a.id,tema:a.tema||&quot;&quot;,conteudo:a.conteudo||&quot;&quot;,dono:a.dono||&quot;&quot;,
+    pendencias:Array.isArray(a.pendencias)?a.pendencias:(a.pendencias?JSON.parse(a.pendencias):[])
+  });
   try{
-    const {data,error}=await sb.from(&quot;anotacoes&quot;).select(&quot;*&quot;).order(&quot;criado_em&quot;,{ascending:false});
-    if(error)throw error;
-    ANOTS=(data||[]).map(a=>({
-      id:a.id,tema:a.tema||&quot;&quot;,conteudo:a.conteudo||&quot;&quot;,dono:a.dono||&quot;&quot;,
-      pendencias:Array.isArray(a.pendencias)?a.pendencias:(a.pendencias?JSON.parse(a.pendencias):[])
-    }));
+    /* 🔧 ordena por atualizado_em (coluna que existe na base). */
+    let {data,error}=await sb.from(&quot;anotacoes&quot;).select(&quot;*&quot;).order(&quot;atualizado_em&quot;,{ascending:false});
+    if(error){ /* fallback à prova de descompasso: tenta sem ordenar */
+      const r=await sb.from(&quot;anotacoes&quot;).select(&quot;*&quot;); if(r.error)throw r.error; data=r.data;
+    }
+    ANOTS=(data||[]).map(_map);
   }catch(e){console.warn(&quot;[anot] load:&quot;,e);ANOTS=[];}
 }
 function cloudSalvarAnotacao(a){
