@@ -11287,7 +11287,7 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div class=&quot;field full&quot;><label>Nome do indicador <span class=&quot;hint&quot;>— sigla ou nome</span></label><input id=&quot;indNome&quot; placeholder=&quot;Ex: AT1&quot;/></div>
         <div class=&quot;field&quot;><label>Área</label><input id=&quot;indArea&quot; placeholder=&quot;Ex: Manutenção&quot;/></div>
         <div class=&quot;field&quot;><label>Unidade</label><input id=&quot;indUnid&quot; placeholder=&quot;Ex: %, p.p., un&quot;/></div>
-        <div class=&quot;field&quot;><label>Meta</label><input type=&quot;number&quot; step=&quot;0.01&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2.5&quot;/></div>
+        <div class=&quot;field&quot;><label>Meta</label><input type=&quot;text&quot; inputmode=&quot;decimal&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2,5 ou 1.250,00&quot;/></div>
         <div class=&quot;field&quot;><label>Direção</label><select id=&quot;indDir&quot;><option value=&quot;menor&quot;>Menor é melhor</option><option value=&quot;maior&quot;>Maior é melhor</option></select></div>
         <div class=&quot;field full&quot;><label>Forma de visualização</label>
           <select id=&quot;indVisao&quot; onchange=&quot;montarMesesInd()&quot;>
@@ -12032,7 +12032,7 @@ function mudarEscopoGov(v){ _escopoGov=v; render(); }
 const _MES=[&quot;jan&quot;,&quot;fev&quot;,&quot;mar&quot;,&quot;abr&quot;,&quot;mai&quot;,&quot;jun&quot;,&quot;jul&quot;,&quot;ago&quot;,&quot;set&quot;,&quot;out&quot;,&quot;nov&quot;,&quot;dez&quot;];
 function _mkey(y,m){return y+&quot;-&quot;+String(m+1).padStart(2,&quot;0&quot;);}
 function _mlbl(y,m){return _MES[m]+&quot;/&quot;+String(y).slice(-2);}
-function _pnum(t){t=(t==null?&quot;&quot;:String(t)).trim();if(t===&quot;&quot;)return null;const n=parseFloat(t.replace(&quot;,&quot;,&quot;.&quot;));return isNaN(n)?null:n;}
+function _pnum(t){t=(t==null?&quot;&quot;:String(t)).trim();if(t===&quot;&quot;)return null;t=t.replace(/[^\d.,-]/g,&quot;&quot;);if(t===&quot;&quot;)return null;if(t.indexOf(&quot;,&quot;)>-1){t=t.replace(/\./g,&quot;&quot;).replace(&quot;,&quot;,&quot;.&quot;);}else if((t.match(/\./g)||[]).length>1){t=t.replace(/\./g,&quot;&quot;);}const n=parseFloat(t);return isNaN(n)?null:n;}
 function fmtN(n){if(n==null||isNaN(n))return &quot;—&quot;;return (Math.round(n*100)/100).toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:0,maximumFractionDigits:2});}
 /* formato COMPLETO (todas as casas) respeitando a unidade: R$ vira &quot;R$ 2.140.708.687,89&quot; */
 function fmtFull(n,unidade){
@@ -12902,7 +12902,7 @@ table input:focus,table select:focus{border-color:var(--ac);background:#fff;box-
         <div class=&quot;pa-fld&quot;><label>Indicador *</label><input id=&quot;indNome&quot; placeholder=&quot;Ex: AT1&quot;/></div>
         <div class=&quot;pa-fld&quot;><label>Área</label><input id=&quot;indArea&quot; placeholder=&quot;Ex: Manutenção&quot;/></div>
         <div class=&quot;pa-fld&quot;><label>Unidade</label><input id=&quot;indUnid&quot; placeholder=&quot;Ex: %, p.p.&quot;/></div>
-        <div class=&quot;pa-fld&quot;><label>Meta</label><input type=&quot;number&quot; step=&quot;0.01&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2.5&quot;/></div>
+        <div class=&quot;pa-fld&quot;><label>Meta</label><input type=&quot;text&quot; inputmode=&quot;decimal&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2,5 ou 1.250,00&quot;/></div>
         <div class=&quot;pa-fld&quot;><label>Direção</label><select id=&quot;indDir&quot;><option value=&quot;menor&quot;>Menor é melhor</option><option value=&quot;maior&quot;>Maior é melhor</option></select></div>
       </div>
       <div style=&quot;margin-top:14px&quot;>
@@ -13295,7 +13295,7 @@ function salvarInd(){
   const hist=cel(&quot;.indHistCell&quot;,12);
   const prev=cel(&quot;.indPrevCell&quot;,6);
   const real=cel(&quot;.indRealCell&quot;,6);
-  const meta=g(&quot;indMeta&quot;)===&quot;&quot;?null:parseFloat(g(&quot;indMeta&quot;).replace(&quot;,&quot;,&quot;.&quot;));
+  const meta=(function(t){t=(g(&quot;indMeta&quot;)||&quot;&quot;).trim();if(t===&quot;&quot;)return null;t=t.replace(/[^\d.,-]/g,&quot;&quot;);if(t===&quot;&quot;)return null;if(t.indexOf(&quot;,&quot;)>-1){t=t.replace(/\./g,&quot;&quot;).replace(&quot;,&quot;,&quot;.&quot;);}else if((t.match(/\./g)||[]).length>1){t=t.replace(/\./g,&quot;&quot;);}const n=parseFloat(t);return isNaN(n)?null:n;})();
   const id=g(&quot;indId&quot;);
   const obj={id:id||uidInd(),nome:nome,area:g(&quot;indArea&quot;).trim(),unidade:g(&quot;indUnid&quot;).trim(),meta:(meta==null||isNaN(meta))?null:meta,direcao:g(&quot;indDir&quot;),hist:hist,prev:prev,real:real,valores:hist};
   if(id){const i=INDS.findIndex(x=>x.id===id);INDS[i]=obj;}else INDS.push(obj);
