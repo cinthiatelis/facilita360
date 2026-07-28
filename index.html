@@ -4357,6 +4357,10 @@ body.sidebar-collapsed .nav-sec[data-nav-slug=&quot;governanca&quot;]{display:no
     </div>
     <div class=&quot;prog-wrap&quot;><div class=&quot;prog-bar&quot;><div id=&quot;progFill&quot;></div></div><div class=&quot;prog-lbl&quot; id=&quot;progLabel&quot;>0%</div></div>
     <div class=&quot;actions&quot;>
+      <span id=&quot;escopoPdcaWrap&quot; style=&quot;display:none;align-items:center;gap:6px;margin-right:8px&quot;>
+        <label style=&quot;font-size:11px;font-weight:700;color:#5A6478;text-transform:uppercase;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px&quot;><svg viewBox=&quot;0 0 24 24&quot; width=&quot;13&quot; height=&quot;13&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z&quot;/><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;3&quot;/></svg> Ver dados de</label>
+        <select id=&quot;escopoPdca&quot; onchange=&quot;mudarEscopoPdca(this.value)&quot; style=&quot;background:#fff;border:1px solid #E5E9F0;padding:7px 10px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit;color:#1A1F36;min-width:170px&quot;></select>
+      </span>
       <input type=&quot;file&quot; id=&quot;fileImp&quot; accept=&quot;.xlsx,.xls&quot; onchange=&quot;importExcel(event)&quot; style=&quot;display:none&quot;/>
       <input type=&quot;file&quot; id=&quot;fileRestore&quot; accept=&quot;.json,application/json&quot; onchange=&quot;importJSON(event)&quot; style=&quot;display:none&quot;/>
     </div>
@@ -4744,16 +4748,129 @@ function loadDB(){
 }
 function saveDB(){localStorage.setItem(KEY,JSON.stringify(DB));localStorage.setItem(KEY+&quot;_lastBackup&quot;,new Date().toISOString())}
 
+/* ============================================================
+   👤 ISOLAMENTO POR USUÁRIO (PDCA) — dono + equipe + papel Governança
+   Regra: admin vê tudo; dono vê o seu; membros da equipe veem; se o projeto
+   tem alguém com papel &quot;Governança&quot;, todo o GRUPO DE GOVERNANÇA vê; gestor vê o time.
+   ============================================================ */
+let ME_PDCA=null, USUARIOS_MAP_PDCA={}, TEAM_PDCA=null, _escopoPdca=&quot;&quot;;
+function _lerCurrentPdca(){
+  try{ if(window.CURRENT)return window.CURRENT; }catch(e){}
+  try{ if(parent&amp;&amp;parent.CURRENT)return parent.CURRENT; }catch(e){}
+  try{ if(top&amp;&amp;top.CURRENT)return top.CURRENT; }catch(e){}
+  return null;
+}
+async function capturarUsuarioPdca(){
+  for(let i=0;i<10;i++){ const u=_lerCurrentPdca(); if(u&amp;&amp;u.nome){ME_PDCA=u;return u;} await new Promise(r=>setTimeout(r,120)); }
+  return ME_PDCA;
+}
+function usuarioAtualPdca(){ if(ME_PDCA)return ME_PDCA; const u=_lerCurrentPdca(); if(u&amp;&amp;u.nome)ME_PDCA=u; return ME_PDCA; }
+function _normP(s){return String(s==null?&quot;&quot;:s).trim().toLowerCase();}
+function _meusIdsP(){ const u=usuarioAtualPdca(); if(!u)return []; return [_normP(u.nome),_normP(u.login),_normP(u.email)].filter(Boolean); }
+/* membros (nome/email) de um projeto */
+function _membrosProj(p){ const eq=(p&amp;&amp;p.data&amp;&amp;Array.isArray(p.data.equipe))?p.data.equipe:[]; const out=[]; eq.forEach(m=>{ if(m&amp;&amp;m.nome)out.push(_normP(m.nome)); if(m&amp;&amp;m.email)out.push(_normP(m.email)); }); return out; }
+/* projeto tem alguém com papel Governança? */
+function _projTemGov(p){ const eq=(p&amp;&amp;p.data&amp;&amp;Array.isArray(p.data.equipe))?p.data.equipe:[]; return eq.some(m=>m&amp;&amp;_normP(m.papel)===&quot;governança&quot;||_normP(m&amp;&amp;m.papel)===&quot;governanca&quot;); }
+/* conjunto de identidades do GRUPO DE GOVERNANÇA (quem tem papel Governança em qualquer projeto) */
+function _grupoGovernanca(){
+  const set={};
+  Object.values(DB.projects||{}).forEach(p=>{
+    const eq=(p&amp;&amp;p.data&amp;&amp;Array.isArray(p.data.equipe))?p.data.equipe:[];
+    eq.forEach(m=>{ const pap=_normP(m&amp;&amp;m.papel); if(pap===&quot;governança&quot;||pap===&quot;governanca&quot;){ if(m.nome)set[_normP(m.nome)]=1; if(m.email)set[_normP(m.email)]=1; } });
+  });
+  return set;
+}
+function _souGovernanca(){ const g=_grupoGovernanca(); return _meusIdsP().some(id=>g[id]); }
+/* posso ver este projeto? */
+function podeVerProjeto(p){
+  const u=usuarioAtualPdca();
+  if(!u)return false;                         /* sem login em modo nuvem: esconde */
+  if(u.perfil===&quot;admin&quot;)return true;
+  const ids=_meusIdsP();
+  const dono=_normP(p&amp;&amp;p.meta&amp;&amp;p.meta.dono);
+  if(dono&amp;&amp;ids.indexOf(dono)>=0)return true;   /* sou o dono */
+  const membros=_membrosProj(p);
+  if(membros.some(m=>ids.indexOf(m)>=0))return true;  /* estou na equipe */
+  if(_projTemGov(p)&amp;&amp;_souGovernanca())return true;    /* projeto de governança + sou do grupo */
+  if(u.perfil===&quot;gestor&quot;&amp;&amp;TEAM_PDCA){                 /* gestor: dono/equipe no time */
+    if(dono&amp;&amp;TEAM_PDCA.some(n=>_normP(n)===dono))return true;
+    if(membros.some(m=>TEAM_PDCA.some(n=>_normP(n)===m)))return true;
+  }
+  return false;
+}
+/* aplica o filtro &quot;Ver dados de&quot; (escopo) por cima da visibilidade */
+function _escopoNomesPdca(){
+  const u=usuarioAtualPdca(); if(!u)return null;
+  if(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)return null;
+  if(!_escopoPdca)return null;
+  if(_escopoPdca===&quot;__meus&quot;)return [u.nome,u.login].filter(Boolean);
+  const login=USUARIOS_MAP_PDCA[_normP(_escopoPdca)];
+  return [_escopoPdca,login].filter(Boolean);
+}
+function projetosVisiveis(){
+  const ids=Object.keys(DB.projects||{}).filter(id=>podeVerProjeto(DB.projects[id]));
+  const esc=_escopoNomesPdca();
+  if(!esc)return ids;
+  const alvo=esc.map(_normP);
+  return ids.filter(id=>{
+    const p=DB.projects[id];
+    const dono=_normP(p&amp;&amp;p.meta&amp;&amp;p.meta.dono);
+    if(alvo.indexOf(dono)>=0)return true;
+    if(_membrosProj(p).some(m=>alvo.indexOf(m)>=0))return true;
+    return false;
+  });
+}
+async function carregarUsuariosPdca(){
+  try{
+    const sbx=(window.supabase&amp;&amp;window.supabase.createClient)?window.supabase.createClient(&quot;https://eaynbqorhcscrdvlcrwp.supabase.co&quot;,&quot;sb_publishable_lRsJQj7OH4K6aiihmf6oDQ_1QyxxFDU&quot;):null;
+    if(!sbx)return;
+    const {data}=await sbx.from(&quot;usuarios&quot;).select(&quot;nome,login,gestor,ativo&quot;).order(&quot;nome&quot;);
+    const ativos=(data||[]).filter(u=>u.ativo);
+    USUARIOS_MAP_PDCA={};ativos.forEach(u=>{if(u.nome)USUARIOS_MAP_PDCA[_normP(u.nome)]=u.login||&quot;&quot;;});
+    const u=usuarioAtualPdca();
+    if(u&amp;&amp;u.perfil===&quot;gestor&quot;){
+      const membros=ativos.filter(x=>_normP(x.gestor)===_normP(u.nome));
+      TEAM_PDCA=[u.nome,u.login].concat(membros.map(x=>x.nome)).concat(membros.map(x=>x.login)).filter(Boolean);
+    }
+    window._USUARIOS_PDCA=ativos.map(u=>u.nome);
+  }catch(e){console.warn(&quot;[pdca usuarios]&quot;,e);}
+}
+/* popula o seletor &quot;Ver dados de&quot; (gestor/admin) */
+function popularEscopoPdca(){
+  const u=usuarioAtualPdca();
+  const wrap=document.getElementById(&quot;escopoPdcaWrap&quot;);
+  const sel=document.getElementById(&quot;escopoPdca&quot;);
+  if(!wrap||!sel)return;
+  if(!u||(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)){wrap.style.display=&quot;none&quot;;return;}
+  wrap.style.display=&quot;inline-flex&quot;;
+  let opts=&quot;&quot;;
+  if(u.perfil===&quot;gestor&quot;){
+    const subs=(TEAM_PDCA||[]).filter(n=>_normP(n)!==_normP(u.nome)&amp;&amp;_normP(n)!==_normP(u.login)).filter((v,i,a)=>a.indexOf(v)===i).sort();
+    opts+='<option value=&quot;&quot;>Todo o meu time</option><option value=&quot;__meus&quot;>Somente os meus</option>';
+    if(subs.length)opts+='<optgroup label=&quot;Por pessoa do time&quot;>'+subs.map(n=>'<option value=&quot;'+n+'&quot;>'+n+'</option>').join(&quot;&quot;)+'</optgroup>';
+  }else{
+    const todos=(window._USUARIOS_PDCA||[]).slice().sort();
+    opts+='<option value=&quot;&quot;>Todos (visão geral)</option>';
+    if(todos.length)opts+='<optgroup label=&quot;Por pessoa&quot;>'+todos.map(n=>'<option value=&quot;'+n+'&quot;>'+n+'</option>').join(&quot;&quot;)+'</optgroup>';
+  }
+  sel.innerHTML=opts;sel.value=_escopoPdca;
+}
+function mudarEscopoPdca(v){ _escopoPdca=v; renderProjSel(); const vis=projetosVisiveis(); if(vis.indexOf(DB.currentId)<0&amp;&amp;vis.length){ DB.currentId=vis[0]; loadCurrentProject(); } }
+
 function renderProjSel(){
   const sel=document.getElementById(&quot;projSel&quot;);sel.innerHTML=&quot;&quot;;
-  Object.entries(DB.projects).forEach(([id,p])=>{const o=document.createElement(&quot;option&quot;);o.value=id;o.textContent=p.meta.name;sel.appendChild(o)});
+  const vis=projetosVisiveis();                 /* 🔒 só projetos que o usuário pode ver */
+  vis.forEach(id=>{const p=DB.projects[id];const o=document.createElement(&quot;option&quot;);o.value=id;o.textContent=p.meta.name;sel.appendChild(o)});
+  if(vis.indexOf(DB.currentId)<0&amp;&amp;vis.length)DB.currentId=vis[0];
   sel.value=DB.currentId;
+  try{ popularEscopoPdca(); }catch(e){}
 }
 function newProj(){
   const name=prompt(&quot;Nome do novo projeto:&quot;,&quot;Novo Projeto &quot;+(Object.keys(DB.projects).length+1));
   if(!name)return;
   const id=uid();
-  DB.projects[id]={meta:{name:name,createdAt:new Date().toISOString()},data:emptyData()};
+  const u=usuarioAtualPdca();
+  DB.projects[id]={meta:{name:name,createdAt:new Date().toISOString(),dono:(u?u.nome:&quot;&quot;)},data:emptyData()};  /* 🆕 carimba o dono */
   DB.currentId=id;saveDB();renderProjSel();loadCurrentProject();
 }
 function delProj(){
@@ -5831,12 +5948,16 @@ setInterval(()=>{try{if(CUR){CUR.data=getCurrentData();saveDB()}}catch(e){}},5*6
   const _origSave=saveDB;
   saveDB=function(){ _origSave(); clearTimeout(window._cp); window._cp=setTimeout(window._pdcaCloudSave,600); };
   async function boot(){
+    /* 🔑 captura o usuário logado (estável) e carrega usuários p/ isolamento */
+    try{ await capturarUsuarioPdca(); }catch(e){}
+    try{ await carregarUsuariosPdca(); }catch(e){}
     if(_sb){
       try{
         const {data,error}=await _sb.from(&quot;estado_app&quot;).select(&quot;dados_json&quot;).eq(&quot;chave&quot;,SB_CHAVE).maybeSingle();
         if(!error&amp;&amp;data&amp;&amp;data.dados_json&amp;&amp;data.dados_json.projects&amp;&amp;Object.keys(data.dados_json.projects).length){
           DB=data.dados_json; try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}
-          if(!DB.currentId||!DB.projects[DB.currentId])DB.currentId=Object.keys(DB.projects)[0];
+          const vis=projetosVisiveis();
+          if(vis.indexOf(DB.currentId)<0)DB.currentId=vis[0]||Object.keys(DB.projects)[0];
           renderProjSel();loadCurrentProject();
           return;
         }
@@ -5847,6 +5968,13 @@ setInterval(()=>{try{if(CUR){CUR.data=getCurrentData();saveDB()}}catch(e){}},5*6
     }
     loadDB();renderProjSel();loadCurrentProject();
   }
+  /* 🔑 o shell chama isto ao injetar o usuário: fixa ME e recarrega se mudou */
+  let _pdcaUltimoUser=null;
+  window.onFacilitaUser=function(u){
+    if(u&amp;&amp;u.nome)ME_PDCA=u;
+    const nomeAtual=(u&amp;&amp;u.nome)||&quot;&quot;;
+    if(_pdcaUltimoUser!==nomeAtual){ _pdcaUltimoUser=nomeAtual; carregarUsuariosPdca().then(()=>{ renderProjSel(); const vis=projetosVisiveis(); if(vis.indexOf(DB.currentId)<0&amp;&amp;vis.length){DB.currentId=vis[0];loadCurrentProject();} }); }
+  };
   boot();
   /* auto-save periódico (rede de segurança): envia o estado atual à nuvem */
   setInterval(function(){ try{ if(typeof CUR!==&quot;undefined&quot;&amp;&amp;CUR&amp;&amp;typeof getCurrentData===&quot;function&quot;){CUR.data=getCurrentData();} window._pdcaCloudSave(); }catch(e){} }, 20000);
@@ -12784,20 +12912,43 @@ function toast(msg,tipo){const t=document.getElementById(&quot;toast&quot;);t.te
 let PLANO=[];              /* lista de ações (do banco) */
 let PLANO_TEAM=null;       /* nomes do time do gestor (para filtro/visão) */
 function _sbP(){ return (typeof sbF!==&quot;undefined&quot;&amp;&amp;sbF)?sbF:null; }
-function usuarioAtual(){ try{ return parent.CURRENT||null; }catch(e){ return null; } }
+/* 🔒 usuário logado, capturado de forma ESTÁVEL (entregue pelo shell) */
+let ME_FER=null;
+function _lerCurrentFer(){
+  try{ if(window.CURRENT)return window.CURRENT; }catch(e){}
+  try{ if(parent&amp;&amp;parent.CURRENT)return parent.CURRENT; }catch(e){}
+  try{ if(top&amp;&amp;top.CURRENT)return top.CURRENT; }catch(e){}
+  return null;
+}
+async function capturarUsuarioFer(){
+  for(let i=0;i<10;i++){ const u=_lerCurrentFer(); if(u&amp;&amp;u.nome){ME_FER=u;return u;} await new Promise(r=>setTimeout(r,120)); }
+  return ME_FER;
+}
+function usuarioAtual(){ if(ME_FER)return ME_FER; const u=_lerCurrentFer(); if(u&amp;&amp;u.nome)ME_FER=u; return ME_FER; }
+/* comparação robusta (nome OU login, sem maiúsc./espaços) */
+function _norm(s){return String(s==null?&quot;&quot;:s).trim().toLowerCase();}
+let USUARIOS_MAP_FER={};   /* nome→login */
+function _meusIdsFer(){ const u=usuarioAtual(); if(!u)return []; return [_norm(u.nome),_norm(u.login)].filter(Boolean); }
+function _ehMeuFer(v){ const ids=_meusIdsFer(); return ids.length?ids.indexOf(_norm(v))>=0:false; }
+function _naListaFer(lista,v){ if(!Array.isArray(lista))return false; const x=_norm(v); return lista.some(n=>_norm(n)===x); }
 /* #9 usuários cadastrados na ferramenta (para o seletor de responsável) */
 let USUARIOS_FER=[];
 async function carregarUsuariosFer(){
   if(!_sbP())return;
-  try{ const {data}=await _sbP().from(&quot;usuarios&quot;).select(&quot;nome,ativo&quot;).order(&quot;nome&quot;); USUARIOS_FER=(data||[]).filter(u=>u.ativo).map(u=>u.nome); }catch(e){}
+  try{ const {data}=await _sbP().from(&quot;usuarios&quot;).select(&quot;nome,login,ativo&quot;).order(&quot;nome&quot;);
+    const ativos=(data||[]).filter(u=>u.ativo);
+    USUARIOS_FER=ativos.map(u=>u.nome);
+    USUARIOS_MAP_FER={};ativos.forEach(u=>{if(u.nome)USUARIOS_MAP_FER[_norm(u.nome)]=u.login||&quot;&quot;;});
+  }catch(e){}
 }
 async function carregarTimeGestor(){
   const u=usuarioAtual(); PLANO_TEAM=null;
   if(!u||!_sbP())return;
   try{
     if(u.perfil===&quot;gestor&quot;){
-      const {data}=await _sbP().from(&quot;usuarios&quot;).select(&quot;nome&quot;).eq(&quot;gestor&quot;,u.nome);
-      PLANO_TEAM=[u.nome].concat((data||[]).map(x=>x.nome)); /* gestor + vinculados */
+      const {data}=await _sbP().from(&quot;usuarios&quot;).select(&quot;nome,login&quot;).eq(&quot;gestor&quot;,u.nome);
+      /* inclui nome E login de cada membro (+ o próprio gestor) */
+      PLANO_TEAM=[u.nome,u.login].concat((data||[]).map(x=>x.nome)).concat((data||[]).map(x=>x.login)).filter(Boolean);
     }
   }catch(e){console.warn(&quot;[plano] time:&quot;,e);}
 }
@@ -12823,8 +12974,10 @@ function _nomesEscopoFer(){
   if(!u)return null;
   if(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)return null;
   if(!_escopoFer)return null;
-  if(_escopoFer===&quot;__meus&quot;)return [u.nome];
-  return [_escopoFer];
+  if(_escopoFer===&quot;__meus&quot;)return [u.nome,u.login].filter(Boolean);
+  /* pessoa específica: inclui nome E login */
+  const login=USUARIOS_MAP_FER[_norm(_escopoFer)];
+  return [_escopoFer,login].filter(Boolean);
 }
 function popularEscopoFer(){
   const u=usuarioAtual();
@@ -12851,10 +13004,10 @@ function planoVisiveis(){
   const u=usuarioAtual();
   let base;
   if(!u||u.perfil===&quot;admin&quot;){ base=PLANO.slice(); }
-  else if(u.perfil===&quot;gestor&quot;&amp;&amp;PLANO_TEAM){ base=PLANO.filter(a=>PLANO_TEAM.indexOf(a.who)>=0||PLANO_TEAM.indexOf(a.dono)>=0); }
-  else{ base=PLANO.filter(a=>a.who===u.nome||a.dono===u.nome); }
+  else if(u.perfil===&quot;gestor&quot;&amp;&amp;PLANO_TEAM){ base=PLANO.filter(a=>_naListaFer(PLANO_TEAM,a.who)||_naListaFer(PLANO_TEAM,a.dono)); }
+  else{ base=PLANO.filter(a=>_ehMeuFer(a.who)||_ehMeuFer(a.dono)); }
   const nomes=_nomesEscopoFer();
-  if(nomes)base=base.filter(a=>nomes.indexOf(a.who)>=0||nomes.indexOf(a.dono)>=0);
+  if(nomes){ const alvo=nomes.map(_norm); const bate=v=>alvo.indexOf(_norm(v))>=0; base=base.filter(a=>bate(a.who)||bate(a.dono)); }
   return base;
 }
 function renderPlano(){
@@ -13238,8 +13391,8 @@ function cloudSalvarFer(){
 const _saveLocalFer=saveDB;
 saveDB=function(){ _saveLocalFer(); clearTimeout(window._cf); window._cf=setTimeout(cloudSalvarFer,500); };
 
-/* ---------- init ---------- */
-(async function(){
+/* carrega dados conforme o usuário atual (reutilizável) */
+async function iniciarFer(){
   loadDB();preencherSmart();preencherStory();
   if(sbF){
     const r=await cloudCarregarFer();
@@ -13248,6 +13401,20 @@ saveDB=function(){ _saveLocalFer(); clearTimeout(window._cf); window._cf=setTime
     try{ popularEscopoFer(); }catch(e){}   /* 🆕 filtro &quot;Ver de&quot; para gestor/admin */
   }
   goTab('plano');
+}
+/* 🔑 o shell chama isto ao injetar o usuário no iframe: fixa ME e recarrega se mudou */
+let _ferIniciado=false, _ferUltimoUser=null;
+window.onFacilitaUser=function(u){
+  if(u&amp;&amp;u.nome){ ME_FER=u; }
+  const nomeAtual=(u&amp;&amp;u.nome)||&quot;&quot;;
+  if(!_ferIniciado || _ferUltimoUser!==nomeAtual){
+    _ferUltimoUser=nomeAtual; _ferIniciado=true; iniciarFer();
+  }
+};
+/* ---------- init ---------- */
+(async function(){
+  try{ await capturarUsuarioFer(); }catch(e){}
+  if(!_ferIniciado){ _ferIniciado=true; await iniciarFer(); }
 })();
 </script>
 </body>
