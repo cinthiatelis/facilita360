@@ -672,7 +672,7 @@ table input:focus,table select:focus{border-color:var(--ac);background:#fff;box-
         <div class=&quot;field&quot;><label>Status da ata</label><select id=&quot;aStatus&quot;><option>Agendada</option><option selected>Realizada</option><option>Pendente</option><option>Cancelada</option></select></div>
       </div>
       <div class=&quot;field full&quot; id=&quot;aTipoOutroWrap&quot; style=&quot;display:none&quot;><label>Qual reunião? <span style=&quot;font-weight:400;text-transform:none;letter-spacing:0;color:var(--mute)&quot;>(descreva o tipo)</span></label><input id=&quot;aTipoOutro&quot; placeholder=&quot;Ex: Reunião de crise, War room...&quot;/></div>
-      <div class=&quot;field full&quot;><label>Participantes</label><input id=&quot;aPart&quot; placeholder=&quot;Ex: Cinthia, Igor, Frankislei...&quot;/></div>
+      <div class=&quot;field full&quot;><label>Participantes</label><input id=&quot;aPart&quot; placeholder=&quot;Nomes dos participantes...&quot;/></div>
       <div class=&quot;field full&quot;><label>Pauta / Resumo</label><textarea id=&quot;aPauta&quot; placeholder=&quot;Assuntos tratados, decisões, alinhamentos...&quot;></textarea></div>
       <div class=&quot;field full&quot;>
         <label>Pendências</label>
@@ -13805,7 +13805,7 @@ tbody tr:hover{background:#FAFBFD}
           <label>Usuário</label>
           <div class=&quot;f-input&quot;>
             <span class=&quot;fico&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2&quot;/><circle cx=&quot;12&quot; cy=&quot;7&quot; r=&quot;4&quot;/></svg></span>
-            <input id=&quot;loginUser&quot; placeholder=&quot;ex: cinthia&quot; autocomplete=&quot;username&quot; autofocus/>
+            <input id=&quot;loginUser&quot; placeholder=&quot;Login corporativo&quot; autocomplete=&quot;username&quot; autofocus/>
           </div>
         </div>
         <div class=&quot;f-group&quot;>
@@ -13995,10 +13995,10 @@ tbody tr:hover{background:#FAFBFD}
     <div class=&quot;modal-body&quot;>
       <input type=&quot;hidden&quot; id=&quot;uId&quot;/>
       <div class=&quot;grid2&quot;>
-        <div class=&quot;field&quot;><label>Nome completo <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uNome&quot; placeholder=&quot;Ex: Cinthia Telis&quot;/></div>
-        <div class=&quot;field&quot;><label>Usuário (login) <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uLogin&quot; placeholder=&quot;ex: cinthia&quot;/></div>
-        <div class=&quot;field&quot;><label>E-mail <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uEmail&quot; type=&quot;email&quot; placeholder=&quot;nome@claro.com.br&quot;/></div>
-        <div class=&quot;field&quot;><label>Área / Setor</label><input id=&quot;uArea&quot; placeholder=&quot;Ex: Qualidade RCO&quot;/></div>
+        <div class=&quot;field&quot;><label>Nome completo <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uNome&quot; placeholder=&quot;Nome completo&quot;/></div>
+        <div class=&quot;field&quot;><label>Usuário (login) <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uLogin&quot; placeholder=&quot;Login corporativo&quot;/></div>
+        <div class=&quot;field&quot;><label>E-mail <span style=&quot;color:var(--ac)&quot;>*</span></label><input id=&quot;uEmail&quot; type=&quot;email&quot; placeholder=&quot;nome@empresa.com&quot;/></div>
+        <div class=&quot;field&quot;><label>Área / Setor</label><input id=&quot;uArea&quot; placeholder=&quot;Área/Setor&quot;/></div>
         <div class=&quot;field&quot;><label>Perfil de acesso</label><select id=&quot;uPerfil&quot; onchange=&quot;toggleGestorField()&quot;><option value=&quot;admin&quot;>Administrador</option><option value=&quot;usuario&quot; selected>Usuário</option><option value=&quot;gestor&quot;>Gestor</option></select></div>
         <div class=&quot;field&quot;><label>Status</label><select id=&quot;uAtivo&quot;><option value=&quot;1&quot; selected>Ativo</option><option value=&quot;0&quot;>Inativo</option></select></div>
       </div>
