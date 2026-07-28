@@ -116,7 +116,7 @@ button,input{font-family:inherit}
   <div style="background:#fff;border-radius:16px;width:430px;max-width:94vw;box-shadow:0 24px 70px rgba(0,0,0,.35);overflow:hidden">
     <div style="padding:18px 22px;border-bottom:1px solid #E5E9F0;display:flex;align-items:center;gap:10px">
       <span style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#DA291C,#F97316);display:flex;align-items:center;justify-content:center;color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#1A1F36">Redefinir minha senha</div><div style="font-size:11.5px;color:#94A0B5">Enviaremos uma senha provisória para o seu e-mail cadastrado.</div></div>
+      <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#1A1F36">Redefinir minha senha</div><div style="font-size:11.5px;color:#94A0B5">Informe seu usuário e o e-mail cadastrado para restaurar a senha padrão.</div></div>
       <button onclick="fecharEsqueciSenha()" style="background:none;border:0;font-size:22px;color:#94A0B5;cursor:pointer">×</button>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
@@ -125,6 +125,8 @@ button,input{font-family:inherit}
       <div id="esqForm">
         <div class="f-group"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Usuário</label>
           <input id="esqUser" placeholder="Seu usuário corporativo" autocomplete="username" style="width:100%;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/></div>
+        <div class="f-group" style="margin-top:12px"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">E-mail cadastrado</label>
+          <input id="esqEmail" type="email" placeholder="seu.email@empresa.com" autocomplete="email" style="width:100%;background:#FAFBFD;border:1px solid #E5E9F0;padding:10px 12px;border-radius:9px;font:inherit;font-size:13.5px;color:#1A1F36;outline:none"/></div>
         <div class="f-group" style="margin-top:12px"><label style="font-size:12px;font-weight:600;color:#5A6478;display:block;margin-bottom:5px">Verificação de segurança</label>
           <div style="display:flex;align-items:center;gap:10px">
             <div id="esqCaptcha" style="font-size:14px;font-weight:800;color:#1A1F36;background:#F1F3F7;border:1px dashed #C7CEDB;border-radius:8px;padding:10px 12px;white-space:nowrap;user-select:none"></div>
@@ -137,7 +139,7 @@ button,input{font-family:inherit}
     </div>
     <div id="esqFoot" style="padding:14px 22px;border-top:1px solid #E5E9F0;display:flex;justify-content:flex-end;gap:8px">
       <button onclick="fecharEsqueciSenha()" style="background:#fff;border:1px solid #E5E9F0;color:#5A6478;padding:9px 14px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600">Cancelar</button>
-      <button id="esqBtn" onclick="enviarResetSenha()" style="background:#DA291C;border:1px solid #DA291C;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700">Enviar</button>
+      <button id="esqBtn" onclick="enviarResetSenha()" style="background:#DA291C;border:1px solid #DA291C;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700">Redefinir senha</button>
     </div>
   </div>
 </div>
@@ -14858,7 +14860,6 @@ async function fazerLogin(e){
 const SENHA_RESET_PADRAO="Facilita@360";  /* senha provisória enviada no reset */
 let _troca_ctx="cloud";                    /* de onde veio o login que exige troca */
 let _esqCaptcha={a:0,b:0};
-function _mascararEmail(em){ if(!em||em.indexOf("@")<0)return "seu e-mail cadastrado"; const p=em.split("@"); const nome=p[0]; const vis=nome.slice(0,Math.min(2,nome.length)); return vis+"•••@"+p[1]; }
 function novoCaptchaEsq(){ _esqCaptcha.a=Math.floor(Math.random()*8)+2; _esqCaptcha.b=Math.floor(Math.random()*8)+2; const el=document.getElementById("esqCaptcha"); if(el)el.textContent=_esqCaptcha.a+" + "+_esqCaptcha.b+" ="; const r=document.getElementById("esqResp"); if(r)r.value=""; }
 function abrirEsqueciSenha(){
   document.getElementById("esqErr").style.display="none";
@@ -14866,58 +14867,56 @@ function abrirEsqueciSenha(){
   document.getElementById("esqForm").style.display="block";
   document.getElementById("esqFoot").style.display="flex";
   const u=document.getElementById("esqUser"); u.value=(document.getElementById("loginUser").value||"").trim();
+  const em=document.getElementById("esqEmail"); if(em)em.value="";
   novoCaptchaEsq();
   document.getElementById("esqBg").style.display="flex";
-  setTimeout(()=>{ if(!u.value)u.focus(); else document.getElementById("esqResp").focus(); },80);
+  setTimeout(()=>{ if(!u.value)u.focus(); else if(em)em.focus(); },80);
 }
 function fecharEsqueciSenha(){ document.getElementById("esqBg").style.display="none"; }
 function _esqErro(msg){ const e=document.getElementById("esqErr"); e.textContent=msg; e.style.display="block"; }
+function _normEmail(s){ return String(s||"").trim().toLowerCase(); }
 async function enviarResetSenha(){
   const login=(document.getElementById("esqUser").value||"").trim().toLowerCase();
+  const email=_normEmail(document.getElementById("esqEmail").value);
   const resp=parseInt((document.getElementById("esqResp").value||"").trim(),10);
   document.getElementById("esqErr").style.display="none";
   if(!login){ _esqErro("Informe o seu usuário."); return; }
+  if(!email){ _esqErro("Informe o e-mail cadastrado."); return; }
   if(resp!==(_esqCaptcha.a+_esqCaptcha.b)){ _esqErro("Verificação de segurança incorreta. Tente novamente."); novoCaptchaEsq(); return; }
-  const btn=document.getElementById("esqBtn"); btn.disabled=true; btn.textContent="Enviando…";
+  const btn=document.getElementById("esqBtn"); btn.disabled=true; btn.textContent="Processando…";
   const novoHash=hash(SENHA_RESET_PADRAO);
-  let emailUser=""; 
-  /* ☁️ nuvem primeiro */
+  let conferiu=false;
+  /* ☁️ nuvem primeiro: login E e-mail precisam bater no mesmo usuário */
   if(sb){
     try{
       const {data}=await sb.from("usuarios").select("*").ilike("login",login).limit(1);
       const u=(data&&data[0])||null;
-      if(u){
-        emailUser=u.email||"";
+      if(u && _normEmail(u.email)===email){
         await sb.from("usuarios").update({senha_hash:novoHash,precisa_trocar:true}).eq("id",u.id);
-        try{ await sb.from("log_atividades").insert({tipo:"edit",texto:"Senha redefinida (esqueci a senha) para "+u.nome+".",quem:u.nome}); }catch(_){}
-        try{ await enviarEmailReset(u.email,u.nome,SENHA_RESET_PADRAO); }catch(_){}
+        try{ await sb.from("log_atividades").insert({tipo:"edit",texto:"Senha redefinida para a padrão (esqueci a senha) — "+u.nome+".",quem:u.nome}); }catch(_){}
+        conferiu=true;
       }
     }catch(ex){ console.warn("[reset] nuvem:",ex); }
   }
-  /* 💾 fallback / espelho local */
+  /* 💾 fallback / espelho local: mesma regra (login + e-mail) */
   try{
     loadDB();
-    const ul=DB.users.find(x=>x.login.toLowerCase()===login);
-    if(ul){ ul.senha=novoHash; ul.precisa_trocar=true; if(!emailUser)emailUser=ul.email||""; saveDB(); }
+    const ul=DB.users.find(x=>x.login.toLowerCase()===login && _normEmail(x.email)===email);
+    if(ul){ ul.senha=novoHash; ul.precisa_trocar=true; saveDB(); conferiu=true; }
   }catch(e){}
-  btn.disabled=false; btn.textContent="Enviar";
-  /* 🔐 mensagem neutra: não revela se o usuário existe (boa prática de segurança) */
+  btn.disabled=false; btn.textContent="Redefinir senha";
+  if(!conferiu){
+    _esqErro("Usuário e e-mail não conferem. Verifique os dados ou contate o administrador.");
+    novoCaptchaEsq();
+    return;
+  }
+  /* ✅ reset concluído — confirma sem revelar a senha padrão */
   document.getElementById("esqForm").style.display="none";
   document.getElementById("esqFoot").style.display="none";
   const okBox=document.getElementById("esqOk");
-  okBox.innerHTML="✅ Se o usuário existir, enviamos uma <b>senha provisória</b> para "+_mascararEmail(emailUser)+".<br>Ao entrar com ela, o sistema pedirá que você crie uma senha pessoal.";
+  okBox.innerHTML="✅ Sua senha foi <b>redefinida para a senha padrão da ferramenta</b>.<br>Ao entrar, o sistema pedirá que você crie uma nova senha pessoal.";
   okBox.style.display="block";
   setTimeout(fecharEsqueciSenha,6000);
-}
-/* 📧 gancho de envio de e-mail — chama uma Edge Function do Supabase, se configurada.
-   Sem backend de e-mail, a senha provisória fica registrada e o login já força a troca. */
-async function enviarEmailReset(email,nome,senha){
-  if(!email)return;
-  try{
-    if(sb&&sb.functions&&sb.functions.invoke){
-      await sb.functions.invoke("enviar-reset-senha",{body:{email:email,nome:nome,senha:senha}});
-    }
-  }catch(e){ console.warn("[reset] envio de e-mail indisponível (configure a Edge Function 'enviar-reset-senha'):",e); }
 }
 /* ---- Troca OBRIGATÓRIA de senha (1º acesso / após reset) ---- */
 function exigirTrocaSenha(ctx){
