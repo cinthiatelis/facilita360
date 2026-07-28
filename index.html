@@ -1025,13 +1025,19 @@ let TIME_ORG=null;
 /* ===== FILTRO DE ESCOPO (gestor/admin) =====
    _escopoVer: &quot;&quot; = padrão do perfil · &quot;__meus&quot; = só os do próprio · &quot;<nome>&quot; = só daquela pessoa */
 let _escopoVer=&quot;&quot;;
+/* 🔧 normaliza texto p/ comparar (sem maiúsc./espaços) — faltava esta definição! */
+function _norm(s){return String(s==null?&quot;&quot;:s).trim().toLowerCase();}
+/* mapa nome→login (preenchido ao carregar usuários) p/ casar dono salvo como login OU nome */
+let USUARIOS_MAP={};
 function _nomesEscopo(){
   const u=usuarioAtualOrg();
   if(!u)return null;
   if(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)return null; /* usuário comum: sem filtro extra */
   if(!_escopoVer)return null;                              /* padrão do perfil */
-  if(_escopoVer===&quot;__meus&quot;)return [u.nome];
-  return [_escopoVer];
+  if(_escopoVer===&quot;__meus&quot;)return [u.nome,u.login].filter(Boolean);
+  /* pessoa específica: inclui nome E login para casar de qualquer jeito */
+  const login=USUARIOS_MAP[_norm(_escopoVer)];
+  return [_escopoVer,login].filter(Boolean);
 }
 /* aplica o filtro de escopo em cima da lista já visível pelo perfil */
 function _aplicaEscopo(lista,campos){
@@ -1189,7 +1195,12 @@ function addSubRow(){subTemp.push({nome:&quot;&quot;,data:&quot;&quot;,status:&q
 let USUARIOS_ORG=[];
 async function carregarUsuariosOrg(){
   if(!sb)return;
-  try{ const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome,ativo&quot;).order(&quot;nome&quot;); USUARIOS_ORG=(data||[]).filter(u=>u.ativo).map(u=>u.nome); }catch(e){}
+  try{
+    const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome,login,ativo&quot;).order(&quot;nome&quot;);
+    const ativos=(data||[]).filter(u=>u.ativo);
+    USUARIOS_ORG=ativos.map(u=>u.nome);
+    USUARIOS_MAP={};ativos.forEach(u=>{ if(u.nome)USUARIOS_MAP[_norm(u.nome)]=u.login||&quot;&quot;; });  /* nome→login p/ o filtro */
+  }catch(e){}
   preencherPessoasFacilita();
 }
 /* #9 popula o datalist de pessoas cadastradas (busca + inclusão de novos) */
