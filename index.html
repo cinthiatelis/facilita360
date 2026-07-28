@@ -1037,13 +1037,15 @@ function _nomesEscopo(){
 function _aplicaEscopo(lista,campos){
   const nomes=_nomesEscopo();
   if(!nomes)return lista;
+  const alvo=nomes.map(_norm);                 /* normaliza os nomes-alvo do escopo */
+  const bate=v=>alvo.indexOf(_norm(v))>=0;
   return lista.filter(item=>{
     for(const c of campos){
       const v=item[c];
-      if(Array.isArray(v)){ if(v.some(x=>nomes.indexOf(x)>=0))return true; }
-      else if(nomes.indexOf(v)>=0)return true;
+      if(Array.isArray(v)){ if(v.some(x=>bate(x)))return true; }
+      else if(bate(v))return true;
     }
-    if(item.pendencias&amp;&amp;item.pendencias.some(p=>nomes.indexOf(p.resp)>=0))return true;
+    if(item.pendencias&amp;&amp;item.pendencias.some(p=>bate(p.resp)))return true;
     return false;
   });
 }
