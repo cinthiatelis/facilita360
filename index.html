@@ -11128,7 +11128,12 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <h1>Governança</h1>
       <p id=&quot;hSub&quot;>Cadastro de projetos, frentes e ações 5W2H — visão gerencial da área.</p>
     </div>
-    <div class=&quot;actions&quot;></div>
+    <div class=&quot;actions&quot;>
+      <span id=&quot;escopoGovWrap&quot; style=&quot;display:none;align-items:center;gap:6px&quot;>
+        <label style=&quot;font-size:11px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px&quot;><svg viewBox=&quot;0 0 24 24&quot; width=&quot;13&quot; height=&quot;13&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z&quot;/><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;3&quot;/></svg> Ver dados de</label>
+        <select id=&quot;escopoGov&quot; onchange=&quot;mudarEscopoGov(this.value)&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit;color:var(--text);min-width:170px&quot;></select>
+      </span>
+    </div>
   </header>
 
   <div class=&quot;content&quot;>
@@ -11417,6 +11422,13 @@ function setView(v){
    Itens antigos sem dono ficam visíveis a todos (compatibilidade).
    ============================================================ */
 let ME=null; /* 🔒 usuário logado, capturado UMA vez e mantido estável (evita leitura intermitente de parent.CURRENT) */
+/* comparação robusta (nome OU login, sem maiúsc./espaços) */
+function _norm(s){return String(s==null?&quot;&quot;:s).trim().toLowerCase();}
+let USUARIOS_MAP_GOV={};   /* nome→login */
+let _escopoGov=&quot;&quot;;          /* &quot;&quot; = padrão perfil · &quot;__meus&quot; = só o próprio · &quot;<nome>&quot; = pessoa */
+function _meusIdsGov(){ const u=usuarioAtualGov(); if(!u)return []; return [_norm(u.nome),_norm(u.login)].filter(Boolean); }
+function _ehMeuGov(v){ const ids=_meusIdsGov(); return ids.length?ids.indexOf(_norm(v))>=0:false; }
+function _naListaGov(lista,v){ if(!Array.isArray(lista))return false; const x=_norm(v); return lista.some(n=>_norm(n)===x); }
 function _lerCurrent(){
   try{ if(parent&amp;&amp;parent.CURRENT)return parent.CURRENT; }catch(e){}
   try{ if(window.CURRENT)return window.CURRENT; }catch(e){}
@@ -11443,7 +11455,8 @@ async function carregarTimeGov(){
   const u=usuarioAtualGov();TIME_GOV=null;
   if(!u||!sb)return;
   if(u.perfil===&quot;gestor&quot;){
-    try{ const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome&quot;).eq(&quot;gestor&quot;,u.nome); TIME_GOV=[u.nome].concat((data||[]).map(x=>x.nome)); }catch(e){}
+    try{ const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome,login&quot;).eq(&quot;gestor&quot;,u.nome);
+      TIME_GOV=[u.nome,u.login].concat((data||[]).map(x=>x.nome)).concat((data||[]).map(x=>x.login)).filter(Boolean); }catch(e){}
   }
 }
 /* lista de delegados de um item (array de nomes) */
@@ -11455,23 +11468,38 @@ function podeVerItem(item){
   if(u.perfil===&quot;admin&quot;)return true;       /* admin vê tudo */
   const dono=(item&amp;&amp;item.dono)||&quot;&quot;;
   if(!dono)return false;                    /* item sem dono: usuário comum NÃO vê (só admin, tratado acima) */
-  if(dono===u.nome)return true;             /* é o dono */
-  if(_compart(item).indexOf(u.nome)>=0)return true; /* foi delegado a mim */
-  if(u.perfil===&quot;gestor&quot;&amp;&amp;TIME_GOV&amp;&amp;TIME_GOV.indexOf(dono)>=0)return true; /* gestor vê o time */
+  if(_ehMeuGov(dono))return true;           /* é o dono (nome ou login) */
+  if(_compart(item).some(x=>_ehMeuGov(x)))return true; /* foi delegado a mim */
+  if(u.perfil===&quot;gestor&quot;&amp;&amp;_naListaGov(TIME_GOV,dono))return true; /* gestor vê o time */
   return false;
 }
 /* pode editar? dono, delegado, gestor do dono ou admin (delegação = ver + editar) */
 function podeEditarItem(item){ return podeVerItem(item); }
-/* indicadores visíveis ao usuário */
-function indicadoresVisiveis(){ return indicadores().filter(podeVerItem); }
+/* ===== FILTRO DE ESCOPO &quot;Ver dados de&quot; (gestor/admin) ===== */
+function _nomesEscopoGov(){
+  const u=usuarioAtualGov();if(!u)return null;
+  if(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)return null;
+  if(!_escopoGov)return null;
+  if(_escopoGov===&quot;__meus&quot;)return [u.nome,u.login].filter(Boolean);
+  const login=USUARIOS_MAP_GOV[_norm(_escopoGov)];
+  return [_escopoGov,login].filter(Boolean);
+}
+/* aplica o escopo em cima da visibilidade (compara dono + delegados) */
+function _aplicaEscopoGov(lista){
+  const nomes=_nomesEscopoGov();
+  if(!nomes)return lista;
+  const alvo=nomes.map(_norm);const bate=v=>alvo.indexOf(_norm(v))>=0;
+  return lista.filter(it=>bate(it&amp;&amp;it.dono)||_compart(it).some(x=>bate(x)));
+}
+/* indicadores visíveis ao usuário (respeita perfil + escopo) */
+function indicadoresVisiveis(){ return _aplicaEscopoGov(indicadores().filter(podeVerItem)); }
 function frentesFiltradas(){
   const p=proj();if(!p)return[];
   const busca=(document.getElementById(&quot;fBusca&quot;).value||&quot;&quot;).toLowerCase();
   const fs=document.getElementById(&quot;fStatus&quot;).value;
   const fp=document.getElementById(&quot;fPilar&quot;).value;
   const fr=(document.getElementById(&quot;fResp&quot;)||{}).value||&quot;&quot;;
-  return (p.frentes||[])
-    .filter(podeVerItem)                    /* 🆕 isolamento por dono/delegação/perfil */
+  return _aplicaEscopoGov((p.frentes||[]).filter(podeVerItem))   /* 🆕 isolamento + escopo &quot;Ver dados de&quot; */
     .filter(f=>!fs||f.status===fs)
     .filter(f=>!fp||f.pilar===fp)
     .filter(f=>!fr||(f.resp||&quot;&quot;)===fr)
@@ -11480,6 +11508,7 @@ function frentesFiltradas(){
 }
 function render(){
   renderProjSel();
+  try{ popularEscopoGov(); }catch(e){}   /* 🆕 seletor &quot;Ver dados de&quot; (gestor/admin) */
   // pilar filter options
   const selP=document.getElementById(&quot;fPilar&quot;);const cur=selP.value;
   selP.innerHTML='<option value=&quot;&quot;>Todos os pilares</option>'+PILARES.map(p=>`<option ${p===cur?&quot;selected&quot;:&quot;&quot;}>${esc(p)}</option>`).join(&quot;&quot;);
@@ -11906,15 +11935,40 @@ const _saveLocalGov=saveDB;
 saveDB=function(){ _saveLocalGov(); clearTimeout(window._cg); window._cg=setTimeout(cloudSalvar,500); };
 
 /* #9 usuários cadastrados → datalist do seletor de responsável */
+let USUARIOS_GOV=[];
 async function carregarUsuariosGov(){
   if(!sb)return;
   try{
-    const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome,ativo&quot;).order(&quot;nome&quot;);
-    const nomes=(data||[]).filter(u=>u.ativo).map(u=>u.nome);
+    const {data}=await sb.from(&quot;usuarios&quot;).select(&quot;nome,login,ativo&quot;).order(&quot;nome&quot;);
+    const ativos=(data||[]).filter(u=>u.ativo);
+    const nomes=ativos.map(u=>u.nome);
+    USUARIOS_GOV=nomes;
+    USUARIOS_MAP_GOV={};ativos.forEach(u=>{if(u.nome)USUARIOS_MAP_GOV[_norm(u.nome)]=u.login||&quot;&quot;;});
     const dl=document.getElementById(&quot;pessoasFacilitaGov&quot;);
     if(dl)dl.innerHTML=nomes.map(n=>`<option value=&quot;${esc(n)}&quot;>`).join(&quot;&quot;);
   }catch(e){}
 }
+/* popula e controla o seletor &quot;Ver dados de&quot; (gestor/admin) */
+function popularEscopoGov(){
+  const u=usuarioAtualGov();
+  const wrap=document.getElementById(&quot;escopoGovWrap&quot;);
+  const sel=document.getElementById(&quot;escopoGov&quot;);
+  if(!wrap||!sel)return;
+  if(!u||(u.perfil!==&quot;gestor&quot;&amp;&amp;u.perfil!==&quot;admin&quot;)){wrap.style.display=&quot;none&quot;;return;}
+  wrap.style.display=&quot;inline-flex&quot;;
+  let opts=&quot;&quot;;
+  if(u.perfil===&quot;gestor&quot;){
+    const subs=(TIME_GOV||[]).filter(n=>_norm(n)!==_norm(u.nome)&amp;&amp;_norm(n)!==_norm(u.login)).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a.localeCompare(b,&quot;pt&quot;));
+    opts+='<option value=&quot;&quot;>Todo o meu time</option><option value=&quot;__meus&quot;>Somente os meus</option>';
+    if(subs.length)opts+='<optgroup label=&quot;Por pessoa do time&quot;>'+subs.map(n=>`<option value=&quot;${esc(n)}&quot;>${esc(n)}</option>`).join(&quot;&quot;)+'</optgroup>';
+  }else{
+    const todos=(USUARIOS_GOV||[]).slice().sort((a,b)=>a.localeCompare(b,&quot;pt&quot;));
+    opts+='<option value=&quot;&quot;>Todos (visão geral)</option>';
+    if(todos.length)opts+='<optgroup label=&quot;Por pessoa&quot;>'+todos.map(n=>`<option value=&quot;${esc(n)}&quot;>${esc(n)}</option>`).join(&quot;&quot;)+'</optgroup>';
+  }
+  sel.innerHTML=opts;sel.value=_escopoGov;
+}
+function mudarEscopoGov(v){ _escopoGov=v; render(); }
 /* ============================================================
    📈 INDICADORES + GRÁFICO DE CASCATA (WATERFALL) — GOVERNANÇA
    ============================================================ */
