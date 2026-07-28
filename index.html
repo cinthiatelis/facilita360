@@ -4855,13 +4855,35 @@ function popularEscopoPdca(){
   }
   sel.innerHTML=opts;sel.value=_escopoPdca;
 }
-function mudarEscopoPdca(v){ _escopoPdca=v; renderProjSel(); const vis=projetosVisiveis(); if(vis.indexOf(DB.currentId)<0&amp;&amp;vis.length){ DB.currentId=vis[0]; loadCurrentProject(); } }
+function mudarEscopoPdca(v){
+  _escopoPdca=v;
+  const vis=projetosVisiveis();
+  if(vis.length===0){
+    /* 🆕 escopo sem projetos → limpa a tela e mostra placeholder */
+    DB.currentId=null;CUR=null;try{clearForm();}catch(e){}
+    renderProjSel();
+    return;
+  }
+  if(vis.indexOf(DB.currentId)<0){ DB.currentId=vis[0]; }
+  renderProjSel();
+  loadCurrentProject();
+}
 
 function renderProjSel(){
   const sel=document.getElementById(&quot;projSel&quot;);sel.innerHTML=&quot;&quot;;
   const vis=projetosVisiveis();                 /* 🔒 só projetos que o usuário pode ver */
+  if(vis.length===0){
+    /* 🆕 nenhum projeto visível → placeholder e limpa a tela (não mostra dados de outro) */
+    const o=document.createElement(&quot;option&quot;);o.value=&quot;&quot;;o.textContent=&quot;Projeto Novo&quot;;o.disabled=true;o.selected=true;
+    sel.appendChild(o);sel.value=&quot;&quot;;
+    if(DB.currentId&amp;&amp;DB.projects[DB.currentId]&amp;&amp;!podeVerProjeto(DB.projects[DB.currentId])){
+      DB.currentId=null;CUR=null;try{clearForm();}catch(e){}
+    }
+    try{ popularEscopoPdca(); }catch(e){}
+    return;
+  }
   vis.forEach(id=>{const p=DB.projects[id];const o=document.createElement(&quot;option&quot;);o.value=id;o.textContent=p.meta.name;sel.appendChild(o)});
-  if(vis.indexOf(DB.currentId)<0&amp;&amp;vis.length)DB.currentId=vis[0];
+  if(vis.indexOf(DB.currentId)<0)DB.currentId=vis[0];   /* garante que o atual é um visível */
   sel.value=DB.currentId;
   try{ popularEscopoPdca(); }catch(e){}
 }
