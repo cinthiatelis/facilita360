@@ -12574,11 +12574,27 @@ function desenharLinhaInd(){
     {label:&quot;Forecast&quot;,data:fcArr,borderColor:&quot;#F5842B&quot;,backgroundColor:&quot;transparent&quot;,borderDash:[6,4],tension:.3,borderWidth:2.4,pointRadius:3,pointBackgroundColor:&quot;#F5842B&quot;,spanGaps:true}
   ];
   if(it.meta!=null&&!isNaN(it.meta)){ds.push({label:&quot;Meta&quot;,data:labels.map(()=>it.meta),borderColor:&quot;#DA291C&quot;,borderDash:[3,3],borderWidth:1.6,pointRadius:0,tension:0});}
+  /* 🆕 eixo Y: FINANCEIRO dá zoom na faixa dos dados (real+forecast); demais unidades seguem como antes */
+  let _lnYScale={beginAtZero:false,grace:&quot;12%&quot;,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>_fmtIndEixo(v,u)}};
+  if(_tipoUnidade(u)===&quot;moeda&quot;){
+    const _vals=realArr.concat(fcArr).filter(x=>x!=null&&!isNaN(x));
+    if(_vals.length){
+      let mn=Math.min.apply(null,_vals),mx=Math.max.apply(null,_vals);
+      const span=(mx-mn)||Math.abs(mx)||1;
+      /* inclui a Meta no enquadramento só se estiver PERTO dos dados (evita achatar por meta muito distante) */
+      if(it.meta!=null&&!isNaN(it.meta)&&it.meta>=mn-2*span&&it.meta<=mx+2*span){mn=Math.min(mn,it.meta);mx=Math.max(mx,it.meta);}
+      let range=(mx-mn);if(range<=0)range=Math.abs(mx)||1;
+      const pad=range*0.15;
+      let ymin=mn-pad,ymax=mx+pad;
+      if(mn>=0&&ymin<0)ymin=0;   /* custos não-negativos não descem abaixo de zero */
+      _lnYScale={min:ymin,max:ymax,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},maxTicksLimit:6,callback:v=>_fmtIndEixo(v,u)}};
+    }
+  }
   _lnChart=new Chart(cv,{type:&quot;line&quot;,data:{labels:labels,datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:&quot;index&quot;,intersect:false},
       plugins:{legend:{position:&quot;bottom&quot;,labels:{boxWidth:12,usePointStyle:true,font:{size:11},padding:14}},
         tooltip:{padding:10,callbacks:{label:c=>c.dataset.label+&quot;: &quot;+(c.parsed.y==null?&quot;—&quot;:_fmtIndTip(c.parsed.y,u))}}},
-      scales:{y:{beginAtZero:false,grace:&quot;12%&quot;,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>_fmtIndEixo(v,u)}},x:{grid:{display:false},ticks:{font:{size:10.5},maxRotation:0,autoSkip:false,callback:function(v,i){return (i%2===0)?labels[i]:&quot;&quot;;}}}}}});
+      scales:{y:_lnYScale,x:{grid:{display:false},ticks:{font:{size:10.5},maxRotation:0,autoSkip:false,callback:function(v,i){return (i%2===0)?labels[i]:&quot;&quot;;}}}}}});
 }
 
 /* ---------- init ---------- */
