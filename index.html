@@ -11301,7 +11301,6 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
           </select>
           <input id=&quot;indUnid&quot; placeholder=&quot;Ex: GB, dias, chamados&quot; style=&quot;margin-top:6px;display:none&quot;/>
         </div>
-        <div class=&quot;field&quot;><label>Meta</label><input type=&quot;text&quot; inputmode=&quot;decimal&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2,5 ou 1.250,00&quot;/></div>
         <div class=&quot;field&quot;><label>Direção</label><select id=&quot;indDir&quot;><option value=&quot;menor&quot;>Menor é melhor</option><option value=&quot;maior&quot;>Maior é melhor</option></select></div>
         <div class=&quot;field full&quot;><label>Frente vinculada <span class=&quot;hint&quot;>— o indicador só aparece na frente selecionada</span></label><select id=&quot;indFrente&quot;></select></div>
         <div class=&quot;field full&quot;><label>Forma de visualização</label>
@@ -11318,7 +11317,7 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <div style=&quot;margin-top:6px&quot;>
         <div style=&quot;font-size:12px;font-weight:800;color:#1A1F36;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px&quot; id=&quot;indMesesTit&quot;>Preenchimento mensal — Realizado e Forecast</div>
         <div id=&quot;indMesesWrap&quot; style=&quot;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px&quot;></div>
-        <div style=&quot;margin-top:10px;font-size:11.5px;color:#94A0B5&quot;>Use ponto ou vírgula como separador decimal. Meses anteriores ao mês atual são <b>Real</b>; do mês atual em diante são <b>Forecast</b> (preencha o Real quando o mês ocorrer).</div>
+        <div style=&quot;margin-top:10px;font-size:11.5px;color:#94A0B5&quot;>Cada mês tem 3 linhas: <b style=&quot;color:#B71C1F&quot;>Meta</b>, <b style=&quot;color:#B45309&quot;>Forecast</b> e <b style=&quot;color:#047857&quot;>Realizado</b>. Use ponto ou vírgula como separador decimal. A <b>Meta</b> pode variar por mês (ex.: metas financeiras diferentes a cada mês).</div>
       </div>
     </div>
     <div class=&quot;modal-foot&quot;>
@@ -12230,6 +12229,15 @@ function _aggBase(it,mode,periodo){
   ms.forEach(mo=>{const val=_valMes(d,mo.key);if(val!=null){s+=val;c++;}});
   return (mode===&quot;media&quot;)?(c?(s/c):0):s;
 }
+/* 🆕 meta do mês (usa meta mensal; se ausente, cai na meta única antiga p/ compatibilidade) */
+function _metaMes(it,key){const v=((it&&it.dados)||{})[key]||{};return (v.meta!=null?v.meta:((it&&it.meta!=null)?it.meta:null));}
+/* 🆕 meta agregada no período (soma p/ acumulativo; média p/ percentual) */
+function _aggMeta(it,mode,periodo){
+  const ms=_mesesPeriodo(it,periodo);let s=0,c=0;
+  ms.forEach(mo=>{const m=_metaMes(it,mo.key);if(m!=null){s+=m;c++;}});
+  if(c===0)return null;
+  return (mode===&quot;media&quot;)?(s/c):s;
+}
 /* 🆕 indicador atualmente selecionado na visão de gráficos */
 function _indAtualWf(){const inds=indicadoresVisiveis();return inds.find(i=>i.nome===_wfSel)||inds[0]||null;}
 function wfSetAgg(v){const it=_indAtualWf();if(it){it.agg=v;saveDB();}desenharWaterfall();}
@@ -12237,9 +12245,11 @@ function wfSetPeriodo(v){const it=_indAtualWf();if(it){it.periodo=v;saveDB();}de
 
 let _indTmp={};
 function _coletarMeses(){
+  document.querySelectorAll(&quot;.indCellMeta&quot;).forEach(inp=>{const k=inp.dataset.k;_indTmp[k]=_indTmp[k]||{};_indTmp[k].meta=_pnum(inp.value);});
   document.querySelectorAll(&quot;.indCellFc&quot;).forEach(inp=>{const k=inp.dataset.k;_indTmp[k]=_indTmp[k]||{};_indTmp[k].fc=_pnum(inp.value);});
   document.querySelectorAll(&quot;.indCellReal&quot;).forEach(inp=>{const k=inp.dataset.k;_indTmp[k]=_indTmp[k]||{};_indTmp[k].real=_pnum(inp.value);});
 }
+let _legacyMetaInd=null;   /* 🆕 meta única antiga usada como sugestão nos meses ao editar */
 function montarMesesInd(preservar){
   const wrap=document.getElementById(&quot;indMesesWrap&quot;);
   if(preservar &amp;&amp; wrap &amp;&amp; wrap.children.length)_coletarMeses(); /* preserva só ao trocar a visão/período */
@@ -12252,10 +12262,17 @@ function montarMesesInd(preservar){
     const d=_indTmp[mo.key]||{};
     const isReal=mo.tipo===&quot;real&quot;;
     const badge=isReal?'<span style=&quot;color:#047857&quot;>REAL</span>':'<span style=&quot;color:#B45309&quot;>FCST</span>';
+    const metaVal=(d.meta!=null?d.meta:(_legacyMetaInd!=null?_legacyMetaInd:&quot;&quot;));  /* 🆕 herda meta antiga como sugestão */
+    const cell='font-size:12px;padding:5px 7px;border:1px solid #E5E9F0;border-radius:6px;width:100%;font-family:inherit';
+    const lbl='font-size:9px;font-weight:800;letter-spacing:.3px;margin:0 0 2px 1px';
     return `<div style=&quot;border:1px solid #E5E9F0;border-radius:8px;padding:7px 8px;background:${isReal?'#F6FBF8':'#FFFDF6'}&quot;>
       <div style=&quot;font-size:9.5px;font-weight:800;color:#5A6478;margin-bottom:5px;display:flex;justify-content:space-between&quot;><span>${mo.label}</span>${badge}</div>
-      <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellFc&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(d.fc)}&quot; placeholder=&quot;Forecast&quot; style=&quot;font-size:12px;padding:5px 7px;border:1px solid #E5E9F0;border-radius:6px;width:100%;margin-bottom:4px;font-family:inherit&quot;/>
-      <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellReal&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(d.real)}&quot; placeholder=&quot;Real&quot; style=&quot;font-size:12px;padding:5px 7px;border:1px solid #E5E9F0;border-radius:6px;width:100%;font-family:inherit&quot;/>
+      <div style=&quot;${lbl};color:#B71C1F&quot;>META</div>
+      <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellMeta&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(metaVal)}&quot; placeholder=&quot;Meta&quot; style=&quot;${cell};margin-bottom:4px&quot;/>
+      <div style=&quot;${lbl};color:#B45309&quot;>FORECAST</div>
+      <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellFc&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(d.fc)}&quot; placeholder=&quot;Forecast&quot; style=&quot;${cell};margin-bottom:4px&quot;/>
+      <div style=&quot;${lbl};color:#047857&quot;>REALIZADO</div>
+      <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellReal&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(d.real)}&quot; placeholder=&quot;Real&quot; style=&quot;${cell}&quot;/>
     </div>`;
   }).join(&quot;&quot;);
 }
@@ -12294,7 +12311,8 @@ function abrirModalInd(id){
     const it=indicadores().find(x=>x.id===id);if(!it)return;
     document.getElementById(&quot;mIndTitle&quot;).textContent=&quot;Editar indicador&quot;;
     set(&quot;indId&quot;,it.id);set(&quot;indNome&quot;,it.nome||&quot;&quot;);set(&quot;indArea&quot;,it.area||&quot;&quot;);set(&quot;indUnid&quot;,it.unidade||&quot;&quot;);
-    set(&quot;indMeta&quot;,it.meta==null?&quot;&quot;:it.meta);set(&quot;indDir&quot;,it.direcao||&quot;menor&quot;);
+    set(&quot;indDir&quot;,it.direcao||&quot;menor&quot;);
+    _legacyMetaInd=(it.meta==null?null:it.meta);   /* 🆕 meta antiga vira sugestão nos meses */
     _setUnidade(it.unidade||&quot;&quot;);_preencherRangeSelects();
     var _vz=it.visao||&quot;fiscal&quot;,_h=it.histMeses,_f=it.futMeses;
     if(_vz===&quot;m12&quot;){_vz=&quot;custom&quot;;if(_h==null)_h=12;if(_f==null)_f=6;}else if(_vz===&quot;m6&quot;){_vz=&quot;custom&quot;;if(_h==null)_h=6;if(_f==null)_f=6;}
@@ -12304,8 +12322,9 @@ function abrirModalInd(id){
     document.getElementById(&quot;mIndDel&quot;).style.display=&quot;inline-flex&quot;;
   }else{
     document.getElementById(&quot;mIndTitle&quot;).textContent=&quot;Novo indicador&quot;;
-    [&quot;indId&quot;,&quot;indNome&quot;,&quot;indArea&quot;,&quot;indMeta&quot;].forEach(k=>set(k,&quot;&quot;));
+    [&quot;indId&quot;,&quot;indNome&quot;,&quot;indArea&quot;].forEach(k=>set(k,&quot;&quot;));
     set(&quot;indDir&quot;,&quot;menor&quot;);set(&quot;indVisao&quot;,&quot;fiscal&quot;);
+    _legacyMetaInd=null;   /* 🆕 sem sugestão de meta em indicador novo */
     _setUnidade(&quot;&quot;);_preencherRangeSelects();document.getElementById(&quot;indHist&quot;).value=6;document.getElementById(&quot;indFut&quot;).value=6;
     _preencherFrentesInd(_nomeFrenteAtiva());
     _indTmp={};
@@ -12320,15 +12339,14 @@ function salvarInd(){
   const nome=g(&quot;indNome&quot;).trim();if(!nome){toast(&quot;Informe o nome do indicador.&quot;,&quot;err&quot;);return;}
   const unidade=g(&quot;indUnid&quot;).trim();if(!unidade){toast(&quot;Selecione ou informe a unidade do indicador.&quot;,&quot;err&quot;);return;}
   _coletarMeses();
-  const dados={};Object.keys(_indTmp).forEach(k=>{const d=_indTmp[k]||{};if(d.fc!=null||d.real!=null)dados[k]={fc:d.fc??null,real:d.real??null};});
-  const meta=_pnum(g(&quot;indMeta&quot;));
+  const dados={};Object.keys(_indTmp).forEach(k=>{const d=_indTmp[k]||{};if(d.fc!=null||d.real!=null||d.meta!=null)dados[k]={meta:(d.meta??null),fc:(d.fc??null),real:(d.real??null)};});
   const id=g(&quot;indId&quot;);
   if(!Array.isArray(GOV_INDS))GOV_INDS=[];
   const u=usuarioAtualGov();
   const antigo=id?GOV_INDS.find(x=>x.id===id):null;
   const fSel=document.getElementById(&quot;indFrente&quot;);
   const projeto=(fSel&&fSel.value)||(antigo&&antigo.projeto)||_nomeFrenteAtiva();   /* &#128994; frente vinculada */
-  const obj={id:id||uid(&quot;ind&quot;),nome:nome,area:g(&quot;indArea&quot;).trim(),unidade:unidade,meta:meta,direcao:g(&quot;indDir&quot;),visao:g(&quot;indVisao&quot;),dados:dados,
+  const obj={id:id||uid(&quot;ind&quot;),nome:nome,area:g(&quot;indArea&quot;).trim(),unidade:unidade,meta:null,direcao:g(&quot;indDir&quot;),visao:g(&quot;indVisao&quot;),dados:dados,
     histMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indHist&quot;),10)||0):null),futMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indFut&quot;),10)||0):null),
     projeto:projeto,                                                                /* &#128994; só aparece nesta frente */
     dono:antigo?(antigo.dono||(u?u.nome:&quot;&quot;)):(u?u.nome:&quot;&quot;),                 /* &#127381; mantém/carimba o dono */
@@ -12366,7 +12384,7 @@ function renderInd(){
       <td style=&quot;font-weight:700&quot;>${esc(it.nome)}</td>
       <td>${esc(it.area)||&quot;—&quot;}</td>
       <td>${esc(it.unidade)||&quot;—&quot;}</td>
-      <td>${it.meta==null?&quot;—&quot;:fmtN(it.meta)}</td>
+      <td>${(function(){const m=_aggMeta(it,_aggPadrao(it),(it.periodo||&quot;fiscal&quot;));return m==null?&quot;—&quot;:fmtN(m);})()}</td>
       <td>${dirLbl(it.direcao)}</td>
       <td>${visLbl(it.visao)}</td>
       <td>${_spark(it)}</td>
@@ -12526,7 +12544,7 @@ function desenharWaterfall(){
       +`<div>${lbl(&quot;Redução total (&quot;+reduc.length+&quot; frente&quot;+(reduc.length===1?&quot;&quot;:&quot;s&quot;)+&quot;):&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#DA291C&quot;>−${fmtFull(totalRed,it.unidade)}</div></div>`
       +`<div>${lbl(&quot;Final:&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#047857&quot;>${fmtFull(running,it.unidade)}</div></div>`
       +`<div>${lbl(&quot;% Redução total (&quot;+reduc.length+&quot; frente&quot;+(reduc.length===1?&quot;&quot;:&quot;s&quot;)+&quot;):&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#DA291C&quot;>- ${pctTxt}</div></div>`
-      +(it.meta!=null?`<div>${lbl(&quot;Meta:&quot;)}<div style=&quot;font-size:14px;font-weight:700;color:#1A1F36&quot;>${fmtFull(it.meta,it.unidade)}</div></div>`:&quot;&quot;);
+      +((function(){const m=_aggMeta(it,mode,periodo);return m!=null?`<div>${lbl((mode===&quot;media&quot;?&quot;Meta (média):&quot;:&quot;Meta (soma):&quot;))}<div style=&quot;font-size:14px;font-weight:700;color:#1A1F36&quot;>${fmtFull(m,it.unidade)}</div></div>`:&quot;&quot;;})());
   }
   /* abaixo do gráfico: apenas a legenda das frentes (texto de resumo foi removido) */
   document.getElementById(&quot;wfResumo&quot;).innerHTML=legendaHtml;
@@ -12573,7 +12591,8 @@ function desenharLinhaInd(){
     {label:&quot;Realizado&quot;,data:realArr,borderColor:&quot;#1F2937&quot;,backgroundColor:&quot;rgba(31,41,55,.08)&quot;,tension:.3,borderWidth:2.6,pointRadius:3,pointBackgroundColor:&quot;#1F2937&quot;,spanGaps:false,fill:false},
     {label:&quot;Forecast&quot;,data:fcArr,borderColor:&quot;#F5842B&quot;,backgroundColor:&quot;transparent&quot;,borderDash:[6,4],tension:.3,borderWidth:2.4,pointRadius:3,pointBackgroundColor:&quot;#F5842B&quot;,spanGaps:true}
   ];
-  if(it.meta!=null&&!isNaN(it.meta)){ds.push({label:&quot;Meta&quot;,data:labels.map(()=>it.meta),borderColor:&quot;#DA291C&quot;,borderDash:[3,3],borderWidth:1.6,pointRadius:0,tension:0});}
+  const metaArr=meses.map(mo=>{const m=_metaMes(it,mo.key);return (m==null||isNaN(m))?null:m;});
+  if(metaArr.some(x=>x!=null)){ds.push({label:&quot;Meta&quot;,data:metaArr,borderColor:&quot;#DA291C&quot;,borderDash:[3,3],borderWidth:1.6,pointRadius:0,tension:0,spanGaps:true});}
   /* 🆕 eixo Y: FINANCEIRO dá zoom na faixa dos dados (real+forecast); demais unidades seguem como antes */
   let _lnYScale={beginAtZero:false,grace:&quot;12%&quot;,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>_fmtIndEixo(v,u)}};
   if(_tipoUnidade(u)===&quot;moeda&quot;){
@@ -12582,7 +12601,7 @@ function desenharLinhaInd(){
       let mn=Math.min.apply(null,_vals),mx=Math.max.apply(null,_vals);
       const span=(mx-mn)||Math.abs(mx)||1;
       /* inclui a Meta no enquadramento só se estiver PERTO dos dados (evita achatar por meta muito distante) */
-      if(it.meta!=null&&!isNaN(it.meta)&&it.meta>=mn-2*span&&it.meta<=mx+2*span){mn=Math.min(mn,it.meta);mx=Math.max(mx,it.meta);}
+      metaArr.forEach(m=>{if(m!=null&&!isNaN(m)&&m>=mn-2*span&&m<=mx+2*span){mn=Math.min(mn,m);mx=Math.max(mx,m);}});
       let range=(mx-mn);if(range<=0)range=Math.abs(mx)||1;
       const pad=range*0.15;
       let ymin=mn-pad,ymax=mx+pad;
