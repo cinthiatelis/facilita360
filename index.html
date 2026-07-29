@@ -11022,7 +11022,11 @@ header{background:#fff;border-bottom:1px solid var(--border);padding:16px 28px;d
 .frente.st-atrasado{border-left-color:var(--dg)}
 .frente.st-risco{border-left-color:var(--wn)}
 .frente.st-andamento{border-left-color:var(--info)}
-.frente.st-concluido{border-left-color:var(--sc)}
+.frente.st-concluido{border-left-color:#B0B7C3;background:#F4F5F7;opacity:.85}
+.frente.st-concluido .frente-title{color:#8A94A6}
+.frente.st-concluido .frente-num{background:#B0B7C3}
+tr.gt-done{background:#F4F5F7}
+tr.gt-done .gt-frente,tr.gt-done .gt-sit{color:#8A94A6}
 .frente.st-planejamento{border-left-color:#8B5CF6}
 .frente-head{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;transition:background .15s}
 .frente-head:hover{background:#FAFBFD}
@@ -11240,10 +11244,11 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div class=&quot;field full&quot;><label>Frente <span class=&quot;hint&quot;>— nome resumido da iniciativa/projeto</span></label><input id=&quot;frFrente&quot; placeholder=&quot;Ex: Upgrade GPON Goiânia&quot;/></div>
         <div class=&quot;field full&quot;><label>Situação <span class=&quot;hint&quot;>— cenário atual, ações em andamento e próximos passos</span></label><textarea id=&quot;frSituacao&quot; placeholder=&quot;Ex: Migração iniciada&amp;#10;3.200 clientes elegíveis&amp;#10;Comunicação prevista para 20/07&quot;></textarea></div>
         <div class=&quot;field&quot;><label>Responsável <span class=&quot;hint&quot;>— nome e área ( )</span></label><input id=&quot;frResp&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Buscar pessoa ou digitar novo nome&quot;/></div>
+        <div class=&quot;field&quot;><label>Precisa de ajuda? <span class=&quot;hint&quot;>— escalar / apoio necessário</span></label><select id=&quot;frAjuda&quot;><option value=&quot;&quot;>Não</option><option value=&quot;sim&quot;>Sim</option></select></div>
         <div class=&quot;field full&quot;><label>🔗 Compartilhar com <span class=&quot;hint&quot;>— delegar (a pessoa poderá ver e editar). Separe por vírgula.</span></label><input id=&quot;frCompart&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Ex: Fulano, Ciclana&quot;/></div>
         <div class=&quot;field&quot;><label>Indicador <span class=&quot;hint&quot;>— foco da ação (impactado)</span></label><select id=&quot;frIndicador&quot;><option value=&quot;&quot;>Selecione o indicador...</option></select></div>
-        <div class=&quot;field&quot;><label>Prazo em Foco <span class=&quot;hint&quot;>— próxima data crítica</span></label><input type=&quot;date&quot; id=&quot;frPrazoFoco&quot;/></div>
-        <div class=&quot;field&quot;><label>Data Limite <span class=&quot;hint&quot;>— data final comprometida</span></label><input type=&quot;date&quot; id=&quot;frDataLimite&quot;/></div>
+        <div class=&quot;field&quot;><label>Data Início <span class=&quot;hint&quot;>— início do prazo em foco</span></label><input type=&quot;date&quot; id=&quot;frPrazoFoco&quot;/></div>
+        <div class=&quot;field&quot;><label>Data Fim <span class=&quot;hint&quot;>— data final comprometida</span></label><input type=&quot;date&quot; id=&quot;frDataLimite&quot;/></div>
         <div class=&quot;field&quot;><label>Potencial Ganho <span class=&quot;hint&quot;>— escolha o tipo e informe o valor</span></label>
           <div style=&quot;display:flex;gap:8px&quot;>
             <select id=&quot;frGanhoUnit&quot; onchange=&quot;fmtGanhoInput();atualizarPreviewGanho()&quot; style=&quot;max-width:120px;flex-shrink:0&quot;>
@@ -11286,15 +11291,28 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <div class=&quot;grid2&quot;>
         <div class=&quot;field full&quot;><label>Nome do indicador <span class=&quot;hint&quot;>— sigla ou nome</span></label><input id=&quot;indNome&quot; placeholder=&quot;Ex: AT1&quot;/></div>
         <div class=&quot;field&quot;><label>Área</label><input id=&quot;indArea&quot; placeholder=&quot;Ex: Manutenção&quot;/></div>
-        <div class=&quot;field&quot;><label>Unidade</label><input id=&quot;indUnid&quot; placeholder=&quot;Ex: %, p.p., un&quot;/></div>
+        <div class=&quot;field&quot;><label>Unidade <span class=&quot;hint&quot;>— tipo de medida</span></label>
+          <select id=&quot;indUnidTipo&quot; onchange=&quot;onUnidTipoChange()&quot;>
+            <option value=&quot;R$&quot;>Financeiro (R$)</option>
+            <option value=&quot;%&quot;>Percentual (%)</option>
+            <option value=&quot;p.p.&quot;>Pontos percentuais (p.p.)</option>
+            <option value=&quot;un&quot;>Quantidade (un)</option>
+            <option value=&quot;__custom__&quot;>Outro…</option>
+          </select>
+          <input id=&quot;indUnid&quot; placeholder=&quot;Ex: GB, dias, chamados&quot; style=&quot;margin-top:6px;display:none&quot;/>
+        </div>
         <div class=&quot;field&quot;><label>Meta</label><input type=&quot;text&quot; inputmode=&quot;decimal&quot; id=&quot;indMeta&quot; placeholder=&quot;Ex: 2,5 ou 1.250,00&quot;/></div>
         <div class=&quot;field&quot;><label>Direção</label><select id=&quot;indDir&quot;><option value=&quot;menor&quot;>Menor é melhor</option><option value=&quot;maior&quot;>Maior é melhor</option></select></div>
+        <div class=&quot;field full&quot;><label>Frente vinculada <span class=&quot;hint&quot;>— o indicador só aparece na frente selecionada</span></label><select id=&quot;indFrente&quot;></select></div>
         <div class=&quot;field full&quot;><label>Forma de visualização</label>
-          <select id=&quot;indVisao&quot; onchange=&quot;montarMesesInd()&quot;>
+          <select id=&quot;indVisao&quot; onchange=&quot;montarMesesInd(true)&quot;>
             <option value=&quot;fiscal&quot;>Ano fiscal (jan–dez do ano vigente · real + forecast)</option>
-            <option value=&quot;m12&quot;>M-12 (12 meses anteriores + 6 de forecast)</option>
-            <option value=&quot;m6&quot;>M-6 (6 meses anteriores + 6 de forecast)</option>
+            <option value=&quot;custom&quot;>Personalizado (escolha histórico e futuro em meses)</option>
           </select>
+        </div>
+        <div class=&quot;field full&quot; id=&quot;indCustomRange&quot; style=&quot;display:none;grid-template-columns:1fr 1fr;gap:12px&quot;>
+          <div><label>Histórico — meses de Real <span class=&quot;hint&quot;>(até 12)</span></label><select id=&quot;indHist&quot; onchange=&quot;montarMesesInd(true)&quot;></select></div>
+          <div><label>Futuro — meses de Forecast <span class=&quot;hint&quot;>(até 12)</span></label><select id=&quot;indFut&quot; onchange=&quot;montarMesesInd(true)&quot;></select></div>
         </div>
       </div>
       <div style=&quot;margin-top:6px&quot;>
@@ -11307,6 +11325,22 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <button class=&quot;btn&quot; id=&quot;mIndDel&quot; onclick=&quot;excluirInd()&quot; style=&quot;margin-right:auto;color:var(--dg);display:none&quot;>Excluir indicador</button>
       <button class=&quot;btn&quot; onclick=&quot;fecharModal('modalInd')&quot;>Cancelar</button>
       <button class=&quot;btn primary&quot; onclick=&quot;salvarInd()&quot;>Salvar indicador</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 🆕 MODAL PROJETO (Nome + Patrocinador) ===== -->
+<div class=&quot;modal-bg&quot; id=&quot;modalProj&quot;>
+  <div class=&quot;modal&quot; style=&quot;width:460px&quot;>
+    <div class=&quot;modal-head&quot;><h3 id=&quot;mProjTitle&quot;>Nova frente ativa</h3><button class=&quot;modal-x&quot; onclick=&quot;fecharModal('modalProj')&quot;>×</button></div>
+    <div class=&quot;modal-body&quot;>
+      <input type=&quot;hidden&quot; id=&quot;projModoEditar&quot;/>
+      <div class=&quot;field full&quot;><label>Nome da frente ativa <span class=&quot;hint&quot;>— nome do projeto/frente</span></label><input id=&quot;projNome&quot; placeholder=&quot;Ex: Eficiência Operacional&quot; onkeydown=&quot;if(event.key==='Enter')salvarProj()&quot;/></div>
+      <div class=&quot;field full&quot; style=&quot;margin-top:12px&quot;><label>Patrocinador <span class=&quot;hint&quot;>— responsável que patrocina a frente</span></label><input id=&quot;projPatroInp&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Ex: Wanda Alves&quot; onkeydown=&quot;if(event.key==='Enter')salvarProj()&quot;/></div>
+    </div>
+    <div class=&quot;modal-foot&quot;>
+      <button class=&quot;btn&quot; onclick=&quot;fecharModal('modalProj')&quot;>Cancelar</button>
+      <button class=&quot;btn primary&quot; onclick=&quot;salvarProj()&quot;>Salvar</button>
     </div>
   </div>
 </div>
@@ -11430,14 +11464,31 @@ function renderProjSel(){
   });
 }
 function trocarProjeto(id){DB.currentId=id;saveDB();render()}
-function novoProjeto(){
-  const nome=prompt(&quot;Nome do novo projeto:&quot;,&quot;Novo projeto&quot;);if(nome===null)return;
-  const id=uid(&quot;p&quot;);DB.projects[id]={meta:{name:nome.trim()||&quot;Novo projeto&quot;},frentes:[],indicadores:GOV_INDS};
-  DB.currentId=id;saveDB();renderProjSel();render();toast(&quot;Projeto criado.&quot;,&quot;ok&quot;);
+/* 🆕 modal próprio (Nome + Patrocinador juntos) — evita bloqueio do 2º prompt() no navegador/Citrix */
+function novoProjeto(){ abrirModalProj(false); }
+function renomearProjeto(){ abrirModalProj(true); }
+function abrirModalProj(editar){
+  const p=proj();
+  document.getElementById(&quot;mProjTitle&quot;).textContent=editar?&quot;Editar frente ativa&quot;:&quot;Nova frente ativa&quot;;
+  document.getElementById(&quot;projModoEditar&quot;).value=editar?&quot;1&quot;:&quot;&quot;;
+  document.getElementById(&quot;projNome&quot;).value=editar?((p&&p.meta&&p.meta.name)||&quot;&quot;):&quot;&quot;;
+  document.getElementById(&quot;projPatroInp&quot;).value=editar?((p&&p.meta&&p.meta.patrocinador)||&quot;&quot;):&quot;&quot;;
+  document.getElementById(&quot;modalProj&quot;).classList.add(&quot;show&quot;);
+  setTimeout(function(){try{document.getElementById(&quot;projNome&quot;).focus();}catch(e){}},60);
 }
-function renomearProjeto(){
-  const p=proj();const nome=prompt(&quot;Renomear projeto:&quot;,p.meta.name);if(nome===null)return;
-  p.meta.name=nome.trim()||p.meta.name;saveDB();renderProjSel();toast(&quot;Projeto renomeado.&quot;,&quot;ok&quot;);
+function salvarProj(){
+  const editar=!!document.getElementById(&quot;projModoEditar&quot;).value;
+  const nome=(document.getElementById(&quot;projNome&quot;).value||&quot;&quot;).trim();
+  const patro=(document.getElementById(&quot;projPatroInp&quot;).value||&quot;&quot;).trim();
+  if(!nome){toast(&quot;Informe o nome da frente ativa.&quot;,&quot;err&quot;);return;}
+  if(editar){
+    const p=proj();if(!p)return;if(!p.meta)p.meta={};
+    p.meta.name=nome;p.meta.patrocinador=patro;
+    saveDB();fecharModal(&quot;modalProj&quot;);renderProjSel();render();toast(&quot;Frente ativa atualizada.&quot;,&quot;ok&quot;);
+  }else{
+    const id=uid(&quot;p&quot;);DB.projects[id]={meta:{name:nome,patrocinador:patro},frentes:[],indicadores:GOV_INDS};
+    DB.currentId=id;saveDB();fecharModal(&quot;modalProj&quot;);renderProjSel();render();toast(&quot;Frente ativa criada.&quot;,&quot;ok&quot;);
+  }
 }
 function excluirProjeto(){
   if(Object.keys(DB.projects).length<=1){toast(&quot;Deve existir ao menos um projeto.&quot;,&quot;err&quot;);return;}
@@ -11561,7 +11612,7 @@ function frentesFiltradas(){
     .filter(f=>!fp||f.pilar===fp)
     .filter(f=>!fr||(f.resp||&quot;&quot;)===fr)
     .filter(f=>!busca||((f.frente||&quot;&quot;)+&quot; &quot;+(f.situacao||&quot;&quot;)+&quot; &quot;+(f.resp||&quot;&quot;)+&quot; &quot;+(f.indicador||&quot;&quot;)).toLowerCase().includes(busca))
-    .sort((a,b)=>(a.num||999)-(b.num||999));
+    .sort((a,b)=>{const ca=stClass(a.status)===&quot;concluido&quot;?1:0,cb=stClass(b.status)===&quot;concluido&quot;?1:0;if(ca!==cb)return ca-cb;return (a.num||999)-(b.num||999);});   /* 🆕 concluída sempre no fim */
 }
 function render(){
   renderProjSel();
@@ -11596,9 +11647,14 @@ function render(){
   // barra de contexto: nome da frente ativa (item 7)
   const ctx=document.getElementById(&quot;ctxFrente&quot;);
   if(ctx){const nome=(p&amp;&amp;p.meta&amp;&amp;p.meta.name)||&quot;—&quot;;
+    const patro=(p&amp;&amp;p.meta&amp;&amp;p.meta.patrocinador)||&quot;&quot;;   /* 🆕 patrocinador */
     ctx.innerHTML='<svg viewBox=&quot;0 0 24 24&quot; width=&quot;16&quot; height=&quot;16&quot; fill=&quot;none&quot; stroke=&quot;#DA291C&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; style=&quot;flex-shrink:0&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>'
       +'<span style=&quot;font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:800&quot;>Frente ativa</span>'
       +'<span style=&quot;font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px&quot;>'+esc(nome)+'</span>'
+      +(patro?'<span style=&quot;width:1px;align-self:stretch;background:var(--border);margin:0 6px&quot;></span>'
+        +'<svg viewBox=&quot;0 0 24 24&quot; width=&quot;15&quot; height=&quot;15&quot; fill=&quot;none&quot; stroke=&quot;#F5842B&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; style=&quot;flex-shrink:0&quot;><path d=&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2&quot;/><circle cx=&quot;12&quot; cy=&quot;7&quot; r=&quot;4&quot;/></svg>'
+        +'<span style=&quot;font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:800&quot;>Patrocinador</span>'
+        +'<span style=&quot;font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px&quot;>'+esc(patro)+'</span>':'')
       +'<span style=&quot;margin-left:auto;font-size:11px;color:var(--soft);font-weight:600&quot;>'+all.length+' frente(s)</span>';
   }
   if(VIEW===&quot;cards&quot;)renderCards();
@@ -11618,7 +11674,7 @@ function renderCards(){
       <div class=&quot;frente-head&quot; onclick=&quot;toggleFrente('${f.id}')&quot;>
         <div class=&quot;frente-num&quot;>${f.num||&quot;–&quot;}</div>
         <div class=&quot;frente-main&quot;>
-          <div class=&quot;frente-title&quot;>${esc(f.frente)||&quot;(sem nome)&quot;} ${f.pilar?`<span class=&quot;pilar-tag&quot;>${esc(f.pilar.split(&quot;,&quot;)[0])}</span>`:&quot;&quot;}</div>
+          <div class=&quot;frente-title&quot;>${esc(f.frente)||&quot;(sem nome)&quot;} ${f.pilar?`<span class=&quot;pilar-tag&quot;>${esc(f.pilar.split(&quot;,&quot;)[0])}</span>`:&quot;&quot;}${f.ajuda?`<span style=&quot;display:inline-flex;align-items:center;gap:3px;background:#FEF2F2;color:#B71C1F;border:1px solid #FCA5A5;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:800&quot;>🆘 Ajuda</span>`:&quot;&quot;}</div>
           <div class=&quot;frente-sub&quot;>
             ${f.resp?`<span class=&quot;it&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2&quot;/><circle cx=&quot;12&quot; cy=&quot;7&quot; r=&quot;4&quot;/></svg><b>${esc(f.resp)}</b></span>`:&quot;&quot;}
             ${f.indicador?`<span class=&quot;it&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>${esc(f.indicador)}</span>`:&quot;&quot;}
@@ -11637,8 +11693,8 @@ function renderCards(){
           <div class=&quot;lbl&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z&quot;/><polyline points=&quot;14 2 14 8 20 8&quot;/></svg> Situação</div>
           <div class=&quot;txt&quot;>${esc(f.situacao)||'<span style=&quot;color:var(--mute)&quot;>Sem descrição.</span>'}</div>
           <div class=&quot;dates-row&quot;>
-            <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Prazo em Foco</span><span class=&quot;v ${pfCls}&quot;>${fmtData(f.prazoFoco)}</span></div>
-            <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Data Limite</span><span class=&quot;v ${dlCls}&quot;>${fmtData(f.dataLimite)}</span></div>
+            <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Data Início</span><span class=&quot;v ${pfCls}&quot;>${fmtData(f.prazoFoco)}</span></div>
+            <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Data Fim</span><span class=&quot;v ${dlCls}&quot;>${fmtData(f.dataLimite)}</span></div>
             <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Potencial Ganho</span><span class=&quot;v&quot; style=&quot;color:var(--sc)&quot; title=&quot;${esc(f.ganho)||&quot;&quot;}&quot;>${f.ganho?fmtGanhoCompact(f.ganho):&quot;—&quot;}</span></div>
             <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Pilar</span><span class=&quot;v&quot; style=&quot;font-weight:600;font-size:12px&quot;>${esc(f.pilar)||&quot;—&quot;}</span></div>
           </div>
@@ -11713,8 +11769,8 @@ const GT_COLS=[
   {k:&quot;situacao&quot;,l:&quot;Situação&quot;},
   {k:&quot;resp&quot;,l:&quot;Responsável&quot;},
   {k:&quot;status&quot;,l:&quot;Status&quot;},
-  {k:&quot;prazoFoco&quot;,l:&quot;Prazo em Foco&quot;},
-  {k:&quot;dataLimite&quot;,l:&quot;Data Limite&quot;},
+  {k:&quot;prazoFoco&quot;,l:&quot;Data Início&quot;},
+  {k:&quot;dataLimite&quot;,l:&quot;Data Fim&quot;},
   {k:&quot;ganho&quot;,l:&quot;Potencial Ganho&quot;},
   {k:&quot;indicador&quot;,l:&quot;Indicador&quot;},
   {k:&quot;pilar&quot;,l:&quot;Pilar&quot;},
@@ -11760,7 +11816,7 @@ function renderTable(){
         +'</tbody></table>';
     }
     acoesInner+='</div>';
-    return `<tr>
+    return `<tr class=&quot;${st==='concluido'?'gt-done':''}&quot;>
       <td><b>${f.num||&quot;–&quot;}</b></td>
       <td class=&quot;gt-frente&quot; onclick=&quot;abrirModalFrente('${f.id}')&quot; style=&quot;cursor:pointer&quot;>${esc(f.frente)}</td>
       <td onclick=&quot;abrirModalFrente('${f.id}')&quot; style=&quot;cursor:pointer&quot;><div class=&quot;gt-sit&quot;>${esc(f.situacao)}</div></td>
@@ -11808,6 +11864,7 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frFrente&quot;).value=f.frente||&quot;&quot;;
     document.getElementById(&quot;frSituacao&quot;).value=f.situacao||&quot;&quot;;
     document.getElementById(&quot;frResp&quot;).value=f.resp||&quot;&quot;;
+    document.getElementById(&quot;frAjuda&quot;).value=f.ajuda?&quot;sim&quot;:&quot;&quot;;
     document.getElementById(&quot;frStatus&quot;).value=f.status||&quot;Em Andamento&quot;;
     document.getElementById(&quot;frPrazoFoco&quot;).value=f.prazoFoco||&quot;&quot;;
     document.getElementById(&quot;frDataLimite&quot;).value=f.dataLimite||&quot;&quot;;
@@ -11822,7 +11879,7 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frId&quot;).value=&quot;&quot;;
     document.getElementById(&quot;frNum&quot;).value=prox;
     document.getElementById(&quot;frFrente&quot;).value=&quot;&quot;;document.getElementById(&quot;frSituacao&quot;).value=&quot;&quot;;
-    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;document.getElementById(&quot;frStatus&quot;).value=&quot;Em Andamento&quot;;
+    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;document.getElementById(&quot;frAjuda&quot;).value=&quot;&quot;;document.getElementById(&quot;frStatus&quot;).value=&quot;Em Andamento&quot;;
     document.getElementById(&quot;frPrazoFoco&quot;).value=&quot;&quot;;document.getElementById(&quot;frDataLimite&quot;).value=&quot;&quot;;
     setGanhoModal(&quot;&quot;);preencherSelectIndicadores(&quot;&quot;);
     document.getElementById(&quot;frPilar&quot;).value=&quot;&quot;;
@@ -11838,7 +11895,7 @@ function salvarFrente(){
   const dados={
     num:parseInt(document.getElementById(&quot;frNum&quot;).value)||null,
     frente:nome,situacao:document.getElementById(&quot;frSituacao&quot;).value,
-    resp:document.getElementById(&quot;frResp&quot;).value,status:document.getElementById(&quot;frStatus&quot;).value,
+    resp:document.getElementById(&quot;frResp&quot;).value,status:document.getElementById(&quot;frStatus&quot;).value,ajuda:(document.getElementById(&quot;frAjuda&quot;).value===&quot;sim&quot;),
     prazoFoco:document.getElementById(&quot;frPrazoFoco&quot;).value,dataLimite:document.getElementById(&quot;frDataLimite&quot;).value,
     ganho:montarGanhoStr(),indicador:document.getElementById(&quot;frIndicador&quot;).value,
     pilar:document.getElementById(&quot;frPilar&quot;).value,
@@ -11912,14 +11969,14 @@ try{ if(window.supabase&amp;&amp;window.supabase.createClient) sb=window.supabas
 let GOV_INDS=[];   /* indicadores do usuário (globais na governança, com dono) */
 
 /* monta a linha da tabela gov_frentes a partir do objeto em memória */
-function _frenteRow(f,projeto,u){
+function _frenteRow(f,projeto,u,patrocinador){
   return {
     id:f.id, projeto:projeto||&quot;Minha Governança&quot;, num:(f.num||null),
     frente:f.frente||&quot;&quot;, situacao:f.situacao||&quot;&quot;, resp:f.resp||&quot;&quot;,
     status:f.status||&quot;&quot;, prazo_foco:(f.prazoFoco||null), data_limite:(f.dataLimite||null),
     ganho:f.ganho||&quot;&quot;, indicador:f.indicador||&quot;&quot;, pilar:f.pilar||&quot;&quot;,
     dono:(f.dono||(u?u.nome:&quot;&quot;)),
-    dados_json:{obj:f, compartilhado:(f.compartilhado||[])},
+    dados_json:{obj:f, compartilhado:(f.compartilhado||[]), patrocinador:(patrocinador||&quot;&quot;)},   /* 🆕 patrocinador do projeto */
     excluido:false, atualizado_em:new Date().toISOString()
   };
 }
@@ -11929,7 +11986,7 @@ function _indRow(it,u){
     id:it.id, nome:it.nome||&quot;&quot;, area:it.area||&quot;&quot;, unidade:it.unidade||&quot;&quot;,
     meta:(it.meta==null?null:it.meta), direcao:it.direcao||&quot;menor&quot;, visao:it.visao||&quot;fiscal&quot;,
     dono:(it.dono||(u?u.nome:&quot;&quot;)),
-    dados_json:{meses:(it.dados||{}), compartilhado:(it.compartilhado||[])}
+    dados_json:{meses:(it.dados||{}), compartilhado:(it.compartilhado||[]), projeto:(it.projeto||&quot;&quot;), histMeses:(it.histMeses==null?null:it.histMeses), futMeses:(it.futMeses==null?null:it.futMeses), agg:(it.agg||&quot;&quot;), periodo:(it.periodo||&quot;&quot;)}
   };
 }
 async function cloudCarregar(){
@@ -11945,7 +12002,7 @@ async function cloudCarregar(){
       const dj=r.dados_json||{};
       return {id:r.id,nome:r.nome||&quot;&quot;,area:r.area||&quot;&quot;,unidade:r.unidade||&quot;&quot;,
         meta:(r.meta==null?null:r.meta),direcao:r.direcao||&quot;menor&quot;,visao:r.visao||&quot;fiscal&quot;,
-        dados:(dj.meses||{}),dono:r.dono||&quot;&quot;,compartilhado:(dj.compartilhado||[])};
+        dados:(dj.meses||{}),dono:r.dono||&quot;&quot;,compartilhado:(dj.compartilhado||[]),projeto:(dj.projeto||&quot;&quot;),histMeses:(dj.histMeses==null?null:dj.histMeses),futMeses:(dj.futMeses==null?null:dj.futMeses),agg:(dj.agg||&quot;&quot;),periodo:(dj.periodo||&quot;&quot;)};
     }).filter(podeVerItem);
     /* ---- frentes agrupadas por projeto (filtra visibilidade) ---- */
     DB={currentId:null,projects:{}};
@@ -11957,6 +12014,7 @@ async function cloudCarregar(){
       if(!podeVerItem(f))return;
       const pn=r.projeto||&quot;Minha Governança&quot;;
       if(!DB.projects[pn])DB.projects[pn]={meta:{name:pn},frentes:[],indicadores:GOV_INDS};
+      if(dj.patrocinador&amp;&amp;!DB.projects[pn].meta.patrocinador)DB.projects[pn].meta.patrocinador=dj.patrocinador;   /* 🆕 patrocinador */
       DB.projects[pn].frentes.push(f);
     });
     if(Object.keys(DB.projects).length===0){
@@ -11964,6 +12022,9 @@ async function cloudCarregar(){
     }
     Object.values(DB.projects).forEach(p=>{p.indicadores=GOV_INDS;});
     DB.currentId=Object.keys(DB.projects)[0];
+    /* &#128994; indicadores antigos (sem frente) -> vinculados à 1ª frente p/ não sumirem */
+    const _1aFr=Object.keys(DB.projects)[0]||&quot;Minha Governança&quot;;
+    GOV_INDS.forEach(function(it){ if(!it.projeto) it.projeto=_1aFr; });
     try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}
     return true;
   }catch(e){console.warn(&quot;[cloud gov] load:&quot;,e);return false;}
@@ -11975,7 +12036,7 @@ async function cloudSalvar(){
   try{
     const rows=[];
     Object.values(DB.projects||{}).forEach(p=>{
-      (p.frentes||[]).forEach(f=>{ if(podeEditarItem(f)){ if(!f.dono&amp;&amp;u)f.dono=u.nome; rows.push(_frenteRow(f,p.meta.name,u)); } });
+      (p.frentes||[]).forEach(f=>{ if(podeEditarItem(f)){ if(!f.dono&amp;&amp;u)f.dono=u.nome; rows.push(_frenteRow(f,p.meta.name,u,(p.meta&amp;&amp;p.meta.patrocinador)||&quot;&quot;)); } });   /* 🆕 patrocinador */
     });
     if(rows.length){ const {error}=await sb.from(&quot;gov_frentes&quot;).upsert(rows,{onConflict:&quot;id&quot;}); if(error)console.warn(&quot;[gov frentes]&quot;,error); }
     const irows=(GOV_INDS||[]).filter(podeEditarItem).map(it=>{ if(!it.dono&amp;&amp;u)it.dono=u.nome; return _indRow(it,u); });
@@ -12118,19 +12179,23 @@ function setGanhoModal(ganho){
   atualizarPreviewGanho();
 }
 
-/* indicadores ficam por projeto */
-function indicadores(){const p=proj();if(!p)return[];if(!Array.isArray(p.indicadores))p.indicadores=[];return p.indicadores;}
+/* &#128994; indicadores ficam VINCULADOS a cada FRENTE (projeto ativo) */
+function _nomeFrenteAtiva(){const p=proj();return (p&&p.meta&&p.meta.name)||DB.currentId||&quot;&quot;;}
+function indicadores(){if(!Array.isArray(GOV_INDS))return[];const pn=_nomeFrenteAtiva();return GOV_INDS.filter(function(it){return (it.projeto||&quot;&quot;)===pn;});}
 
 /* meses conforme a forma de visualização escolhida */
 function mesesParaVisao(visao){
   const now=new Date();const cy=now.getFullYear();const cm=now.getMonth();
   const arr=[];
-  if(visao===&quot;fiscal&quot;){
+  if(visao===&quot;custom&quot;){
+    const hEl=document.getElementById(&quot;indHist&quot;),fEl=document.getElementById(&quot;indFut&quot;);
+    let hist=hEl?parseInt(hEl.value,10):6, fut=fEl?parseInt(fEl.value,10):6;
+    if(isNaN(hist))hist=6; if(isNaN(fut))fut=6;
+    hist=Math.max(0,Math.min(12,hist)); fut=Math.max(0,Math.min(12,fut));
+    for(let k=hist;k>=1;k--){const d=new Date(cy,cm-k,1);arr.push({key:_mkey(d.getFullYear(),d.getMonth()),label:_mlbl(d.getFullYear(),d.getMonth()),tipo:&quot;real&quot;});}
+    for(let k=0;k<fut;k++){const d=new Date(cy,cm+k,1);arr.push({key:_mkey(d.getFullYear(),d.getMonth()),label:_mlbl(d.getFullYear(),d.getMonth()),tipo:&quot;fc&quot;});}
+  }else{ /* fiscal */
     for(let m=0;m<12;m++)arr.push({key:_mkey(cy,m),label:_mlbl(cy,m),tipo:(m<cm?&quot;real&quot;:&quot;fc&quot;)});
-  }else{
-    const back=(visao===&quot;m6&quot;)?6:12;
-    for(let k=back;k>=1;k--){const d=new Date(cy,cm-k,1);arr.push({key:_mkey(d.getFullYear(),d.getMonth()),label:_mlbl(d.getFullYear(),d.getMonth()),tipo:&quot;real&quot;});}
-    for(let k=0;k<=5;k++){const d=new Date(cy,cm+k,1);arr.push({key:_mkey(d.getFullYear(),d.getMonth()),label:_mlbl(d.getFullYear(),d.getMonth()),tipo:&quot;fc&quot;});}
   }
   return arr;
 }
@@ -12142,19 +12207,47 @@ function somaFiscal(it){
   mesesFiscal().forEach(mo=>{const v=d[mo.key]||{};const val=(v.real!=null?v.real:(v.fc!=null?v.fc:null));if(val!=null)s+=val;});
   return s;
 }
+/* 🆕 modo de cálculo padrão pela unidade: % e p.p. → média; R$ e quantidade → acumulativo */
+function _aggPadrao(it){const t=_tipoUnidade(it&&it.unidade);return (t===&quot;pct&quot;||t===&quot;pp&quot;)?&quot;media&quot;:&quot;acumulativo&quot;;}
+/* 🆕 meses do período escolhido: ano fiscal (jan–dez) ou período personalizado do indicador (X hist + Y fut) */
+function _mesesPeriodo(it,periodo){
+  if(periodo===&quot;indicador&quot; &amp;&amp; it &amp;&amp; it.visao===&quot;custom&quot;){
+    const now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
+    let h=(it.histMeses==null?6:it.histMeses),f=(it.futMeses==null?6:it.futMeses);
+    h=Math.max(0,Math.min(12,h));f=Math.max(0,Math.min(12,f));
+    const a=[];
+    for(let k=h;k>=1;k--){const d=new Date(cy,cm-k,1);a.push({key:_mkey(d.getFullYear(),d.getMonth())});}
+    for(let k=0;k<f;k++){const d=new Date(cy,cm+k,1);a.push({key:_mkey(d.getFullYear(),d.getMonth())});}
+    return a;
+  }
+  return mesesFiscal();
+}
+function _valMes(d,key){const v=d[key]||{};return (v.real!=null?v.real:(v.fc!=null?v.fc:null));}
+/* 🆕 base agregada: soma (acumulativo) ou média (só meses preenchidos) no período */
+function _aggBase(it,mode,periodo){
+  const d=(it&&it.dados)||{};const ms=_mesesPeriodo(it,periodo);
+  let s=0,c=0;
+  ms.forEach(mo=>{const val=_valMes(d,mo.key);if(val!=null){s+=val;c++;}});
+  return (mode===&quot;media&quot;)?(c?(s/c):0):s;
+}
+/* 🆕 indicador atualmente selecionado na visão de gráficos */
+function _indAtualWf(){const inds=indicadoresVisiveis();return inds.find(i=>i.nome===_wfSel)||inds[0]||null;}
+function wfSetAgg(v){const it=_indAtualWf();if(it){it.agg=v;saveDB();}desenharWaterfall();}
+function wfSetPeriodo(v){const it=_indAtualWf();if(it){it.periodo=v;saveDB();}desenharWaterfall();}
 
 let _indTmp={};
 function _coletarMeses(){
   document.querySelectorAll(&quot;.indCellFc&quot;).forEach(inp=>{const k=inp.dataset.k;_indTmp[k]=_indTmp[k]||{};_indTmp[k].fc=_pnum(inp.value);});
   document.querySelectorAll(&quot;.indCellReal&quot;).forEach(inp=>{const k=inp.dataset.k;_indTmp[k]=_indTmp[k]||{};_indTmp[k].real=_pnum(inp.value);});
 }
-function montarMesesInd(){
+function montarMesesInd(preservar){
   const wrap=document.getElementById(&quot;indMesesWrap&quot;);
-  if(wrap &amp;&amp; wrap.children.length)_coletarMeses(); /* preserva o que já foi digitado ao trocar a visão */
+  if(preservar &amp;&amp; wrap &amp;&amp; wrap.children.length)_coletarMeses(); /* preserva só ao trocar a visão/período */
   const visao=document.getElementById(&quot;indVisao&quot;).value;
+  const cr=document.getElementById(&quot;indCustomRange&quot;); if(cr) cr.style.display=(visao===&quot;custom&quot;)?&quot;grid&quot;:&quot;none&quot;;
   const meses=mesesParaVisao(visao);
   const fmt=v=>(v==null||isNaN(v))?&quot;&quot;:v;
-  document.getElementById(&quot;indMesesTit&quot;).textContent=&quot;Preenchimento mensal — &quot;+(visao===&quot;fiscal&quot;?&quot;Ano fiscal (jan–dez)&quot;:visao===&quot;m12&quot;?&quot;M-12 + forecast&quot;:&quot;M-6 + forecast&quot;);
+  document.getElementById(&quot;indMesesTit&quot;).textContent=&quot;Preenchimento mensal — &quot;+(visao===&quot;fiscal&quot;?&quot;Ano fiscal (jan–dez)&quot;:&quot;Período personalizado&quot;);
   wrap.innerHTML=meses.map(mo=>{
     const d=_indTmp[mo.key]||{};
     const isReal=mo.tipo===&quot;real&quot;;
@@ -12166,39 +12259,81 @@ function montarMesesInd(){
     </div>`;
   }).join(&quot;&quot;);
 }
+/* &#128994; preenche o seletor de frente vinculada com todas as frentes cadastradas */
+function _preencherFrentesInd(selecionada){
+  const sel=document.getElementById(&quot;indFrente&quot;);if(!sel)return;
+  const nomes=Object.values(DB.projects||{}).map(function(p){return (p&&p.meta&&p.meta.name)||&quot;&quot;;}).filter(Boolean);
+  const atual=_nomeFrenteAtiva();
+  if(atual&&nomes.indexOf(atual)<0)nomes.unshift(atual);
+  const alvo=selecionada||atual;
+  if(alvo&&nomes.indexOf(alvo)<0)nomes.unshift(alvo);
+  sel.innerHTML=nomes.map(function(n){return '<option value=&quot;'+esc(n)+'&quot;'+(n===alvo?' selected':'')+'>'+esc(n)+'</option>';}).join('');
+}
+function _setUnidade(u){
+  u=(u||&quot;&quot;).trim();
+  const sel=document.getElementById(&quot;indUnidTipo&quot;),inp=document.getElementById(&quot;indUnid&quot;);
+  const known=[&quot;R$&quot;,&quot;%&quot;,&quot;p.p.&quot;,&quot;un&quot;];
+  if(u===&quot;&quot;){sel.value=&quot;R$&quot;;inp.style.display=&quot;none&quot;;inp.value=&quot;R$&quot;;}
+  else if(known.indexOf(u)>=0){sel.value=u;inp.style.display=&quot;none&quot;;inp.value=u;}
+  else{sel.value=&quot;__custom__&quot;;inp.style.display=&quot;&quot;;inp.value=u;}
+}
+function onUnidTipoChange(){
+  const tipo=document.getElementById(&quot;indUnidTipo&quot;).value;
+  const inp=document.getElementById(&quot;indUnid&quot;);
+  if(tipo===&quot;__custom__&quot;){const known=[&quot;R$&quot;,&quot;%&quot;,&quot;p.p.&quot;,&quot;un&quot;];inp.style.display=&quot;&quot;;if(known.indexOf(inp.value)>=0)inp.value=&quot;&quot;;try{inp.focus();}catch(e){}}
+  else{inp.style.display=&quot;none&quot;;inp.value=tipo;}
+}
+function _preencherRangeSelects(){
+  const h=document.getElementById(&quot;indHist&quot;),f=document.getElementById(&quot;indFut&quot;);
+  if(h&&!h.dataset.done){let s=&quot;&quot;;for(let i=0;i<=12;i++)s+='<option value=&quot;'+i+'&quot;>'+i+' '+(i===1?'mês':'meses')+'</option>';h.innerHTML=s;h.dataset.done=&quot;1&quot;;}
+  if(f&&!f.dataset.done){let s=&quot;&quot;;for(let i=0;i<=12;i++)s+='<option value=&quot;'+i+'&quot;>'+i+' '+(i===1?'mês':'meses')+'</option>';f.innerHTML=s;f.dataset.done=&quot;1&quot;;}
+}
 function abrirModalInd(id){
   const set=(k,v)=>{document.getElementById(k).value=v;};
   if(id){
     const it=indicadores().find(x=>x.id===id);if(!it)return;
     document.getElementById(&quot;mIndTitle&quot;).textContent=&quot;Editar indicador&quot;;
     set(&quot;indId&quot;,it.id);set(&quot;indNome&quot;,it.nome||&quot;&quot;);set(&quot;indArea&quot;,it.area||&quot;&quot;);set(&quot;indUnid&quot;,it.unidade||&quot;&quot;);
-    set(&quot;indMeta&quot;,it.meta==null?&quot;&quot;:it.meta);set(&quot;indDir&quot;,it.direcao||&quot;menor&quot;);set(&quot;indVisao&quot;,it.visao||&quot;fiscal&quot;);
+    set(&quot;indMeta&quot;,it.meta==null?&quot;&quot;:it.meta);set(&quot;indDir&quot;,it.direcao||&quot;menor&quot;);
+    _setUnidade(it.unidade||&quot;&quot;);_preencherRangeSelects();
+    var _vz=it.visao||&quot;fiscal&quot;,_h=it.histMeses,_f=it.futMeses;
+    if(_vz===&quot;m12&quot;){_vz=&quot;custom&quot;;if(_h==null)_h=12;if(_f==null)_f=6;}else if(_vz===&quot;m6&quot;){_vz=&quot;custom&quot;;if(_h==null)_h=6;if(_f==null)_f=6;}
+    set(&quot;indVisao&quot;,_vz);document.getElementById(&quot;indHist&quot;).value=(_h==null?6:_h);document.getElementById(&quot;indFut&quot;).value=(_f==null?6:_f);
+    _preencherFrentesInd(it.projeto||_nomeFrenteAtiva());
     _indTmp=JSON.parse(JSON.stringify(it.dados||{}));
     document.getElementById(&quot;mIndDel&quot;).style.display=&quot;inline-flex&quot;;
   }else{
     document.getElementById(&quot;mIndTitle&quot;).textContent=&quot;Novo indicador&quot;;
-    [&quot;indId&quot;,&quot;indNome&quot;,&quot;indArea&quot;,&quot;indUnid&quot;,&quot;indMeta&quot;].forEach(k=>set(k,&quot;&quot;));
+    [&quot;indId&quot;,&quot;indNome&quot;,&quot;indArea&quot;,&quot;indMeta&quot;].forEach(k=>set(k,&quot;&quot;));
     set(&quot;indDir&quot;,&quot;menor&quot;);set(&quot;indVisao&quot;,&quot;fiscal&quot;);
+    _setUnidade(&quot;&quot;);_preencherRangeSelects();document.getElementById(&quot;indHist&quot;).value=6;document.getElementById(&quot;indFut&quot;).value=6;
+    _preencherFrentesInd(_nomeFrenteAtiva());
     _indTmp={};
     document.getElementById(&quot;mIndDel&quot;).style.display=&quot;none&quot;;
   }
+  document.getElementById(&quot;indMesesWrap&quot;).innerHTML=&quot;&quot;;   /* 🐛 evita herdar dados do indicador anterior */
   montarMesesInd();
   document.getElementById(&quot;modalInd&quot;).classList.add(&quot;show&quot;);
 }
 function salvarInd(){
   const g=k=>document.getElementById(k).value;
   const nome=g(&quot;indNome&quot;).trim();if(!nome){toast(&quot;Informe o nome do indicador.&quot;,&quot;err&quot;);return;}
+  const unidade=g(&quot;indUnid&quot;).trim();if(!unidade){toast(&quot;Selecione ou informe a unidade do indicador.&quot;,&quot;err&quot;);return;}
   _coletarMeses();
   const dados={};Object.keys(_indTmp).forEach(k=>{const d=_indTmp[k]||{};if(d.fc!=null||d.real!=null)dados[k]={fc:d.fc??null,real:d.real??null};});
   const meta=_pnum(g(&quot;indMeta&quot;));
   const id=g(&quot;indId&quot;);
-  const arr=indicadores();
+  if(!Array.isArray(GOV_INDS))GOV_INDS=[];
   const u=usuarioAtualGov();
-  const antigo=id?arr.find(x=>x.id===id):null;
-  const obj={id:id||uid(&quot;ind&quot;),nome:nome,area:g(&quot;indArea&quot;).trim(),unidade:g(&quot;indUnid&quot;).trim(),meta:meta,direcao:g(&quot;indDir&quot;),visao:g(&quot;indVisao&quot;),dados:dados,
-    dono:antigo?(antigo.dono||(u?u.nome:&quot;&quot;)):(u?u.nome:&quot;&quot;),                 /* 🆕 mantém/carimba o dono */
+  const antigo=id?GOV_INDS.find(x=>x.id===id):null;
+  const fSel=document.getElementById(&quot;indFrente&quot;);
+  const projeto=(fSel&&fSel.value)||(antigo&&antigo.projeto)||_nomeFrenteAtiva();   /* &#128994; frente vinculada */
+  const obj={id:id||uid(&quot;ind&quot;),nome:nome,area:g(&quot;indArea&quot;).trim(),unidade:unidade,meta:meta,direcao:g(&quot;indDir&quot;),visao:g(&quot;indVisao&quot;),dados:dados,
+    histMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indHist&quot;),10)||0):null),futMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indFut&quot;),10)||0):null),
+    projeto:projeto,                                                                /* &#128994; só aparece nesta frente */
+    dono:antigo?(antigo.dono||(u?u.nome:&quot;&quot;)):(u?u.nome:&quot;&quot;),                 /* &#127381; mantém/carimba o dono */
     compartilhado:antigo?_compart(antigo):[]};
-  if(id){const i=arr.findIndex(x=>x.id===id);if(i>=0)arr[i]=obj;}else arr.push(obj);
+  if(id){const i=GOV_INDS.findIndex(x=>x.id===id);if(i>=0)GOV_INDS[i]=obj;else GOV_INDS.push(obj);}else GOV_INDS.push(obj);
   saveDB();fecharModal(&quot;modalInd&quot;);renderInd();toast(&quot;Indicador salvo.&quot;,&quot;ok&quot;);
 }
 function excluirInd(){
@@ -12255,17 +12390,44 @@ function renderInd(){
           <svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot; fill=&quot;none&quot; stroke=&quot;#DA291C&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><rect x=&quot;7&quot; y=&quot;12&quot; width=&quot;3&quot; height=&quot;6&quot;/><rect x=&quot;14&quot; y=&quot;8&quot; width=&quot;3&quot; height=&quot;10&quot;/></svg>
           Cascata do indicador (Waterfall)
         </h3>
-        <div style=&quot;margin-left:auto;display:flex;align-items:center;gap:8px&quot;>
-          <label style=&quot;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;>Indicador</label>
-          <select id=&quot;wfInd&quot; onchange=&quot;_wfSel=this.value;desenharWaterfall()&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit&quot;>${optSel||'<option value=&quot;&quot;>—</option>'}</select>
+        <div style=&quot;margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap&quot;>
+          <div style=&quot;display:flex;align-items:center;gap:7px&quot;>
+            <label style=&quot;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;>Indicador</label>
+            <select id=&quot;wfInd&quot; onchange=&quot;_wfSel=this.value;desenharWaterfall()&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit&quot;>${optSel||'<option value=&quot;&quot;>—</option>'}</select>
+          </div>
+          <div style=&quot;display:flex;align-items:center;gap:7px&quot;>
+            <label style=&quot;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;>Cálculo</label>
+            <select id=&quot;wfAgg&quot; onchange=&quot;wfSetAgg(this.value)&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit&quot;>
+              <option value=&quot;acumulativo&quot;>Acumulativo (soma)</option>
+              <option value=&quot;media&quot;>Média</option>
+            </select>
+          </div>
+          <div style=&quot;display:flex;align-items:center;gap:7px&quot;>
+            <label style=&quot;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;>Período</label>
+            <select id=&quot;wfPeriodo&quot; onchange=&quot;wfSetPeriodo(this.value)&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit&quot;>
+              <option value=&quot;fiscal&quot;>Ano fiscal (jan–dez)</option>
+              <option value=&quot;indicador&quot;>Período do indicador</option>
+            </select>
+          </div>
         </div>
       </div>
-      <p style=&quot;font-size:12px;color:var(--soft);margin:0 0 12px&quot;>Base = soma do <b>ano fiscal (real + forecast)</b>. Cada frente com o indicador em foco reduz o valor conforme seu <b>Potencial de Ganho</b>. A barra final mostra o valor após as ações.</p>
+      <p style=&quot;font-size:12px;color:var(--soft);margin:0 0 12px&quot;>Base = <b id=&quot;wfModoTxt&quot;>agregação</b> do período selecionado (soma para valores acumulativos; <b>média</b> para percentuais). Cada frente com o indicador em foco reduz a base conforme seu <b>Potencial de Ganho</b>. A barra final mostra o valor após as ações.</p>
       <div style=&quot;display:flex;gap:18px;align-items:stretch;flex-wrap:wrap&quot;>
         <div style=&quot;flex:1;min-width:340px;height:360px;position:relative&quot;><canvas id=&quot;wfCanvas&quot;></canvas></div>
         <div id=&quot;wfSide&quot; style=&quot;width:230px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;gap:16px&quot;></div>
       </div>
       <div id=&quot;wfResumo&quot; style=&quot;margin-top:14px&quot;></div>
+    </div>
+    <div style=&quot;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px;margin-top:20px&quot;>
+      <div style=&quot;display:flex;align-items:center;gap:10px;margin-bottom:4px&quot;>
+        <h3 style=&quot;font-size:15px;font-weight:800;color:#1A1F36;margin:0;display:flex;align-items:center;gap:8px&quot;>
+          <svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot; fill=&quot;none&quot; stroke=&quot;#DA291C&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>
+          Evolução do indicador — Real × Forecast
+        </h3>
+        <span id=&quot;lnUnidBadge&quot; style=&quot;margin-left:auto;font-size:11px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;></span>
+      </div>
+      <p style=&quot;font-size:12px;color:var(--soft);margin:0 0 12px&quot;>Linha do <b>Realizado</b> (meses já ocorridos) e do <b>Forecast</b> (projeção) no ano fiscal vigente. A escala se ajusta automaticamente à unidade do indicador.</p>
+      <div style=&quot;height:320px;position:relative&quot;><canvas id=&quot;lnCanvas&quot;></canvas></div>
     </div>`;
   desenharWaterfall();
 }
@@ -12296,12 +12458,17 @@ function desenharWaterfall(){
   const cv=document.getElementById(&quot;wfCanvas&quot;);if(!cv||typeof Chart===&quot;undefined&quot;)return;
   if(_wfChart){try{_wfChart.destroy();}catch(e){}_wfChart=null;}
   const inds=indicadoresVisiveis();
-  if(!inds.length){document.getElementById(&quot;wfResumo&quot;).innerHTML=&quot;Cadastre um indicador para ver a cascata.&quot;;return;}
+  if(!inds.length){document.getElementById(&quot;wfResumo&quot;).innerHTML=&quot;Cadastre um indicador para ver a cascata.&quot;;try{desenharLinhaInd();}catch(e){}return;}
   if(!_wfSel||!inds.some(i=>i.nome===_wfSel))_wfSel=inds[0].nome;
   const sel=document.getElementById(&quot;wfInd&quot;);if(sel)sel.value=_wfSel;
   const it=inds.find(i=>i.nome===_wfSel);
   const unid=it.unidade?(&quot; &quot;+it.unidade):&quot;&quot;;
-  const base=somaFiscal(it);
+  const mode=(it.agg||_aggPadrao(it));                 /* 🆕 acumulativo | media */
+  const periodo=(it.periodo||&quot;fiscal&quot;);                /* 🆕 fiscal | indicador */
+  const aggSel=document.getElementById(&quot;wfAgg&quot;);if(aggSel)aggSel.value=mode;
+  const perSel=document.getElementById(&quot;wfPeriodo&quot;);if(perSel)perSel.value=periodo;
+  const modoTxt=document.getElementById(&quot;wfModoTxt&quot;);if(modoTxt)modoTxt.textContent=(mode===&quot;media&quot;?&quot;média&quot;:&quot;soma&quot;);
+  const base=_aggBase(it,mode,periodo);                /* 🆕 soma OU média conforme o modo */
   const p=proj();
   const frentesImp=(p.frentes||[]).filter(f=>(f.indicador||&quot;&quot;)===_wfSel);
   const reduc=frentesImp.map(f=>{const g=parseGanho(f.ganho);return {nome:f.frente||&quot;Frente&quot;,val:g?Math.abs(g.n):0};}).filter(r=>r.val>0);
@@ -12334,7 +12501,7 @@ function desenharWaterfall(){
         tooltip:{padding:10,titleFont:{size:12.5,weight:&quot;700&quot;},bodyFont:{size:12.5},callbacks:{
           title:c=>fullLabels[c[0].dataIndex],
           label:c=>{const v=c.raw;const d=Math.abs(v[1]-v[0]);return (c.dataIndex>0&amp;&amp;c.dataIndex<data.length-1?&quot;Redução: −&quot;:&quot;Valor: &quot;)+fmtFull(d,it.unidade);},
-          afterLabel:c=>{const v=c.raw;const acc=Math.max(v[0],v[1]);return &quot;Acumulado: &quot;+fmtFull(acc,it.unidade);}}}},
+          afterLabel:c=>{const v=c.raw;const acc=Math.max(v[0],v[1]);return (mode===&quot;media&quot;?&quot;Valor: &quot;:&quot;Acumulado: &quot;)+fmtFull(acc,it.unidade);}}}},
       scales:{y:{beginAtZero:true,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>fmtCompact(v)}},x:{grid:{display:false},ticks:{font:{size:11,weight:&quot;600&quot;},maxRotation:0,autoSkip:false}}}},
     plugins:[_wfLabelPlugin]
   });
@@ -12355,7 +12522,7 @@ function desenharWaterfall(){
   const side=document.getElementById(&quot;wfSide&quot;);
   if(side){
     side.innerHTML=
-      `<div>${lbl(&quot;Base:&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#1A1F36&quot;>${fmtFull(base,it.unidade)}</div></div>`
+      `<div>${lbl((mode===&quot;media&quot;?&quot;Base (média):&quot;:&quot;Base (soma):&quot;))}<div style=&quot;font-size:15px;font-weight:800;color:#1A1F36&quot;>${fmtFull(base,it.unidade)}</div></div>`
       +`<div>${lbl(&quot;Redução total (&quot;+reduc.length+&quot; frente&quot;+(reduc.length===1?&quot;&quot;:&quot;s&quot;)+&quot;):&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#DA291C&quot;>−${fmtFull(totalRed,it.unidade)}</div></div>`
       +`<div>${lbl(&quot;Final:&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#047857&quot;>${fmtFull(running,it.unidade)}</div></div>`
       +`<div>${lbl(&quot;% Redução total (&quot;+reduc.length+&quot; frente&quot;+(reduc.length===1?&quot;&quot;:&quot;s&quot;)+&quot;):&quot;)}<div style=&quot;font-size:15px;font-weight:800;color:#DA291C&quot;>- ${pctTxt}</div></div>`
@@ -12363,6 +12530,55 @@ function desenharWaterfall(){
   }
   /* abaixo do gráfico: apenas a legenda das frentes (texto de resumo foi removido) */
   document.getElementById(&quot;wfResumo&quot;).innerHTML=legendaHtml;
+  try{desenharLinhaInd();}catch(e){}
+}
+
+/* 🆕 gráfico de linha Real × Forecast (adapta escala/formato à unidade) */
+let _lnChart=null;
+function _tipoUnidade(u){u=(u||&quot;&quot;).trim().toLowerCase();
+  if(/r\$|financ|reais/.test(u))return &quot;moeda&quot;;
+  if(u===&quot;%&quot;||/percent/.test(u))return &quot;pct&quot;;
+  if(u===&quot;p.p.&quot;||/ponto/.test(u))return &quot;pp&quot;;
+  return &quot;num&quot;;
+}
+function _fmtIndEixo(v,u){const t=_tipoUnidade(u);
+  if(t===&quot;moeda&quot;)return &quot;R$ &quot;+fmtCompact(v);
+  if(t===&quot;pct&quot;)return fmtN(v)+&quot;%&quot;;
+  if(t===&quot;pp&quot;)return fmtN(v)+&quot; p.p.&quot;;
+  return fmtCompact(v);
+}
+function _fmtIndTip(v,u){const t=_tipoUnidade(u);
+  if(t===&quot;moeda&quot;)return &quot;R$ &quot;+v.toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(t===&quot;pct&quot;)return v.toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:0,maximumFractionDigits:2})+&quot;%&quot;;
+  if(t===&quot;pp&quot;)return v.toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:0,maximumFractionDigits:2})+&quot; p.p.&quot;;
+  return v.toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:0,maximumFractionDigits:2})+(u?(&quot; &quot;+u):&quot;&quot;);
+}
+function desenharLinhaInd(){
+  const cv=document.getElementById(&quot;lnCanvas&quot;);if(!cv||typeof Chart===&quot;undefined&quot;)return;
+  if(_lnChart){try{_lnChart.destroy();}catch(e){}_lnChart=null;}
+  const inds=indicadoresVisiveis();
+  const it=inds.find(i=>i.nome===_wfSel)||inds[0];
+  const badge=document.getElementById(&quot;lnUnidBadge&quot;);
+  if(!it){if(badge)badge.textContent=&quot;&quot;;return;}
+  if(badge)badge.textContent=&quot;Unidade: &quot;+(it.unidade||&quot;—&quot;);
+  const d=it.dados||{};const meses=mesesFiscal();
+  const labels=meses.map(mo=>{const p=mo.key.split(&quot;-&quot;);return _MES[parseInt(p[1],10)-1]+&quot;/&quot;+p[0].slice(-2);});
+  const realArr=meses.map(mo=>{const v=d[mo.key]||{};return (v.real!=null?v.real:null);});
+  const fcArr=meses.map(mo=>{const v=d[mo.key]||{};return (v.fc!=null?v.fc:null);});
+  /* conecta a linha de forecast ao último real (evita gap visual) */
+  let lastReal=-1;for(let i=0;i<realArr.length;i++){if(realArr[i]!=null)lastReal=i;}
+  if(lastReal>=0&&fcArr[lastReal]==null)fcArr[lastReal]=realArr[lastReal];
+  const u=it.unidade;
+  const ds=[
+    {label:&quot;Realizado&quot;,data:realArr,borderColor:&quot;#1F2937&quot;,backgroundColor:&quot;rgba(31,41,55,.08)&quot;,tension:.3,borderWidth:2.6,pointRadius:3,pointBackgroundColor:&quot;#1F2937&quot;,spanGaps:false,fill:false},
+    {label:&quot;Forecast&quot;,data:fcArr,borderColor:&quot;#F5842B&quot;,backgroundColor:&quot;transparent&quot;,borderDash:[6,4],tension:.3,borderWidth:2.4,pointRadius:3,pointBackgroundColor:&quot;#F5842B&quot;,spanGaps:true}
+  ];
+  if(it.meta!=null&&!isNaN(it.meta)){ds.push({label:&quot;Meta&quot;,data:labels.map(()=>it.meta),borderColor:&quot;#DA291C&quot;,borderDash:[3,3],borderWidth:1.6,pointRadius:0,tension:0});}
+  _lnChart=new Chart(cv,{type:&quot;line&quot;,data:{labels:labels,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:&quot;index&quot;,intersect:false},
+      plugins:{legend:{position:&quot;bottom&quot;,labels:{boxWidth:12,usePointStyle:true,font:{size:11},padding:14}},
+        tooltip:{padding:10,callbacks:{label:c=>c.dataset.label+&quot;: &quot;+(c.parsed.y==null?&quot;—&quot;:_fmtIndTip(c.parsed.y,u))}}},
+      scales:{y:{beginAtZero:false,grace:&quot;12%&quot;,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>_fmtIndEixo(v,u)}},x:{grid:{display:false},ticks:{font:{size:10.5},maxRotation:0,autoSkip:false,callback:function(v,i){return (i%2===0)?labels[i]:&quot;&quot;;}}}}}});
 }
 
 /* ---------- init ---------- */
@@ -12378,7 +12594,7 @@ async function iniciarGov(){
       GOV_INDS=[];
       Object.values(DB.projects).forEach(p=>p.indicadores=GOV_INDS);
     }
-  }else{ loadDB(); GOV_INDS=(proj()&amp;&amp;proj().indicadores)||[]; Object.values(DB.projects).forEach(p=>p.indicadores=GOV_INDS); }
+  }else{ loadDB(); GOV_INDS=(proj()&amp;&amp;proj().indicadores)||[]; const _1aFr=(proj()&amp;&amp;proj().meta&amp;&amp;proj().meta.name)||DB.currentId||&quot;Minha Governança&quot;; GOV_INDS.forEach(function(it){if(!it.projeto)it.projeto=_1aFr;}); Object.values(DB.projects).forEach(p=>p.indicadores=GOV_INDS); }
   render();
 }
 /* 🔑 o shell chama isto ao injetar o usuário no iframe: fixa ME e recarrega */
