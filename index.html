@@ -14363,6 +14363,10 @@ function iniciais(n){if(!n)return&quot;?&quot;;const p=n.trim().split(/\s+/);ret
 function corAvatar(s){let h=0;for(let i=0;i<(s||&quot;&quot;).length;i++)h=s.charCodeAt(i)+((h<<5)-h);return AVATAR_CORES[Math.abs(h)%AVATAR_CORES.length]}
 /* hash simples — apenas para não guardar a senha em texto puro nesta demo */
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return &quot;h&quot;+(h>>>0).toString(16)}
+/* 🔐 SHA-256 (crypto.subtle) com prefixo &quot;s2$&quot;; compatível com hash antigo (djb2) */
+async function hashPw(s){try{if(!(window.crypto&&crypto.subtle))throw 0;const b=await crypto.subtle.digest(&quot;SHA-256&quot;,new TextEncoder().encode(String(s)));return &quot;s2$&quot;+Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,&quot;0&quot;)).join(&quot;&quot;);}catch(e){return hash(String(s));}}
+async function senhaOK(stored,plain){stored=stored||&quot;&quot;;if(stored.indexOf(&quot;s2$&quot;)===0){return stored===(await hashPw(plain));}return stored===hash(plain);}
+function ehLegado(stored){return !!stored && String(stored).indexOf(&quot;s2$&quot;)!==0;}
 
 function loadDB(){
   try{const r=localStorage.getItem(KEY);if(r)DB=Object.assign(DB,JSON.parse(r));}catch(e){}
@@ -14380,16 +14384,9 @@ function defaultPerms(){
   };
 }
 function seed(){
-  DB.users=[
-    {id:uid(),nome:&quot;Administrador&quot;,login:&quot;admin&quot;,email:&quot;admin@claro.com.br&quot;,area:&quot;TI / Qualidade&quot;,perfil:&quot;admin&quot;,gestor:&quot;&quot;,ativo:1,senha:hash(&quot;facilita360&quot;),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:&quot;Cinthia Telis&quot;,login:&quot;cinthia&quot;,email:&quot;cinthia.telis@claro.com.br&quot;,area:&quot;Qualidade RCO&quot;,perfil:&quot;admin&quot;,gestor:&quot;&quot;,ativo:1,senha:hash(&quot;claro123&quot;),ultimo:new Date(Date.now()-86400000).toISOString(),criado:new Date().toISOString()},
-    {id:uid(),nome:&quot;Igor Silva&quot;,login:&quot;igor&quot;,email:&quot;igor.silva@claro.com.br&quot;,area:&quot;Qualidade RCO&quot;,perfil:&quot;gestor&quot;,gestor:&quot;&quot;,ativo:1,senha:hash(&quot;claro123&quot;),ultimo:new Date(Date.now()-3600000*5).toISOString(),criado:new Date().toISOString()},
-    {id:uid(),nome:&quot;Frankislei Dias&quot;,login:&quot;frankislei&quot;,email:&quot;frankislei.dias@claro.com.br&quot;,area:&quot;Operações&quot;,perfil:&quot;usuario&quot;,gestor:&quot;Igor Silva&quot;,ativo:1,senha:hash(&quot;claro123&quot;),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:&quot;Wanda Pereira&quot;,login:&quot;wanda&quot;,email:&quot;wanda.pereira@claro.com.br&quot;,area:&quot;Diretoria&quot;,perfil:&quot;usuario&quot;,gestor:&quot;&quot;,ativo:0,senha:hash(&quot;claro123&quot;),ultimo:null,criado:new Date().toISOString()}
-  ];
+  DB.users=[];                 /* 🔐 sem usuários/senhas fixos no código (segurança) */
   DB.perms=defaultPerms();
   DB.log=[];
-  addLog(&quot;login&quot;,&quot;Sistema inicializado com usuários de demonstração.&quot;,&quot;Sistema&quot;);
   saveDB();
 }
 function addLog(tipo,texto,quem){
@@ -14404,13 +14401,13 @@ function togglePass(){
   i.type=i.type===&quot;password&quot;?&quot;text&quot;:&quot;password&quot;;
   document.getElementById(&quot;eyeIcon&quot;).style.opacity=i.type===&quot;text&quot;?&quot;.5&quot;:&quot;1&quot;;
 }
-function fazerLogin(e){
+async function fazerLogin(e){
   e.preventDefault();
   const login=(document.getElementById(&quot;loginUser&quot;).value||&quot;&quot;).trim().toLowerCase();
   const pass=document.getElementById(&quot;loginPass&quot;).value||&quot;&quot;;
   const err=document.getElementById(&quot;loginErr&quot;);
   const u=DB.users.find(x=>x.login.toLowerCase()===login);
-  if(!u||u.senha!==hash(pass)){
+  if(!u||!(await senhaOK(u.senha||&quot;&quot;,pass))){
     document.getElementById(&quot;loginErrTxt&quot;).textContent=&quot;Usuário ou senha inválidos.&quot;;
     err.classList.add(&quot;show&quot;);return;
   }
@@ -14565,7 +14562,7 @@ async function salvarUser(){
   if(sb){
     try{
       const row={nome:nome,login:login,email:email||null,area:area||null,perfil:perfil,gestor:gestor||null,modulos:modulosStr||null,ativo:!!ativo};
-      if(senha)row.senha_hash=hash(senha);
+      if(senha)row.senha_hash=await hashPw(senha);
       if(id){
         const {error}=await sb.from(&quot;usuarios&quot;).update(row).eq(&quot;id&quot;,id);if(error)throw error;
         try{await sb.from(&quot;log_atividades&quot;).insert({tipo:&quot;user&quot;,texto:&quot;Usuário &quot;+nome+&quot; foi atualizado.&quot;,quem:(CURRENT?CURRENT.nome:&quot;—&quot;)});}catch(_){}
@@ -14583,11 +14580,11 @@ async function salvarUser(){
   if(id){
     const u=DB.users.find(x=>x.id===id);
     Object.assign(u,{nome,login,email,area,perfil,ativo,gestor,modulos:modulos});
-    if(senha)u.senha=hash(senha);
+    if(senha)u.senha=await hashPw(senha);
     addLog(&quot;user&quot;,'Usuário <b>'+esc(nome)+'</b> foi atualizado.');
     if(CURRENT&amp;&amp;u.id===CURRENT.id){CURRENT=u;document.getElementById(&quot;suName&quot;).textContent=u.nome;document.getElementById(&quot;suRole&quot;).textContent=&quot;Perfil: &quot;+(PERFIS[u.perfil].nome);}
   }else{
-    DB.users.push({id:uid(),nome,login,email,area,perfil,ativo,gestor,modulos:modulos,senha:hash(senha),ultimo:null,criado:new Date().toISOString()});
+    DB.users.push({id:uid(),nome,login,email,area,perfil,ativo,gestor,modulos:modulos,senha:(await hashPw(senha)),ultimo:null,criado:new Date().toISOString()});
     addLog(&quot;user&quot;,'Novo usuário <b>'+esc(nome)+'</b> ('+PERFIS[perfil].nome+') foi criado.');
   }
   saveDB();fecharModal(&quot;modalUser&quot;);renderUsers();toast(&quot;Usuário salvo (local).&quot;,&quot;ok&quot;);
@@ -14677,18 +14674,18 @@ function saveCfg(){
 function abrirModalSenha(){[&quot;spAtual&quot;,&quot;spNova&quot;,&quot;spConf&quot;].forEach(i=>document.getElementById(i).value=&quot;&quot;);document.getElementById(&quot;modalSenha&quot;).classList.add(&quot;show&quot;);}
 async function salvarSenha(){
   const at=document.getElementById(&quot;spAtual&quot;).value,nv=document.getElementById(&quot;spNova&quot;).value,cf=document.getElementById(&quot;spConf&quot;).value;
-  if((CURRENT.senha||&quot;&quot;)!==hash(at)){toast(&quot;Senha atual incorreta.&quot;,&quot;err&quot;);return;}
+  if(!(await senhaOK(CURRENT.senha||&quot;&quot;,at))){toast(&quot;Senha atual incorreta.&quot;,&quot;err&quot;);return;}
   if(nv.length<DB.cfg.minSenha){toast(&quot;Nova senha muito curta (mín. &quot;+DB.cfg.minSenha+&quot;).&quot;,&quot;err&quot;);return;}
   if(nv!==cf){toast(&quot;A confirmação não confere.&quot;,&quot;err&quot;);return;}
   if(sb){
     try{
-      const {error}=await sb.from(&quot;usuarios&quot;).update({senha_hash:hash(nv)}).eq(&quot;id&quot;,CURRENT.id);if(error)throw error;
-      CURRENT.senha=hash(nv);
+      const _h=await hashPw(nv);const {error}=await sb.from(&quot;usuarios&quot;).update({senha_hash:_h}).eq(&quot;id&quot;,CURRENT.id);if(error)throw error;
+      CURRENT.senha=_h;
       try{await sb.from(&quot;log_atividades&quot;).insert({tipo:&quot;edit&quot;,texto:&quot;Senha alterada pelo próprio usuário.&quot;,quem:CURRENT.nome});}catch(_){}
       fecharModal(&quot;modalSenha&quot;);toast(&quot;Senha alterada na nuvem ✅&quot;,&quot;ok&quot;);return;
     }catch(e){console.warn(e);toast(&quot;Erro ao alterar senha na nuvem.&quot;,&quot;err&quot;);return;}
   }
-  CURRENT.senha=hash(nv);const u=DB.users.find(x=>x.id===CURRENT.id);if(u)u.senha=hash(nv);
+  const _h2=await hashPw(nv);CURRENT.senha=_h2;const u=DB.users.find(x=>x.id===CURRENT.id);if(u)u.senha=_h2;
   addLog(&quot;edit&quot;,&quot;Senha alterada pelo próprio usuário.&quot;);
   saveDB();fecharModal(&quot;modalSenha&quot;);toast(&quot;Senha alterada (local).&quot;,&quot;ok&quot;);
 }
@@ -15026,6 +15023,10 @@ const TREE=[
 
 function uid(){return "u_"+Date.now()+"_"+Math.floor(Math.random()*10000)}
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return "h"+(h>>>0).toString(16)}
+/* 🔐 SHA-256 (crypto.subtle) com prefixo "s2$"; compatível com hash antigo (djb2) */
+async function hashPw(s){try{if(!(window.crypto&&crypto.subtle))throw 0;const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(s)));return "s2$"+Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}catch(e){return hash(String(s));}}
+async function senhaOK(stored,plain){stored=stored||"";if(stored.indexOf("s2$")===0){return stored===(await hashPw(plain));}return stored===hash(plain);}
+function ehLegado(stored){return !!stored && String(stored).indexOf("s2$")!==0;}
 function iniciais(n){if(!n)return"?";const p=n.trim().split(/\s+/);return((p[0]||"")[0]||"").toUpperCase()+((p[1]||"")[0]||"").toUpperCase()}
 
 function loadDB(){
@@ -15034,13 +15035,7 @@ function loadDB(){
 }
 function saveDB(){localStorage.setItem(KEY,JSON.stringify(DB))}
 function seed(){
-  DB.users=[
-    {id:uid(),nome:"Administrador",login:"admin",email:"admin@claro.com.br",area:"TI / Qualidade",perfil:"admin",gestor:"",ativo:1,senha:hash("facilita360"),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:"Cinthia Telis",login:"cinthia",email:"cinthia.telis@claro.com.br",area:"Qualidade RCO",perfil:"admin",gestor:"",ativo:1,senha:hash("claro123"),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:"Igor Silva",login:"igor",email:"igor.silva@claro.com.br",area:"Qualidade RCO",perfil:"gestor",gestor:"",ativo:1,senha:hash("claro123"),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:"Frankislei Dias",login:"frankislei",email:"frankislei.dias@claro.com.br",area:"Operações",perfil:"usuario",gestor:"Igor Silva",ativo:1,senha:hash("claro123"),ultimo:null,criado:new Date().toISOString()},
-    {id:uid(),nome:"Wanda Pereira",login:"wanda",email:"wanda.pereira@claro.com.br",area:"Diretoria",perfil:"usuario",gestor:"",ativo:0,senha:hash("claro123"),ultimo:null,criado:new Date().toISOString()}
-  ];
+  DB.users=[];                 /* 🔐 sem usuários/senhas fixos no código (segurança) */
   DB.perms={admin:{org:true,pdca:true,gov:true,fer:true},usuario:{org:true,pdca:true,gov:true,fer:true},gestor:{org:true,pdca:true,gov:true,fer:true}};
   DB.cfg={org:"Claro RCO",sessao:12,minSenha:6,troca:true};DB.log=[];
   saveDB();
@@ -15079,7 +15074,9 @@ async function fazerLogin(e){
       const {data,error}=await sb.from("usuarios").select("*").ilike("login",login).limit(1);
       if(error)throw error;
       const u=(data&&data[0])||null;
-      if(!u||(u.senha_hash||"")!==hash(pass)){errar("Usuário ou senha inválidos.");return;}
+      if(!u||!(await senhaOK(u.senha_hash||"",pass))){errar("Usuário ou senha inválidos.");return;}
+      /* 🔐 auto-upgrade: se a senha estava em hash antigo, regrava em SHA-256 (sem travar ninguém) */
+      try{ if(ehLegado(u.senha_hash||"")){ const _nh=await hashPw(pass); if(_nh.indexOf("s2$")===0){ await sb.from("usuarios").update({senha_hash:_nh}).eq("id",u.id); } } }catch(_){}
       if(!u.ativo){errar("Usuário inativo. Contate o administrador.");return;}
       err.classList.remove("show");
       CURRENT={id:u.id,nome:u.nome,login:u.login,email:u.email,area:u.area,perfil:u.perfil,gestor:u.gestor,ativo:u.ativo?1:0};
@@ -15094,7 +15091,7 @@ async function fazerLogin(e){
   }
   /* 💾 fallback LOCAL (se a nuvem falhar) */
   const u=DB.users.find(x=>x.login.toLowerCase()===login);
-  if(!u||u.senha!==hash(pass)){errar("Usuário ou senha inválidos.");return;}
+  if(!u||!(await senhaOK(u.senha||"",pass))){errar("Usuário ou senha inválidos.");return;}
   if(!u.ativo){errar("Usuário inativo. Contate o administrador.");return;}
   err.classList.remove("show");
   u.ultimo=new Date().toISOString();CURRENT=u;DB.session=u.id;
@@ -15135,7 +15132,7 @@ async function enviarResetSenha(){
   if(!email){ _esqErro("Informe o e-mail cadastrado."); return; }
   if(resp!==(_esqCaptcha.a+_esqCaptcha.b)){ _esqErro("Verificação de segurança incorreta. Tente novamente."); novoCaptchaEsq(); return; }
   const btn=document.getElementById("esqBtn"); btn.disabled=true; btn.textContent="Processando…";
-  const novoHash=hash(SENHA_RESET_PADRAO);
+  const novoHash=await hashPw(SENHA_RESET_PADRAO);
   let conferiu=false;
   /* ☁️ nuvem primeiro: login E e-mail precisam bater no mesmo usuário */
   if(sb){
@@ -15188,7 +15185,7 @@ async function salvarTrocaObrigatoria(){
   if(nova!==conf){ mostrar("As senhas não conferem."); return; }
   if(nova===SENHA_RESET_PADRAO){ mostrar("Escolha uma senha diferente da provisória."); return; }
   const btn=document.getElementById("trocaBtn"); btn.disabled=true; btn.textContent="Salvando…";
-  const novoHash=hash(nova);
+  const novoHash=await hashPw(nova);
   if(_troca_ctx==="cloud"&&sb&&CURRENT){
     try{ await sb.from("usuarios").update({senha_hash:novoHash,precisa_trocar:false}).eq("id",CURRENT.id);
          try{ await sb.from("log_atividades").insert({tipo:"edit",texto:CURRENT.nome+" definiu uma nova senha.",quem:CURRENT.nome}); }catch(_){} }
