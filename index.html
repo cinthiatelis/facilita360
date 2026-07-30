@@ -11244,23 +11244,15 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div class=&quot;field full&quot;><label>Frente <span class=&quot;hint&quot;>— nome resumido da iniciativa/projeto</span></label><input id=&quot;frFrente&quot; placeholder=&quot;Ex: Upgrade GPON Goiânia&quot;/></div>
         <div class=&quot;field full&quot;><label>Situação <span class=&quot;hint&quot;>— cenário atual, ações em andamento e próximos passos</span></label><textarea id=&quot;frSituacao&quot; placeholder=&quot;Ex: Migração iniciada&amp;#10;3.200 clientes elegíveis&amp;#10;Comunicação prevista para 20/07&quot;></textarea></div>
         <div class=&quot;field&quot;><label>Responsável <span class=&quot;hint&quot;>— nome e área ( )</span></label><input id=&quot;frResp&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Buscar pessoa ou digitar novo nome&quot;/></div>
-        <div class=&quot;field&quot;><label>Precisa de ajuda? <span class=&quot;hint&quot;>— escalar / apoio necessário</span></label><select id=&quot;frAjuda&quot;><option value=&quot;&quot;>Não</option><option value=&quot;sim&quot;>Sim</option></select></div>
+        <div class=&quot;field&quot;><label>Precisa de ajuda? <span class=&quot;hint&quot;>— preenchido nas ações (5W2H)</span></label><div id=&quot;frAjudaInfo&quot; style=&quot;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:42px;padding:9px 12px;border:1px dashed #E5E9F0;border-radius:8px;background:#FAFBFD;font-size:12.5px;color:#5A6478&quot;>—</div></div>
         <div class=&quot;field full&quot;><label>🔗 Compartilhar com <span class=&quot;hint&quot;>— delegar (a pessoa poderá ver e editar). Separe por vírgula.</span></label><input id=&quot;frCompart&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Ex: Fulano, Ciclana&quot;/></div>
-        <div class=&quot;field&quot;><label>Indicador <span class=&quot;hint&quot;>— foco da ação (impactado)</span></label><select id=&quot;frIndicador&quot;><option value=&quot;&quot;>Selecione o indicador...</option></select></div>
+        <div class=&quot;field full&quot;><label>Indicadores impactados <span class=&quot;hint&quot;>— marque um ou mais; o ganho é informado por indicador</span></label><div id=&quot;frIndsBox&quot; style=&quot;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1px solid #E5E9F0;border-radius:8px;background:#FAFBFD;max-height:150px;overflow:auto&quot;></div><input type=&quot;hidden&quot; id=&quot;frIndicador&quot;/></div>
+        <div class=&quot;field full&quot;><label>Potencial Ganho <span class=&quot;hint&quot;>— informe o ganho de cada indicador marcado acima</span></label>
+          <div id=&quot;frGanhoLista&quot; style=&quot;display:flex;flex-direction:column;gap:8px&quot;></div>
+          <span class=&quot;hint&quot; id=&quot;frGanhoPrev&quot; style=&quot;margin-top:6px;color:var(--sc);font-weight:600&quot;></span>
+        </div>
         <div class=&quot;field&quot;><label>Data Início <span class=&quot;hint&quot;>— início do prazo em foco</span></label><input type=&quot;date&quot; id=&quot;frPrazoFoco&quot;/></div>
         <div class=&quot;field&quot;><label>Data Fim <span class=&quot;hint&quot;>— data final comprometida</span></label><input type=&quot;date&quot; id=&quot;frDataLimite&quot;/></div>
-        <div class=&quot;field&quot;><label>Potencial Ganho <span class=&quot;hint&quot;>— escolha o tipo e informe o valor</span></label>
-          <div style=&quot;display:flex;gap:8px&quot;>
-            <select id=&quot;frGanhoUnit&quot; onchange=&quot;fmtGanhoInput();atualizarPreviewGanho()&quot; style=&quot;max-width:120px;flex-shrink:0&quot;>
-              <option value=&quot;R$&quot;>R$</option>
-              <option value=&quot;%&quot;>%</option>
-              <option value=&quot;p.p.&quot;>p.p.</option>
-              <option value=&quot;num&quot;>Número</option>
-            </select>
-            <input id=&quot;frGanhoVal&quot; inputmode=&quot;decimal&quot; placeholder=&quot;Ex: 1.287.077,00&quot; oninput=&quot;fmtGanhoInput();atualizarPreviewGanho()&quot; onblur=&quot;fmtGanhoBlur();atualizarPreviewGanho()&quot; style=&quot;flex:1&quot;/>
-          </div>
-          <span class=&quot;hint&quot; id=&quot;frGanhoPrev&quot; style=&quot;margin-top:4px;color:var(--sc);font-weight:600&quot;></span>
-        </div>
         <div class=&quot;field&quot;><label>Pilar <button type=&quot;button&quot; class=&quot;info-btn&quot; onclick=&quot;document.getElementById('pilarInfo').classList.toggle('show')&quot;>i</button></label>
           <select id=&quot;frPilar&quot; onchange=&quot;mostrarConceitoPilar()&quot;>
             <option value=&quot;&quot;>Selecione...</option>
@@ -11318,6 +11310,11 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div style=&quot;font-size:12px;font-weight:800;color:#1A1F36;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px&quot; id=&quot;indMesesTit&quot;>Preenchimento mensal — Realizado e Forecast</div>
         <div id=&quot;indMesesWrap&quot; style=&quot;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px&quot;></div>
         <div style=&quot;margin-top:10px;font-size:11.5px;color:#94A0B5&quot;>Cada mês tem 3 linhas: <b style=&quot;color:#B71C1F&quot;>Meta</b>, <b style=&quot;color:#B45309&quot;>Forecast</b> e <b style=&quot;color:#047857&quot;>Realizado</b>. Use ponto ou vírgula como separador decimal. A <b>Meta</b> pode variar por mês (ex.: metas financeiras diferentes a cada mês).</div>
+      </div>
+      <div style=&quot;margin-top:16px;border-top:1px dashed #E5E9F0;padding-top:14px&quot;>
+        <div style=&quot;font-size:12px;font-weight:800;color:#1A1F36;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px&quot; id=&quot;indAntTit&quot;>Ano anterior — Realizado</div>
+        <div id=&quot;indAntWrap&quot; style=&quot;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px&quot;></div>
+        <div style=&quot;margin-top:8px;font-size:11.5px;color:#94A0B5&quot;>Preencha o realizado de jan–dez do ano anterior para o gráfico exibir a linha cinza <b>Ano anterior</b> como comparativo. Campos em branco são ignorados.</div>
       </div>
     </div>
     <div class=&quot;modal-foot&quot;>
@@ -11389,7 +11386,8 @@ const W5H2_COLS=[
   {k:&quot;status&quot;,l:&quot;Status&quot;,t:&quot;select&quot;,opt:[&quot;Programada&quot;,&quot;Em andamento&quot;,&quot;Concluída&quot;]},
   {k:&quot;ganho&quot;,l:&quot;Projeção de Ganho&quot;,t:&quot;text&quot;,ph:&quot;Ex: -2,9 p.p.&quot;},
   {k:&quot;pct&quot;,l:&quot;% Conclusão&quot;,t:&quot;pct&quot;,ph:&quot;0&quot;},
-  {k:&quot;ajuda&quot;,l:&quot;Ajuda?&quot;,t:&quot;check&quot;}
+  {k:&quot;ajuda&quot;,l:&quot;Ajuda?&quot;,t:&quot;check&quot;},
+  {k:&quot;ajudaQuem&quot;,l:&quot;Ajuda — Quem?&quot;,t:&quot;helpwho&quot;,ph:&quot;Quem pode ajudar&quot;}
 ];
 
 function uid(p){return (p||&quot;i&quot;)+&quot;_&quot;+Date.now()+&quot;_&quot;+Math.floor(Math.random()*10000)}
@@ -11413,7 +11411,7 @@ function parseGanho(str){
 }
 function somarGanho(lista){
   const acc={};
-  (lista||[]).forEach(f=>{const g=parseGanho(f.ganho);if(!g)return;acc[g.unit]=(acc[g.unit]||0)+g.n;});
+  (lista||[]).forEach(f=>{const a=somarGanhosFrente(f);Object.keys(a).forEach(u=>{acc[u]=(acc[u]||0)+a[u];});});
   return acc;
 }
 function fmtUnidade(n,unit){
@@ -11428,6 +11426,78 @@ function fmtGanhoAcc(acc){
   const parts=ordem.filter(u=>acc[u]!=null).map(u=>fmtUnidade(acc[u],u));
   return parts.length?(&quot;+ &quot;+parts.join(&quot; · &quot;)):&quot;&quot;;
 }
+/* ====== 🆕 GANHO POR INDICADOR — uma frente pode impactar vários indicadores ======
+   Modelo novo:  f.ganhos = [{ind:&quot;Nome do indicador&quot;, unit:&quot;R$|%|p.p.|num&quot;, val:&quot;1.287.077,00&quot;}]
+   Legado:       f.indicador (1 nome) + f.ganho (1 string) — convertido on-the-fly. */
+function _fmtValGanho(n,unit){
+  if(unit===&quot;R$&quot;)return n.toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:2,maximumFractionDigits:2});
+  return (Math.round(n*100)/100).toLocaleString(&quot;pt-BR&quot;,{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+/* {unit,val} -> string no formato antigo (&quot;R$ 1.287,00&quot;, &quot;0,4 p.p.&quot;) */
+function ganhoStrDe(g){
+  const val=String((g&amp;&amp;g.val)||&quot;&quot;).trim();if(!val)return &quot;&quot;;
+  const unit=(g&amp;&amp;g.unit)||&quot;num&quot;;
+  if(unit===&quot;R$&quot;)return &quot;R$ &quot;+val;
+  if(unit===&quot;%&quot;)return val+&quot;%&quot;;
+  if(unit===&quot;p.p.&quot;)return val+&quot; p.p.&quot;;
+  return val;
+}
+/* lista normalizada de ganhos da frente (novo modelo ou convertido do legado) */
+function ganhosFrente(f){
+  if(!f)return [];
+  if(Array.isArray(f.ganhos)&amp;&amp;f.ganhos.length){
+    return f.ganhos.filter(function(g){return g&amp;&amp;(String(g.ind||&quot;&quot;).trim()||String(g.val||&quot;&quot;).trim());});
+  }
+  const g=parseGanho(f.ganho);
+  const ind=String(f.indicador||&quot;&quot;).trim();
+  if(!g&amp;&amp;!ind)return [];
+  return [{ind:ind,unit:g?g.unit:&quot;R$&quot;,val:g?_fmtValGanho(g.n,g.unit):&quot;&quot;}];
+}
+/* nomes dos indicadores vinculados à frente */
+function indsFrente(f){
+  const out=[];
+  ganhosFrente(f).forEach(function(g){const n=String(g.ind||&quot;&quot;).trim();if(n&amp;&amp;out.indexOf(n)<0)out.push(n);});
+  if(!out.length&amp;&amp;f&amp;&amp;f.indicador)out.push(f.indicador);
+  return out;
+}
+/* ganho numérico (absoluto) da frente PARA UM indicador específico — usado na cascata */
+function ganhoNumIndicador(f,nome){
+  let t=0;
+  ganhosFrente(f).forEach(function(g){
+    if(String(g.ind||&quot;&quot;)===nome){const p=parseGanho(ganhoStrDe(g));if(p)t+=Math.abs(p.n);}
+  });
+  return t;
+}
+/* soma por unidade dentro da própria frente ({R$:1200, &quot;p.p.&quot;:0.4}) */
+function somarGanhosFrente(f){
+  const acc={};
+  ganhosFrente(f).forEach(function(g){const p=parseGanho(ganhoStrDe(g));if(p)acc[p.unit]=(acc[p.unit]||0)+p.n;});
+  return acc;
+}
+/* rótulo curto p/ card e tabela: &quot;R$ 1,2 M · 0,4 p.p.&quot; */
+function fmtGanhosCompact(f){
+  const acc=somarGanhosFrente(f);
+  const ordem=[&quot;R$&quot;,&quot;%&quot;,&quot;p.p.&quot;,&quot;num&quot;];
+  return ordem.filter(function(u){return acc[u]!=null;}).map(function(u){return fmtUnidade(acc[u],u);}).join(&quot; · &quot;);
+}
+/* detalhe &quot;Indicador: valor&quot; — tooltips e exportação */
+function ganhosDetalheTxt(f){
+  return ganhosFrente(f).map(function(g){
+    const st=ganhoStrDe(g);if(!st)return &quot;&quot;;
+    return (g.ind||&quot;Sem indicador&quot;)+&quot;: &quot;+fmtGanhoCompact(st);
+  }).filter(Boolean).join(&quot; · &quot;);
+}
+/* detalhe em HTML (valor destacado + nome do indicador embaixo) */
+function ganhosDetalheHtml(f){
+  const its=ganhosFrente(f).filter(function(g){return ganhoStrDe(g);});
+  if(!its.length)return &quot;—&quot;;
+  return its.map(function(g){
+    return '<span style=&quot;display:inline-flex;flex-direction:column;margin-right:14px;line-height:1.25&quot;>'
+      +'<b style=&quot;color:var(--sc)&quot;>'+esc(fmtGanhoCompact(ganhoStrDe(g)))+'</b>'
+      +'<span style=&quot;font-size:9.5px;font-weight:600;color:var(--mute)&quot;>'+esc(g.ind||&quot;sem indicador&quot;)+'</span></span>';
+  }).join(&quot;&quot;);
+}
+
 function setGanhoKPI(elId,lista){
   const el=document.getElementById(elId);if(!el)return;
   const txt=fmtGanhoAcc(somarGanho(lista));
@@ -11610,7 +11680,7 @@ function frentesFiltradas(){
     .filter(f=>!fs||f.status===fs)
     .filter(f=>!fp||f.pilar===fp)
     .filter(f=>!fr||(f.resp||&quot;&quot;)===fr)
-    .filter(f=>!busca||((f.frente||&quot;&quot;)+&quot; &quot;+(f.situacao||&quot;&quot;)+&quot; &quot;+(f.resp||&quot;&quot;)+&quot; &quot;+(f.indicador||&quot;&quot;)).toLowerCase().includes(busca))
+    .filter(f=>!busca||((f.frente||&quot;&quot;)+&quot; &quot;+(f.situacao||&quot;&quot;)+&quot; &quot;+(f.resp||&quot;&quot;)+&quot; &quot;+indsFrente(f).join(&quot; &quot;)).toLowerCase().includes(busca))
     .sort((a,b)=>{const ca=stClass(a.status)===&quot;concluido&quot;?1:0,cb=stClass(b.status)===&quot;concluido&quot;?1:0;if(ca!==cb)return ca-cb;return (a.num||999)-(b.num||999);});   /* 🆕 concluída sempre no fim */
 }
 function render(){
@@ -11661,6 +11731,36 @@ function render(){
   else renderTable();
 }
 
+/* 🆕 AJUDA — agora é derivada das AÇÕES da frente (não mais do cadastro da frente) */
+function ajudaFrente(f){
+  const out={has:false,quem:[]};
+  (((f&&f.acoes)||[])).forEach(function(a){
+    if(a&&a.ajuda){out.has=true;const w=String(a.ajudaQuem||&quot;&quot;).trim();if(w&&out.quem.indexOf(w)<0)out.quem.push(w);}
+  });
+  return out;
+}
+const AJUDA_BADGE_CSS='display:inline-flex;align-items:center;gap:3px;background:#FEF2F2;color:#B71C1F;border:1px solid #FCA5A5;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:800';
+function ajudaBadgeHtml(f){
+  const aj=ajudaFrente(f);if(!aj.has)return '';
+  const quem=aj.quem.length?(' · '+esc(aj.quem.join(', '))):'';
+  return '<span class=&quot;ajuda-badge&quot; style=&quot;'+AJUDA_BADGE_CSS+'&quot; title=&quot;Apoio solicitado em ação(ões) desta frente&quot;>🆘 Ajuda'+quem+'</span>';
+}
+/* atualiza o selo da frente sem re-renderizar o card (mantém o card aberto) */
+function _refreshAjudaBadge(frId){
+  const f=(proj().frentes||[]).find(function(x){return x.id===frId;});if(!f)return;
+  const t=document.querySelector('#fr_'+frId+' .frente-title');if(!t)return;
+  const old=t.querySelector('.ajuda-badge');if(old)old.remove();
+  const h=ajudaBadgeHtml(f);if(h)t.insertAdjacentHTML('beforeend',' '+h);
+}
+/* mostra no modal da frente o resumo de ajuda vindo das ações (somente leitura) */
+function _pintarAjudaInfo(f){
+  const box=document.getElementById('frAjudaInfo');if(!box)return;
+  const aj=ajudaFrente(f);
+  box.innerHTML=aj.has
+    ? ('<span style=&quot;'+AJUDA_BADGE_CSS+'&quot;>🆘 Ajuda</span><span>'+(aj.quem.length?('com <b>'+esc(aj.quem.join(', '))+'</b>'):'sinalizada nas ações')+'</span>')
+    : '<span style=&quot;color:#94A0B5&quot;>Nenhuma ação sinalizou necessidade de ajuda.</span>';
+}
+
 function renderCards(){
   const box=document.getElementById(&quot;viewCards&quot;);
   const lista=frentesFiltradas();
@@ -11673,14 +11773,14 @@ function renderCards(){
       <div class=&quot;frente-head&quot; onclick=&quot;toggleFrente('${f.id}')&quot;>
         <div class=&quot;frente-num&quot;>${f.num||&quot;–&quot;}</div>
         <div class=&quot;frente-main&quot;>
-          <div class=&quot;frente-title&quot;>${esc(f.frente)||&quot;(sem nome)&quot;} ${f.pilar?`<span class=&quot;pilar-tag&quot;>${esc(f.pilar.split(&quot;,&quot;)[0])}</span>`:&quot;&quot;}${f.ajuda?`<span style=&quot;display:inline-flex;align-items:center;gap:3px;background:#FEF2F2;color:#B71C1F;border:1px solid #FCA5A5;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:800&quot;>🆘 Ajuda</span>`:&quot;&quot;}</div>
+          <div class=&quot;frente-title&quot;>${esc(f.frente)||&quot;(sem nome)&quot;} ${f.pilar?`<span class=&quot;pilar-tag&quot;>${esc(f.pilar.split(&quot;,&quot;)[0])}</span>`:&quot;&quot;}${ajudaBadgeHtml(f)}</div>
           <div class=&quot;frente-sub&quot;>
             ${f.resp?`<span class=&quot;it&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2&quot;/><circle cx=&quot;12&quot; cy=&quot;7&quot; r=&quot;4&quot;/></svg><b>${esc(f.resp)}</b></span>`:&quot;&quot;}
-            ${f.indicador?`<span class=&quot;it&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>${esc(f.indicador)}</span>`:&quot;&quot;}
+            ${indsFrente(f).map(n=>`<span class=&quot;it&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>${esc(n)}</span>`).join(&quot;&quot;)}
           </div>
         </div>
         <div class=&quot;frente-right&quot;>
-          ${f.ganho?`<div class=&quot;ganho-box&quot;><div class=&quot;g-val&quot; title=&quot;${esc(f.ganho)}&quot;>${fmtGanhoCompact(f.ganho)}</div><div class=&quot;g-lbl&quot;>Pot. ganho</div></div>`:&quot;&quot;}
+          ${(function(){const t=fmtGanhosCompact(f);return t?`<div class=&quot;ganho-box&quot;><div class=&quot;g-val&quot; title=&quot;${esc(ganhosDetalheTxt(f))}&quot;>${t}</div><div class=&quot;g-lbl&quot;>Pot. ganho</div></div>`:&quot;&quot;;})()}
           <span class=&quot;st-badge ${st}&quot;>${esc(f.status||&quot;—&quot;)}</span>
           <span class=&quot;acoes-chip&quot;>${nAcoes} ${nAcoes===1?&quot;ação&quot;:&quot;ações&quot;}</span>
           <button class=&quot;frente-menu&quot; onclick=&quot;event.stopPropagation();abrirModalFrente('${f.id}')&quot; title=&quot;Editar frente&quot;>✎</button>
@@ -11694,7 +11794,7 @@ function renderCards(){
           <div class=&quot;dates-row&quot;>
             <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Data Início</span><span class=&quot;v ${pfCls}&quot;>${fmtData(f.prazoFoco)}</span></div>
             <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Data Fim</span><span class=&quot;v ${dlCls}&quot;>${fmtData(f.dataLimite)}</span></div>
-            <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Potencial Ganho</span><span class=&quot;v&quot; style=&quot;color:var(--sc)&quot; title=&quot;${esc(f.ganho)||&quot;&quot;}&quot;>${f.ganho?fmtGanhoCompact(f.ganho):&quot;—&quot;}</span></div>
+            <div class=&quot;date-it&quot; style=&quot;min-width:210px&quot;><span class=&quot;l&quot;>Potencial Ganho${(function(){const n=ganhosFrente(f).filter(g=>ganhoStrDe(g)).length;return n>1?` <span style=&quot;font-size:8.5px;color:var(--mute)&quot;>(${n} indicadores)</span>`:&quot;&quot;;})()}</span><span class=&quot;v&quot; style=&quot;font-size:13px;display:flex;flex-wrap:wrap&quot;>${ganhosDetalheHtml(f)}</span></div>
             <div class=&quot;date-it&quot;><span class=&quot;l&quot;>Pilar</span><span class=&quot;v&quot; style=&quot;font-weight:600;font-size:12px&quot;>${esc(f.pilar)||&quot;—&quot;}</span></div>
           </div>
         </div>
@@ -11726,6 +11826,11 @@ function renderAcoes(frId){
       if(c.t===&quot;check&quot;){
         return `<td style=&quot;text-align:center&quot;><input type=&quot;checkbox&quot; ${a[c.k]?&quot;checked&quot;:&quot;&quot;} onchange=&quot;upAcao('${frId}',${i},'${c.k}',this.checked)&quot; title=&quot;Precisa de ajuda?&quot; style=&quot;width:17px;height:17px;accent-color:#DA291C;cursor:pointer&quot;/></td>`;
       }
+      /* 🆕 só abre o campo QUEM? quando a flag de ajuda estiver marcada */
+      if(c.t===&quot;helpwho&quot;){
+        if(!a.ajuda)return '<td style=&quot;text-align:center;color:#C7CEDA&quot; title=&quot;Marque a flag Ajuda? para informar quem pode ajudar&quot;>—</td>';
+        return `<td><input type=&quot;text&quot; list=&quot;pessoasFacilitaGov&quot; value=&quot;${esc(v)}&quot; placeholder=&quot;${c.ph||&quot;&quot;}&quot; oninput=&quot;upAcao('${frId}',${i},'ajudaQuem',this.value)&quot; style=&quot;min-width:140px&quot;/></td>`;
+      }
       if(c.t===&quot;select&quot;){
         return `<td><select class=&quot;${c.k==='status'?'mini-status':''}&quot; onchange=&quot;upAcao('${frId}',${i},'${c.k}',this.value)&quot;>${c.opt.map(o=>`<option ${o===v?&quot;selected&quot;:&quot;&quot;}>${esc(o)}</option>`).join(&quot;&quot;)}</select></td>`;
       }
@@ -11742,7 +11847,7 @@ function addAcao(frId){
   const f=proj().frentes.find(x=>x.id===frId);if(!f)return;
   f.acoes=f.acoes||[];
   // herda pilar/indicador da frente para agilizar
-  f.acoes.push({id:uid(&quot;a&quot;),area:&quot;&quot;,pilar:f.pilar||&quot;&quot;,indicador:f.indicador||&quot;&quot;,causaRaiz:&quot;&quot;,what:&quot;&quot;,why:&quot;&quot;,who:&quot;&quot;,how:&quot;&quot;,inicio:&quot;&quot;,fim:&quot;&quot;,where:&quot;&quot;,howmuch:&quot;&quot;,status:&quot;Programada&quot;,ganho:&quot;&quot;,pct:0});
+  f.acoes.push({id:uid(&quot;a&quot;),area:&quot;&quot;,pilar:f.pilar||&quot;&quot;,indicador:f.indicador||&quot;&quot;,causaRaiz:&quot;&quot;,what:&quot;&quot;,why:&quot;&quot;,who:&quot;&quot;,how:&quot;&quot;,inicio:&quot;&quot;,fim:&quot;&quot;,where:&quot;&quot;,howmuch:&quot;&quot;,status:&quot;Programada&quot;,ganho:&quot;&quot;,pct:0,ajuda:false,ajudaQuem:&quot;&quot;});
   saveDB();renderAcoes(frId);
   // atualiza contador de ações no header do card
   const chip=document.querySelector(`#fr_${frId} .acoes-chip`);if(chip)chip.textContent=f.acoes.length+&quot; ações&quot;;
@@ -11751,12 +11856,15 @@ function upAcao(frId,i,campo,val){
   const f=proj().frentes.find(x=>x.id===frId);if(!f||!f.acoes[i])return;
   f.acoes[i][campo]=val;
   if(campo===&quot;pct&quot;){const pct=Math.max(0,Math.min(100,parseFloat(val)||0));const bar=document.querySelector(`#acoes_${frId} tr:nth-child(${i+1}) .pct-bar>div`);if(bar)bar.style.width=pct+&quot;%&quot;;}
+  /* 🆕 flag de ajuda: redesenha a linha (abre/fecha o QUEM?) e atualiza o selo da frente */
+  if(campo===&quot;ajuda&quot;){if(!val)f.acoes[i].ajudaQuem=&quot;&quot;;renderAcoes(frId);_refreshAjudaBadge(frId);saveDB();return;}
+  if(campo===&quot;ajudaQuem&quot;){clearTimeout(window._tq);window._tq=setTimeout(function(){_refreshAjudaBadge(frId);},600);}
   clearTimeout(window._ta);window._ta=setTimeout(saveDB,400);
 }
 function delAcao(frId,i){
   const f=proj().frentes.find(x=>x.id===frId);if(!f)return;
   if(!confirm(&quot;Excluir esta ação?&quot;))return;
-  f.acoes.splice(i,1);saveDB();renderAcoes(frId);
+  f.acoes.splice(i,1);saveDB();renderAcoes(frId);_refreshAjudaBadge(frId);
   const chip=document.querySelector(`#fr_${frId} .acoes-chip`);if(chip)chip.textContent=f.acoes.length+(f.acoes.length===1?&quot; ação&quot;:&quot; ações&quot;);
 }
 
@@ -11778,7 +11886,8 @@ const GT_COLS=[
 function gtSortVal(f,k){
   if(k===&quot;acoes&quot;)return (f.acoes||[]).length;
   if(k===&quot;num&quot;)return (f.num||0);
-  if(k===&quot;ganho&quot;){const g=parseGanho(f.ganho);return g?g.n:-Infinity;}
+  if(k===&quot;ganho&quot;){const a=somarGanhosFrente(f);const ks=Object.keys(a);if(!ks.length)return -Infinity;let t=0;ks.forEach(function(u){t+=Math.abs(a[u]);});return t;}
+  if(k===&quot;indicador&quot;)return indsFrente(f).join(&quot;, &quot;).toLowerCase();
   return String(f[k]==null?&quot;&quot;:f[k]).toLowerCase();
 }
 function ordenarTabela(k){
@@ -11797,7 +11906,7 @@ function renderTable(){
   lista=lista.slice().sort((a,b)=>{const va=gtSortVal(a,GT_SORT.col),vb=gtSortVal(b,GT_SORT.col);if(va<vb)return -1*GT_SORT.dir;if(va>vb)return 1*GT_SORT.dir;return 0;});
   const arrow=(k)=>{const on=GT_SORT.col===k;const car=on?(GT_SORT.dir>0?&quot;▲&quot;:&quot;▼&quot;):&quot;▲&quot;;return '<span class=&quot;sar&quot;>'+car+'</span>';};
   const th=GT_COLS.map(c=>`<th class=&quot;sortable ${GT_SORT.col===c.k?'sorted':''}&quot; onclick=&quot;ordenarTabela('${c.k}')&quot;>${c.l}${arrow(c.k)}</th>`).join(&quot;&quot;);
-  const acoesCols=[&quot;Área&quot;,&quot;Pilar&quot;,&quot;Indicador&quot;,&quot;O quê (What)&quot;,&quot;Quem&quot;,&quot;Início&quot;,&quot;Fim&quot;,&quot;Status&quot;,&quot;% Concl.&quot;,&quot;Ajuda?&quot;];
+  const acoesCols=[&quot;Área&quot;,&quot;Pilar&quot;,&quot;Indicador&quot;,&quot;O quê (What)&quot;,&quot;Quem&quot;,&quot;Início&quot;,&quot;Fim&quot;,&quot;Status&quot;,&quot;% Concl.&quot;,&quot;Ajuda?&quot;,&quot;Ajuda — Quem?&quot;];
   const rows=lista.map(f=>{
     const st=stClass(f.status);
     const nA=(f.acoes||[]).length;
@@ -11811,7 +11920,8 @@ function renderTable(){
           +'<td style=&quot;font-weight:600&quot;>'+esc(a.what)+'</td><td>'+esc(a.who)+'</td>'
           +'<td>'+fmtData(a.inicio)+'</td><td>'+fmtData(a.fim)+'</td>'
           +'<td>'+esc(a.status)+'</td><td>'+pct+'%</td>'
-          +'<td style=&quot;text-align:center;font-weight:800;color:'+(a.ajuda?'#DA291C':'#94A0B5')+'&quot;>'+(a.ajuda?'✓ Sim':'—')+'</td></tr>';}).join(&quot;&quot;)
+          +'<td style=&quot;text-align:center;font-weight:800;color:'+(a.ajuda?'#DA291C':'#94A0B5')+'&quot;>'+(a.ajuda?'✓ Sim':'—')+'</td>'
+          +'<td>'+(a.ajuda?(esc(a.ajudaQuem)||'—'):'—')+'</td></tr>';}).join(&quot;&quot;)
         +'</tbody></table>';
     }
     acoesInner+='</div>';
@@ -11823,8 +11933,8 @@ function renderTable(){
       <td><span class=&quot;st-badge ${st}&quot;>${esc(f.status||&quot;—&quot;)}</span></td>
       <td>${fmtData(f.prazoFoco)}</td>
       <td>${fmtData(f.dataLimite)}</td>
-      <td style=&quot;font-weight:700;color:var(--sc)&quot; title=&quot;${esc(f.ganho)||&quot;&quot;}&quot;>${f.ganho?fmtGanhoCompact(f.ganho):&quot;—&quot;}</td>
-      <td>${esc(f.indicador)||&quot;—&quot;}</td>
+      <td style=&quot;font-weight:700;color:var(--sc)&quot; title=&quot;${esc(ganhosDetalheTxt(f))}&quot;>${fmtGanhosCompact(f)||&quot;—&quot;}</td>
+      <td>${indsFrente(f).length?indsFrente(f).map(n=>esc(n)).join('<br/>'):&quot;—&quot;}</td>
       <td style=&quot;font-size:11.5px;color:var(--soft)&quot;>${esc(f.pilar)||&quot;—&quot;}</td>
       <td><div style=&quot;display:flex;align-items:center;gap:8px&quot;><span class=&quot;acoes-chip&quot;>${nA}</span>${expBtn}</div></td>
     </tr>
@@ -11844,14 +11954,116 @@ function mostrarConceitoPilar(){
   const p=document.getElementById(&quot;frPilar&quot;).value;const box=document.getElementById(&quot;pilarInfo&quot;);
   if(p&amp;&amp;PILAR_CONCEITO[p]){box.textContent=PILAR_CONCEITO[p];box.classList.add(&quot;show&quot;);}else box.classList.remove(&quot;show&quot;);
 }
-function preencherSelectIndicadores(atual){
-  const sel=document.getElementById(&quot;frIndicador&quot;);if(!sel)return;
+/* 🆕 estado das linhas de ganho no modal: [{ind,unit,val}] */
+let _frGanhoRows=[];
+/* unidade sugerida a partir da unidade cadastrada do indicador */
+function _unitDoIndicador(nome){
+  const it=indicadoresVisiveis().find(function(i){return i.nome===nome;});
+  const u=String((it&amp;&amp;it.unidade)||&quot;&quot;).trim().toLowerCase();
+  if(!u)return &quot;R$&quot;;
+  if(/r\$|financ|reais/.test(u))return &quot;R$&quot;;
+  if(u===&quot;%&quot;||/percent/.test(u))return &quot;%&quot;;
+  if(u===&quot;p.p.&quot;||/ponto/.test(u))return &quot;p.p.&quot;;
+  return &quot;num&quot;;
+}
+/* 🆕 monta as opções de indicadores como checkboxes (aceita string ou array) */
+function preencherSelectIndicadores(atuais){
+  const box=document.getElementById(&quot;frIndsBox&quot;);if(!box)return;
+  const sel=Array.isArray(atuais)?atuais.slice():(atuais?[atuais]:[]);
   const inds=indicadoresVisiveis();
-  let html='<option value=&quot;&quot;>Selecione o indicador...</option>';
-  html+=inds.map(i=>`<option value=&quot;${esc(i.nome)}&quot; ${i.nome===atual?&quot;selected&quot;:&quot;&quot;}>${esc(i.nome)}${i.area?&quot; · &quot;+esc(i.area):&quot;&quot;}</option>`).join(&quot;&quot;);
-  // preserva valor legado que não está mais cadastrado
-  if(atual&amp;&amp;!inds.some(i=>i.nome===atual)){html+=`<option value=&quot;${esc(atual)}&quot; selected>${esc(atual)} (não cadastrado)</option>`;}
-  sel.innerHTML=html;
+  const nomes=inds.map(function(i){return i.nome;});
+  sel.forEach(function(n){if(n&amp;&amp;nomes.indexOf(n)<0)nomes.push(n);});   /* preserva legado não cadastrado */
+  const hid=document.getElementById(&quot;frIndicador&quot;);if(hid)hid.value=sel[0]||&quot;&quot;;
+  if(!nomes.length){
+    box.innerHTML='<span style=&quot;font-size:12px;color:var(--mute)&quot;>Nenhum indicador cadastrado nesta frente ativa. Cadastre em <b>Indicadores</b> para lançar o ganho.</span>';
+    return;
+  }
+  box.innerHTML=nomes.map(function(n){
+    const on=sel.indexOf(n)>=0;
+    const it=inds.find(function(i){return i.nome===n;});
+    const un=it?(it.unidade?(&quot; · &quot;+esc(it.unidade)):&quot;&quot;):&quot; · não cadastrado&quot;;
+    return '<label style=&quot;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid '+(on?'#FCA5A5':'#E5E9F0')+';border-radius:20px;background:'+(on?'#FEF2F2':'#fff')+';cursor:pointer;font-size:12px;font-weight:600;color:#1A1F36&quot;>'
+      +'<input type=&quot;checkbox&quot; value=&quot;'+esc(n)+'&quot; '+(on?'checked':'')+' onchange=&quot;_toggleIndFrente(this)&quot; style=&quot;accent-color:#DA291C;cursor:pointer&quot;/>'
+      +esc(n)+'<span style=&quot;font-weight:500;color:var(--mute)&quot;>'+un+'</span></label>';
+  }).join(&quot;&quot;);
+}
+/* indicadores atualmente marcados */
+function _indsMarcados(){
+  return Array.prototype.slice.call(document.querySelectorAll(&quot;#frIndsBox input[type=checkbox]&quot;))
+    .filter(function(c){return c.checked;}).map(function(c){return c.value;});
+}
+function _toggleIndFrente(cb){
+  const lb=cb.parentElement;
+  if(lb){lb.style.borderColor=cb.checked?&quot;#FCA5A5&quot;:&quot;#E5E9F0&quot;;lb.style.background=cb.checked?&quot;#FEF2F2&quot;:&quot;#fff&quot;;}
+  const hid=document.getElementById(&quot;frIndicador&quot;);if(hid)hid.value=(_indsMarcados()[0]||&quot;&quot;);
+  _sincronizarGanhos();
+}
+/* 🆕 mantém UMA linha de ganho por indicador marcado, preservando o que já foi digitado */
+function _sincronizarGanhos(){
+  const marcados=_indsMarcados();
+  const antigos={};_frGanhoRows.forEach(function(r){antigos[r.ind||&quot;&quot;]=r;});
+  const novos=marcados.map(function(n){return antigos[n]||{ind:n,unit:_unitDoIndicador(n),val:&quot;&quot;};});
+  const semInd=antigos[&quot;&quot;];                       /* ganho legado sem indicador: só mantém se tiver valor */
+  if(semInd&amp;&amp;String(semInd.val||&quot;&quot;).trim())novos.unshift(semInd);
+  _frGanhoRows=novos;
+  _renderGanhoLinhas();
+}
+/* 🆕 desenha uma linha (indicador · unidade · valor) para cada indicador marcado */
+function _renderGanhoLinhas(){
+  const box=document.getElementById(&quot;frGanhoLista&quot;);if(!box)return;
+  if(!_frGanhoRows.length){
+    box.innerHTML='<span style=&quot;font-size:12px;color:var(--mute)&quot;>Marque um ou mais indicadores acima para lançar o ganho de cada um.</span>';
+    atualizarPreviewGanho();return;
+  }
+  box.innerHTML=_frGanhoRows.map(function(r,i){
+    const opts=[&quot;R$&quot;,&quot;%&quot;,&quot;p.p.&quot;,&quot;num&quot;].map(function(u){
+      return '<option value=&quot;'+u+'&quot; '+(r.unit===u?&quot;selected&quot;:&quot;&quot;)+'>'+(u===&quot;num&quot;?&quot;Número&quot;:u)+'</option>';}).join(&quot;&quot;);
+    return '<div style=&quot;display:flex;gap:8px;align-items:center&quot;>'
+      +'<span title=&quot;'+esc(r.ind||&quot;Sem indicador&quot;)+'&quot; style=&quot;flex:1;min-width:0;font-size:12px;font-weight:700;color:#1A1F36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap&quot;>'+esc(r.ind||&quot;Sem indicador&quot;)+'</span>'
+      +'<select onchange=&quot;upGanhoLinha('+i+',\'unit\',this.value)&quot; style=&quot;max-width:110px;flex-shrink:0&quot;>'+opts+'</select>'
+      +'<input inputmode=&quot;decimal&quot; value=&quot;'+esc(r.val)+'&quot; placeholder=&quot;Ex: 1.287.077,00&quot; oninput=&quot;upGanhoLinha('+i+',\'val\',this.value,true)&quot; onblur=&quot;ganhoLinhaBlur('+i+')&quot; style=&quot;width:170px;flex-shrink:0&quot;/>'
+      +'</div>';
+  }).join(&quot;&quot;);
+  atualizarPreviewGanho();
+}
+/* edição de uma linha (formata R$ ao vivo, como no campo antigo) */
+function upGanhoLinha(i,campo,val,aoVivo){
+  const r=_frGanhoRows[i];if(!r)return;
+  r[campo]=val;
+  if(campo===&quot;unit&quot;){_renderGanhoLinhas();return;}
+  if(aoVivo&amp;&amp;r.unit===&quot;R$&quot;){
+    let d=String(val||&quot;&quot;).replace(/\D/g,&quot;&quot;);
+    if(d===&quot;&quot;){r.val=&quot;&quot;;}
+    else{d=d.replace(/^0+(?=\d)/,&quot;&quot;);while(d.length<3)d=&quot;0&quot;+d;r.val=parseInt(d.slice(0,-2),10).toLocaleString(&quot;pt-BR&quot;)+&quot;,&quot;+d.slice(-2);}
+    const inp=document.querySelectorAll(&quot;#frGanhoLista input&quot;)[i];if(inp)inp.value=r.val;
+  }
+  atualizarPreviewGanho();
+}
+/* ao sair do campo: normaliza o número no formato pt-BR */
+function ganhoLinhaBlur(i){
+  const r=_frGanhoRows[i];if(!r)return;
+  const raw=String(r.val||&quot;&quot;).trim();
+  if(!raw){r.val=&quot;&quot;;}
+  else{
+    let num=raw;
+    if(num.indexOf(&quot;,&quot;)>=0)num=num.replace(/\./g,&quot;&quot;).replace(&quot;,&quot;,&quot;.&quot;);
+    num=num.replace(/[^0-9.\-]/g,&quot;&quot;);
+    const n=parseFloat(num);
+    if(!isNaN(n))r.val=_fmtValGanho(n,r.unit);
+  }
+  const inp=document.querySelectorAll(&quot;#frGanhoLista input&quot;)[i];if(inp)inp.value=r.val;
+  atualizarPreviewGanho();
+}
+/* 🆕 lê as linhas para salvar (garante linha p/ indicador marcado sem valor) */
+function _coletarGanhos(){
+  const marcados=_indsMarcados();
+  const rows=_frGanhoRows.filter(function(r){
+    return (r.ind&amp;&amp;marcados.indexOf(r.ind)>=0)||(!r.ind&amp;&amp;String(r.val||&quot;&quot;).trim());
+  });
+  marcados.forEach(function(n){
+    if(!rows.some(function(r){return r.ind===n;}))rows.push({ind:n,unit:_unitDoIndicador(n),val:&quot;&quot;});
+  });
+  return rows.map(function(r){return {ind:r.ind||&quot;&quot;,unit:r.unit||&quot;R$&quot;,val:String(r.val||&quot;&quot;).trim()};});
 }
 function abrirModalFrente(id){
   document.getElementById(&quot;pilarInfo&quot;).classList.remove(&quot;show&quot;);
@@ -11863,12 +12075,13 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frFrente&quot;).value=f.frente||&quot;&quot;;
     document.getElementById(&quot;frSituacao&quot;).value=f.situacao||&quot;&quot;;
     document.getElementById(&quot;frResp&quot;).value=f.resp||&quot;&quot;;
-    document.getElementById(&quot;frAjuda&quot;).value=f.ajuda?&quot;sim&quot;:&quot;&quot;;
+    _pintarAjudaInfo(f);
     document.getElementById(&quot;frStatus&quot;).value=f.status||&quot;Em Andamento&quot;;
     document.getElementById(&quot;frPrazoFoco&quot;).value=f.prazoFoco||&quot;&quot;;
     document.getElementById(&quot;frDataLimite&quot;).value=f.dataLimite||&quot;&quot;;
-    setGanhoModal(f.ganho||&quot;&quot;);
-    preencherSelectIndicadores(f.indicador||&quot;&quot;);
+    _frGanhoRows=ganhosFrente(f).map(function(g){return {ind:g.ind||&quot;&quot;,unit:g.unit||&quot;R$&quot;,val:g.val||&quot;&quot;};});
+    preencherSelectIndicadores(indsFrente(f));
+    _renderGanhoLinhas();
     document.getElementById(&quot;frPilar&quot;).value=f.pilar||&quot;&quot;;
     document.getElementById(&quot;frCompart&quot;).value=(_compart(f)||[]).join(&quot;, &quot;);
     document.getElementById(&quot;mFrDel&quot;).style.display=&quot;inline-flex&quot;;
@@ -11878,9 +12091,9 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frId&quot;).value=&quot;&quot;;
     document.getElementById(&quot;frNum&quot;).value=prox;
     document.getElementById(&quot;frFrente&quot;).value=&quot;&quot;;document.getElementById(&quot;frSituacao&quot;).value=&quot;&quot;;
-    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;document.getElementById(&quot;frAjuda&quot;).value=&quot;&quot;;document.getElementById(&quot;frStatus&quot;).value=&quot;Em Andamento&quot;;
+    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;_pintarAjudaInfo(null);document.getElementById(&quot;frStatus&quot;).value=&quot;Em Andamento&quot;;
     document.getElementById(&quot;frPrazoFoco&quot;).value=&quot;&quot;;document.getElementById(&quot;frDataLimite&quot;).value=&quot;&quot;;
-    setGanhoModal(&quot;&quot;);preencherSelectIndicadores(&quot;&quot;);
+    _frGanhoRows=[];preencherSelectIndicadores([]);_renderGanhoLinhas();
     document.getElementById(&quot;frPilar&quot;).value=&quot;&quot;;
     document.getElementById(&quot;frCompart&quot;).value=&quot;&quot;;
     document.getElementById(&quot;mFrDel&quot;).style.display=&quot;none&quot;;
@@ -11891,12 +12104,17 @@ function salvarFrente(){
   const nome=document.getElementById(&quot;frFrente&quot;).value.trim();
   if(!nome){toast(&quot;Informe o nome da frente.&quot;,&quot;err&quot;);return;}
   const id=document.getElementById(&quot;frId&quot;).value;
+  /* 🆕 ganhos por indicador (+ campos legados derivados p/ compatibilidade) */
+  const _gs=_coletarGanhos();
+  const _nomes=_gs.map(function(g){return g.ind;}).filter(Boolean);
+  const _pri=_gs.filter(function(g){return String(g.val||&quot;&quot;).trim();})[0]||null;
   const dados={
     num:parseInt(document.getElementById(&quot;frNum&quot;).value)||null,
     frente:nome,situacao:document.getElementById(&quot;frSituacao&quot;).value,
-    resp:document.getElementById(&quot;frResp&quot;).value,status:document.getElementById(&quot;frStatus&quot;).value,ajuda:(document.getElementById(&quot;frAjuda&quot;).value===&quot;sim&quot;),
+    resp:document.getElementById(&quot;frResp&quot;).value,status:document.getElementById(&quot;frStatus&quot;).value,
     prazoFoco:document.getElementById(&quot;frPrazoFoco&quot;).value,dataLimite:document.getElementById(&quot;frDataLimite&quot;).value,
-    ganho:montarGanhoStr(),indicador:document.getElementById(&quot;frIndicador&quot;).value,
+    ganhos:_gs,indicadores:_nomes,
+    ganho:(_pri?ganhoStrDe(_pri):&quot;&quot;),indicador:(_nomes[0]||&quot;&quot;),
     pilar:document.getElementById(&quot;frPilar&quot;).value,
     compartilhado:(document.getElementById(&quot;frCompart&quot;).value||&quot;&quot;).split(&quot;,&quot;).map(s=>s.trim()).filter(Boolean)
   };
@@ -11928,13 +12146,20 @@ function exportarExcel(){
   const p=proj();const wb=XLSX.utils.book_new();
   const frentes=(p.frentes||[]).map(f=>({
     &quot;#&quot;:f.num,Frente:f.frente,Situacao:f.situacao,Responsavel:f.resp,Status:f.status,
-    &quot;Prazo em Foco&quot;:f.prazoFoco,&quot;Data Limite&quot;:f.dataLimite,&quot;Potencial Ganho&quot;:f.ganho,
-    Indicador:f.indicador,Pilar:f.pilar,&quot;Qtd Ações&quot;:(f.acoes||[]).length}));
+    &quot;Prazo em Foco&quot;:f.prazoFoco,&quot;Data Limite&quot;:f.dataLimite,&quot;Potencial Ganho&quot;:ganhosDetalheTxt(f),
+    Indicador:indsFrente(f).join(&quot; | &quot;),Pilar:f.pilar,&quot;Qtd Ações&quot;:(f.acoes||[]).length}));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(frentes.length?frentes:[{}]),&quot;Visão Gerencial&quot;);
+  /* 🆕 aba analítica: uma linha por frente x indicador */
+  const gpi=[];(p.frentes||[]).forEach(function(f){
+    ganhosFrente(f).forEach(function(g){
+      gpi.push({Frente:f.frente,Indicador:(g.ind||&quot;(sem indicador)&quot;),Unidade:(g.unit===&quot;num&quot;?&quot;Número&quot;:g.unit),Valor:(g.val||&quot;&quot;),&quot;Ganho formatado&quot;:(ganhoStrDe(g)?fmtGanhoCompact(ganhoStrDe(g)):&quot;&quot;)});
+    });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(gpi.length?gpi:[{}]),&quot;Ganho por Indicador&quot;);
   const acoes=[];(p.frentes||[]).forEach(f=>{(f.acoes||[]).forEach(a=>acoes.push({
     Frente:f.frente,&quot;Área Responsável&quot;:a.area,Pilar:a.pilar,Indicador:a.indicador,&quot;Causa Raiz&quot;:a.causaRaiz,
     &quot;O quê&quot;:a.what,&quot;Por quê&quot;:a.why,Quem:a.who,Como:a.how,Início:a.inicio,Fim:a.fim,Onde:a.where,
-    &quot;Quanto&quot;:a.howmuch,Status:a.status,&quot;Projeção de Ganho&quot;:a.ganho,&quot;% Conclusão&quot;:a.pct,&quot;Ajuda?&quot;:(a.ajuda?&quot;Sim&quot;:&quot;Não&quot;)}))});
+    &quot;Quanto&quot;:a.howmuch,Status:a.status,&quot;Projeção de Ganho&quot;:a.ganho,&quot;% Conclusão&quot;:a.pct,&quot;Ajuda?&quot;:(a.ajuda?&quot;Sim&quot;:&quot;Não&quot;),&quot;Ajuda — Quem?&quot;:(a.ajudaQuem||&quot;&quot;)}))});
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(acoes.length?acoes:[{}]),&quot;Ações 5W2H&quot;);
   XLSX.writeFile(wb,&quot;FACILITA360_Governanca_&quot;+(p.meta.name||&quot;projeto&quot;).replace(/[^\w]+/g,&quot;_&quot;)+&quot;_&quot;+new Date().toISOString().slice(0,10)+&quot;.xlsx&quot;);
   toast(&quot;Excel gerado.&quot;,&quot;ok&quot;);
@@ -12126,8 +12351,9 @@ function fmtGanhoCompact(ganho){
 /* ===== campo Potencial de Ganho: formatação amigável no modal ===== */
 /* formatação ao vivo enquanto digita (só quando o tipo é R$): dígitos entram como centavos */
 function fmtGanhoInput(){
-  const unit=document.getElementById(&quot;frGanhoUnit&quot;).value;
-  const inp=document.getElementById(&quot;frGanhoVal&quot;);
+  const uEl=document.getElementById(&quot;frGanhoUnit&quot;),inp=document.getElementById(&quot;frGanhoVal&quot;);
+  if(!uEl||!inp)return;                       /* campo antigo removido: agora é por indicador */
+  const unit=uEl.value;
   if(unit!==&quot;R$&quot;)return; /* %, p.p. e número: deixa digitar livre (formata no blur) */
   let d=(inp.value||&quot;&quot;).replace(/\D/g,&quot;&quot;);
   if(d===&quot;&quot;){inp.value=&quot;&quot;;return;}
@@ -12138,8 +12364,9 @@ function fmtGanhoInput(){
 }
 /* ao sair do campo: normaliza o número no formato pt-BR */
 function fmtGanhoBlur(){
-  const unit=document.getElementById(&quot;frGanhoUnit&quot;).value;
-  const inp=document.getElementById(&quot;frGanhoVal&quot;);
+  const uEl=document.getElementById(&quot;frGanhoUnit&quot;),inp=document.getElementById(&quot;frGanhoVal&quot;);
+  if(!uEl||!inp)return;                       /* campo antigo removido: agora é por indicador */
+  const unit=uEl.value;
   const raw=(inp.value||&quot;&quot;).trim();if(!raw){inp.value=&quot;&quot;;return;}
   let num=raw;
   if(num.indexOf(&quot;,&quot;)>=0){num=num.replace(/\./g,&quot;&quot;).replace(&quot;,&quot;,&quot;.&quot;);}
@@ -12151,20 +12378,17 @@ function fmtGanhoBlur(){
 /* preview reduzido (igual aos gráficos) abaixo do campo */
 function atualizarPreviewGanho(){
   const el=document.getElementById(&quot;frGanhoPrev&quot;);if(!el)return;
-  el.textContent=&quot;&quot;;
-  const s=montarGanhoStr();
-  if(!s)return;
-  el.textContent=&quot;≈ &quot;+fmtGanhoCompact(s)+&quot; (como aparece nos cards e gráficos)&quot;;
+  const fake={ganhos:_frGanhoRows};
+  const tot=fmtGanhosCompact(fake);
+  if(!tot){el.textContent=&quot;&quot;;return;}
+  const n=(_frGanhoRows||[]).filter(function(r){return String(r.val||&quot;&quot;).trim();}).length;
+  el.textContent=&quot;≈ &quot;+tot+(n>1?(&quot; no total  ·  &quot;+ganhosDetalheTxt(fake)):&quot; (como aparece nos cards e gráficos)&quot;);
 }
 /* monta a string final do ganho a partir do seletor + valor */
+/* compat: string única do ganho (1º indicador com valor) — mantida p/ a coluna legada */
 function montarGanhoStr(){
-  const unit=(document.getElementById(&quot;frGanhoUnit&quot;)||{}).value||&quot;R$&quot;;
-  const val=((document.getElementById(&quot;frGanhoVal&quot;)||{}).value||&quot;&quot;).trim();
-  if(!val)return &quot;&quot;;
-  if(unit===&quot;R$&quot;)return &quot;R$ &quot;+val;
-  if(unit===&quot;%&quot;)return val+&quot;%&quot;;
-  if(unit===&quot;p.p.&quot;)return val+&quot; p.p.&quot;;
-  return val;
+  const gs=_coletarGanhos().filter(function(g){return String(g.val||&quot;&quot;).trim();});
+  return gs.length?ganhoStrDe(gs[0]):&quot;&quot;;
 }
 /* preenche o seletor + valor a partir da string salva */
 function setGanhoModal(ganho){
@@ -12275,6 +12499,23 @@ function montarMesesInd(preservar){
       <input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellReal&quot; data-k=&quot;${mo.key}&quot; value=&quot;${fmt(d.real)}&quot; placeholder=&quot;Real&quot; style=&quot;${cell}&quot;/>
     </div>`;
   }).join(&quot;&quot;);
+  _montarAnoAnteriorInd();
+}
+/* 🆕 grade de preenchimento do ANO ANTERIOR (jan-dez de N-1, só Realizado) */
+function _montarAnoAnteriorInd(){
+  const w=document.getElementById(&quot;indAntWrap&quot;);if(!w)return;
+  const py=(new Date().getFullYear())-1;
+  const tit=document.getElementById(&quot;indAntTit&quot;);if(tit)tit.textContent=&quot;Ano anterior — Realizado (&quot;+py+&quot;)&quot;;
+  const cell='font-size:12px;padding:5px 7px;border:1px solid #E5E9F0;border-radius:6px;width:100%;font-family:inherit';
+  let h='';
+  for(let m=0;m<12;m++){
+    const k=_mkey(py,m);const dd=_indTmp[k]||{};
+    const v=(dd.real==null||isNaN(dd.real))?'':dd.real;
+    h+='<div style=&quot;border:1px solid #E5E9F0;border-radius:8px;padding:6px 7px;background:#F8FAFC&quot;>'
+      +'<div style=&quot;font-size:9.5px;font-weight:800;color:#5A6478;margin-bottom:4px&quot;>'+_MES[m]+'/'+String(py).slice(-2)+'</div>'
+      +'<input type=&quot;text&quot; inputmode=&quot;decimal&quot; class=&quot;indCellReal&quot; data-k=&quot;'+k+'&quot; value=&quot;'+v+'&quot; placeholder=&quot;Real&quot; style=&quot;'+cell+'&quot;/></div>';
+  }
+  w.innerHTML=h;
 }
 /* &#128994; preenche o seletor de frente vinculada com todas as frentes cadastradas */
 function _preencherFrentesInd(selecionada){
@@ -12381,14 +12622,14 @@ function renderInd(){
     linhas=`<tr><td colspan=&quot;8&quot;><div class=&quot;empty&quot; style=&quot;padding:26px&quot;><div class=&quot;t&quot;>Nenhum indicador cadastrado.</div><div style=&quot;font-size:12.5px&quot;>Clique em <b>+ Novo indicador</b> para começar.</div></div></td></tr>`;
   }else{
     linhas=inds.map(it=>`<tr onclick=&quot;abrirModalInd('${it.id}')&quot; style=&quot;cursor:pointer&quot;>
-      <td style=&quot;font-weight:700&quot;>${esc(it.nome)}</td>
-      <td>${esc(it.area)||&quot;—&quot;}</td>
-      <td>${esc(it.unidade)||&quot;—&quot;}</td>
-      <td>${(function(){const m=_aggMeta(it,_aggPadrao(it),(it.periodo||&quot;fiscal&quot;));return m==null?&quot;—&quot;:fmtN(m);})()}</td>
-      <td>${dirLbl(it.direcao)}</td>
-      <td>${visLbl(it.visao)}</td>
-      <td>${_spark(it)}</td>
-      <td><button class=&quot;btn-del&quot; onclick=&quot;event.stopPropagation();(function(){if(confirm('Excluir este indicador?')){removerIndicador('${it.id}');cloudExcluirInd('${it.id}');saveDB();renderInd();}})()&quot;>🗑</button></td>
+      <td style=&quot;font-weight:700;padding:13px 16px 13px 24px;vertical-align:middle;line-height:1.35&quot;>${esc(it.nome)}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${esc(it.area)||&quot;—&quot;}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${esc(it.unidade)||&quot;—&quot;}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${(function(){const m=_aggMeta(it,_aggPadrao(it),(it.periodo||&quot;fiscal&quot;));return m==null?&quot;—&quot;:fmtN(m);})()}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${dirLbl(it.direcao)}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${visLbl(it.visao)}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle&quot;>${_spark(it)}</td>
+      <td style=&quot;padding:13px 16px;vertical-align:middle;text-align:center&quot;><button class=&quot;btn-del&quot; onclick=&quot;event.stopPropagation();(function(){if(confirm('Excluir este indicador?')){removerIndicador('${it.id}');cloudExcluirInd('${it.id}');saveDB();renderInd();}})()&quot;>🗑</button></td>
     </tr>`).join(&quot;&quot;);
   }
   const optSel=inds.map(i=>`<option value=&quot;${esc(i.nome)}&quot; ${i.nome===_wfSel?&quot;selected&quot;:&quot;&quot;}>${esc(i.nome)}</option>`).join(&quot;&quot;);
@@ -12397,7 +12638,7 @@ function renderInd(){
     <div class=&quot;gt-tblwrap&quot; style=&quot;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px&quot;>
       <table style=&quot;width:100%;border-collapse:collapse;font-size:12.5px&quot;>
         <thead><tr style=&quot;background:#F7F8FC;text-align:left&quot;>
-          <th style=&quot;padding:10px 12px&quot;>Indicador</th><th style=&quot;padding:10px 12px&quot;>Área</th><th style=&quot;padding:10px 12px&quot;>Unidade</th><th style=&quot;padding:10px 12px&quot;>Meta</th><th style=&quot;padding:10px 12px&quot;>Direção</th><th style=&quot;padding:10px 12px&quot;>Visualização</th><th style=&quot;padding:10px 12px&quot;>Ano fiscal</th><th style=&quot;padding:10px 12px;width:44px&quot;></th>
+          <th style=&quot;padding:12px 16px 12px 24px;width:30%;min-width:240px&quot;>Indicador</th><th style=&quot;padding:12px 16px&quot;>Área</th><th style=&quot;padding:12px 16px;width:100px&quot;>Unidade</th><th style=&quot;padding:12px 16px;width:100px&quot;>Meta</th><th style=&quot;padding:12px 16px;width:150px&quot;>Direção</th><th style=&quot;padding:12px 16px;width:140px&quot;>Visualização</th><th style=&quot;padding:12px 16px;width:130px&quot;>Ano fiscal</th><th style=&quot;padding:12px 16px;width:52px&quot;></th>
         </tr></thead>
         <tbody>${linhas}</tbody>
       </table>
@@ -12444,7 +12685,7 @@ function renderInd(){
         </h3>
         <span id=&quot;lnUnidBadge&quot; style=&quot;margin-left:auto;font-size:11px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;></span>
       </div>
-      <p style=&quot;font-size:12px;color:var(--soft);margin:0 0 12px&quot;>Linha do <b>Realizado</b> (meses já ocorridos) e do <b>Forecast</b> (projeção) no ano fiscal vigente. A escala se ajusta automaticamente à unidade do indicador.</p>
+      <p style=&quot;font-size:12px;color:var(--soft);margin:0 0 12px&quot;>Linha do <b>Realizado</b> (meses já ocorridos), do <b>Forecast</b> (projeção) e do <b>Ano anterior</b> (linha cinza pontilhada, mês a mês do ano N-1) no ano fiscal vigente. A escala se ajusta automaticamente à unidade do indicador.</p>
       <div style=&quot;height:320px;position:relative&quot;><canvas id=&quot;lnCanvas&quot;></canvas></div>
     </div>`;
   desenharWaterfall();
@@ -12488,8 +12729,9 @@ function desenharWaterfall(){
   const modoTxt=document.getElementById(&quot;wfModoTxt&quot;);if(modoTxt)modoTxt.textContent=(mode===&quot;media&quot;?&quot;média&quot;:&quot;soma&quot;);
   const base=_aggBase(it,mode,periodo);                /* 🆕 soma OU média conforme o modo */
   const p=proj();
-  const frentesImp=(p.frentes||[]).filter(f=>(f.indicador||&quot;&quot;)===_wfSel);
-  const reduc=frentesImp.map(f=>{const g=parseGanho(f.ganho);return {nome:f.frente||&quot;Frente&quot;,val:g?Math.abs(g.n):0};}).filter(r=>r.val>0);
+  /* 🆕 entra toda frente que impacta o indicador; a redução é o ganho DAQUELE indicador */
+  const frentesImp=(p.frentes||[]).filter(f=>indsFrente(f).indexOf(_wfSel)>=0);
+  const reduc=frentesImp.map(f=>({nome:f.frente||&quot;Frente&quot;,val:ganhoNumIndicador(f,_wfSel)})).filter(r=>r.val>0);
   // eixo X com códigos curtos: Base · F1..Fn · Final (nomes completos vão na legenda abaixo)
   const labels=[&quot;Base&quot;];
   const fullLabels=[&quot;Ano fiscal (real + forecast)&quot;];
@@ -12583,6 +12825,9 @@ function desenharLinhaInd(){
   const labels=meses.map(mo=>{const p=mo.key.split(&quot;-&quot;);return _MES[parseInt(p[1],10)-1]+&quot;/&quot;+p[0].slice(-2);});
   const realArr=meses.map(mo=>{const v=d[mo.key]||{};return (v.real!=null?v.real:null);});
   const fcArr=meses.map(mo=>{const v=d[mo.key]||{};return (v.fc!=null?v.fc:null);});
+  /* 🆕 ANO ANTERIOR (N-1): mesmo mês do ano passado — usa Realizado; se vazio, Forecast */
+  const _pyAno=(new Date().getFullYear())-1;
+  const prevArr=meses.map(mo=>{const p=mo.key.split(&quot;-&quot;);const pk=(parseInt(p[0],10)-1)+&quot;-&quot;+p[1];const v=d[pk]||{};return (v.real!=null?v.real:(v.fc!=null?v.fc:null));});
   /* conecta a linha de forecast ao último real (evita gap visual) */
   let lastReal=-1;for(let i=0;i<realArr.length;i++){if(realArr[i]!=null)lastReal=i;}
   if(lastReal>=0&&fcArr[lastReal]==null)fcArr[lastReal]=realArr[lastReal];
@@ -12591,12 +12836,14 @@ function desenharLinhaInd(){
     {label:&quot;Realizado&quot;,data:realArr,borderColor:&quot;#1F2937&quot;,backgroundColor:&quot;rgba(31,41,55,.08)&quot;,tension:.3,borderWidth:2.6,pointRadius:3,pointBackgroundColor:&quot;#1F2937&quot;,spanGaps:false,fill:false},
     {label:&quot;Forecast&quot;,data:fcArr,borderColor:&quot;#F5842B&quot;,backgroundColor:&quot;transparent&quot;,borderDash:[6,4],tension:.3,borderWidth:2.4,pointRadius:3,pointBackgroundColor:&quot;#F5842B&quot;,spanGaps:true}
   ];
+  /* 🆕 linha comparativa do ano anterior (só aparece se houver dado preenchido) */
+  if(prevArr.some(x=>x!=null))ds.push({label:&quot;Ano anterior (&quot;+_pyAno+&quot;)&quot;,data:prevArr,borderColor:&quot;#94A3B8&quot;,backgroundColor:&quot;transparent&quot;,borderDash:[2,3],tension:.3,borderWidth:2,pointRadius:2.4,pointBackgroundColor:&quot;#94A3B8&quot;,spanGaps:true,fill:false});
   const metaArr=meses.map(mo=>{const m=_metaMes(it,mo.key);return (m==null||isNaN(m))?null:m;});
   if(metaArr.some(x=>x!=null)){ds.push({label:&quot;Meta&quot;,data:metaArr,borderColor:&quot;#DA291C&quot;,borderDash:[3,3],borderWidth:1.6,pointRadius:0,tension:0,spanGaps:true});}
   /* 🆕 eixo Y: FINANCEIRO dá zoom na faixa dos dados (real+forecast); demais unidades seguem como antes */
   let _lnYScale={beginAtZero:false,grace:&quot;12%&quot;,grid:{color:&quot;#EEF2F7&quot;},ticks:{font:{size:10.5},callback:v=>_fmtIndEixo(v,u)}};
   if(_tipoUnidade(u)===&quot;moeda&quot;){
-    const _vals=realArr.concat(fcArr).filter(x=>x!=null&&!isNaN(x));
+    const _vals=realArr.concat(fcArr).concat(prevArr).filter(x=>x!=null&&!isNaN(x));
     if(_vals.length){
       let mn=Math.min.apply(null,_vals),mx=Math.max.apply(null,_vals);
       const span=(mx-mn)||Math.abs(mx)||1;
