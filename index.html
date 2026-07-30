@@ -11141,6 +11141,22 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
 .info-btn{width:18px;height:18px;border-radius:50%;background:var(--info);color:#fff;border:0;font-weight:700;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
 .pilar-info{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#3730A3;margin-top:-6px;margin-bottom:14px;display:none;line-height:1.5}
 .pilar-info.show{display:block}
+/* 🆕 ===== multi-seleção de pessoas (Compartilhar com) ===== */
+.msel{border:1px solid var(--border);border-radius:9px;background:#FAFBFD;padding:9px}
+.msel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.msel-chips .msel-none{font-size:11.5px;color:var(--mute)}
+.msel-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#4338CA;background:rgba(99,102,241,.10);border:1px solid rgba(99,102,241,.28);padding:4px 6px 4px 10px;border-radius:20px}
+.msel-chip button{border:0;background:transparent;color:#4338CA;cursor:pointer;font-size:15px;line-height:1;padding:0 3px;font-weight:700}
+.msel-chip button:hover{color:var(--ac)}
+.msel-top{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.msel-top input{flex:1;min-width:0}
+.msel-act{border:0;background:transparent;color:var(--ac);font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;padding:0}
+.msel-act:hover{text-decoration:underline}
+.msel-list{display:flex;flex-wrap:wrap;gap:8px;max-height:148px;overflow-y:auto}
+.msel-list label{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text);background:#fff;border:1px solid var(--border);padding:6px 10px;border-radius:7px;cursor:pointer;transition:all .15s}
+.msel-list label:hover{border-color:var(--ac)}
+.msel-list input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);cursor:pointer}
+.msel-list .cb-empty{font-size:11.5px;color:var(--mute);padding:3px 2px}
 
 /* ===== TOAST ===== */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -11245,7 +11261,18 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div class=&quot;field full&quot;><label>Situação <span class=&quot;hint&quot;>— cenário atual, ações em andamento e próximos passos</span></label><textarea id=&quot;frSituacao&quot; placeholder=&quot;Ex: Migração iniciada&amp;#10;3.200 clientes elegíveis&amp;#10;Comunicação prevista para 20/07&quot;></textarea></div>
         <div class=&quot;field&quot;><label>Responsável <span class=&quot;hint&quot;>— nome e área ( )</span></label><input id=&quot;frResp&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Buscar pessoa ou digitar novo nome&quot;/></div>
         <div class=&quot;field&quot;><label>Precisa de ajuda? <span class=&quot;hint&quot;>— preenchido nas ações (5W2H)</span></label><div id=&quot;frAjudaInfo&quot; style=&quot;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:42px;padding:9px 12px;border:1px dashed #E5E9F0;border-radius:8px;background:#FAFBFD;font-size:12.5px;color:#5A6478&quot;>—</div></div>
-        <div class=&quot;field full&quot;><label>🔗 Compartilhar com <span class=&quot;hint&quot;>— delegar (a pessoa poderá ver e editar). Separe por vírgula.</span></label><input id=&quot;frCompart&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Ex: Fulano, Ciclana&quot;/></div>
+        <div class=&quot;field full&quot;><label>🔗 Compartilhar com <span class=&quot;hint&quot;>— delegue para UMA OU MAIS pessoas (todas poderão ver e editar esta frente)</span></label>
+          <input type=&quot;hidden&quot; id=&quot;frCompart&quot;/>
+          <div class=&quot;msel&quot;>
+            <div class=&quot;msel-chips&quot; id=&quot;frCompartChips&quot;></div>
+            <div class=&quot;msel-top&quot;>
+              <input id=&quot;frCompartBusca&quot; autocomplete=&quot;off&quot; placeholder=&quot;Buscar pessoa e marcar abaixo (ou digite um nome e tecle Enter)&quot; oninput=&quot;renderFrCompartLista()&quot; onkeydown=&quot;frCompartKey(event)&quot;/>
+              <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartTodos()&quot;>Marcar todos</button>
+              <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartLimpar()&quot;>Limpar</button>
+            </div>
+            <div class=&quot;msel-list&quot; id=&quot;frCompartLista&quot;></div>
+          </div>
+        </div>
         <div class=&quot;field full&quot;><label>Indicadores impactados <span class=&quot;hint&quot;>— marque um ou mais; o ganho é informado por indicador</span></label><div id=&quot;frIndsBox&quot; style=&quot;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1px solid #E5E9F0;border-radius:8px;background:#FAFBFD;max-height:150px;overflow:auto&quot;></div><input type=&quot;hidden&quot; id=&quot;frIndicador&quot;/></div>
         <div class=&quot;field full&quot;><label>Potencial Ganho <span class=&quot;hint&quot;>— informe o ganho de cada indicador marcado acima</span></label>
           <div id=&quot;frGanhoLista&quot; style=&quot;display:flex;flex-direction:column;gap:8px&quot;></div>
@@ -12065,6 +12092,83 @@ function _coletarGanhos(){
   });
   return rows.map(function(r){return {ind:r.ind||&quot;&quot;,unit:r.unit||&quot;R$&quot;,val:String(r.val||&quot;&quot;).trim()};});
 }
+/* 🆕 ===== COMPARTILHAR COM: seleção de VÁRIOS usuários (frentes) ===== */
+let _FR_COMPART=[];   /* nomes selecionados */
+let _FR_DONO=&quot;&quot;;      /* dono da frente (já tem acesso, não aparece na lista) */
+function getFrCompart(){ return _FR_COMPART.slice(); }
+function _frCompartTem(n){ return _FR_COMPART.some(function(x){return _norm(x)===_norm(n);}); }
+function _frCompartCandidatos(){
+  const dono=_norm(_FR_DONO);
+  return (USUARIOS_GOV||[]).filter(function(n){return n&amp;&amp;_norm(n)!==dono;})
+                           .slice().sort(function(a,b){return a.localeCompare(b,&quot;pt&quot;);});
+}
+function setFrCompart(lista,dono){
+  _FR_DONO=dono||&quot;&quot;;
+  const vistos={};
+  _FR_COMPART=(lista||[]).map(function(s){return String(s==null?&quot;&quot;:s).trim();}).filter(function(n){
+    if(!n)return false; const k=_norm(n); if(vistos[k])return false; vistos[k]=1; return true;
+  });
+  const b=document.getElementById(&quot;frCompartBusca&quot;); if(b)b.value=&quot;&quot;;
+  _frCompartRender();
+}
+function toggleFrCompart(n){
+  if(_frCompartTem(n))_FR_COMPART=_FR_COMPART.filter(function(x){return _norm(x)!==_norm(n);});
+  else _FR_COMPART.push(n);
+  _frCompartRender();
+}
+function removerFrCompart(n){
+  _FR_COMPART=_FR_COMPART.filter(function(x){return _norm(x)!==_norm(n);});
+  _frCompartRender();
+}
+function frCompartLimpar(){ _FR_COMPART=[]; _frCompartRender(); }
+function frCompartTodos(){
+  let lista=_frCompartCandidatos();
+  const busca=_norm((document.getElementById(&quot;frCompartBusca&quot;)||{}).value||&quot;&quot;);
+  if(busca)lista=lista.filter(function(n){return _norm(n).indexOf(busca)>=0;});  /* marca só o que está filtrado */
+  lista.forEach(function(n){ if(!_frCompartTem(n))_FR_COMPART.push(n); });
+  _frCompartRender();
+}
+function frCompartKey(ev){
+  if(ev.key!==&quot;Enter&quot;)return;
+  ev.preventDefault();
+  const v=(ev.target.value||&quot;&quot;).trim();
+  if(!v)return;
+  if(!_frCompartTem(v))_FR_COMPART.push(v);   /* permite nome fora do cadastro */
+  ev.target.value=&quot;&quot;;
+  _frCompartRender();
+}
+function renderFrCompartLista(){
+  const box=document.getElementById(&quot;frCompartLista&quot;); if(!box)return;
+  const busca=_norm((document.getElementById(&quot;frCompartBusca&quot;)||{}).value||&quot;&quot;);
+  let lista=_frCompartCandidatos();
+  _FR_COMPART.forEach(function(n){                       /* já marcados sempre visíveis */
+    if(!lista.some(function(x){return _norm(x)===_norm(n);}))lista.push(n);
+  });
+  if(busca)lista=lista.filter(function(n){return _norm(n).indexOf(busca)>=0;});
+  if(!lista.length){
+    box.innerHTML='<span class=&quot;cb-empty&quot;>'+(busca?'Nenhuma pessoa encontrada — tecle Enter para incluir este nome mesmo assim.':'Nenhum outro usuário cadastrado para compartilhar.')+'</span>';
+    return;
+  }
+  box.innerHTML=lista.map(function(n){
+    return '<label><input type=&quot;checkbox&quot; value=&quot;'+esc(n)+'&quot; '+(_frCompartTem(n)?'checked':'')+' onchange=&quot;toggleFrCompart(this.value)&quot;/> '+esc(n)+'</label>';
+  }).join(&quot;&quot;);
+}
+function _frCompartChips(){
+  const box=document.getElementById(&quot;frCompartChips&quot;); if(!box)return;
+  if(!_FR_COMPART.length){
+    box.innerHTML='<span class=&quot;msel-none&quot;>Ninguém selecionado — a frente fica visível apenas para o dono e a gestão.</span>';
+    return;
+  }
+  box.innerHTML='<span class=&quot;msel-none&quot; style=&quot;align-self:center;margin-right:2px&quot;>'+_FR_COMPART.length+' selecionado(s):</span>'+
+    _FR_COMPART.map(function(n){
+      return '<span class=&quot;msel-chip&quot;>'+esc(n)+'<button type=&quot;button&quot; title=&quot;Remover&quot; data-n=&quot;'+esc(n)+'&quot; onclick=&quot;removerFrCompart(this.dataset.n)&quot;>×</button></span>';
+    }).join(&quot;&quot;);
+}
+function _frCompartRender(){
+  _frCompartChips();
+  renderFrCompartLista();
+  const h=document.getElementById(&quot;frCompart&quot;); if(h)h.value=_FR_COMPART.join(&quot;, &quot;);  /* compatibilidade */
+}
 function abrirModalFrente(id){
   document.getElementById(&quot;pilarInfo&quot;).classList.remove(&quot;show&quot;);
   if(id){
@@ -12083,7 +12187,7 @@ function abrirModalFrente(id){
     preencherSelectIndicadores(indsFrente(f));
     _renderGanhoLinhas();
     document.getElementById(&quot;frPilar&quot;).value=f.pilar||&quot;&quot;;
-    document.getElementById(&quot;frCompart&quot;).value=(_compart(f)||[]).join(&quot;, &quot;);
+    setFrCompart(_compart(f)||[], f.dono||&quot;&quot;);
     document.getElementById(&quot;mFrDel&quot;).style.display=&quot;inline-flex&quot;;
   }else{
     const prox=(proj().frentes||[]).reduce((m,f)=>Math.max(m,f.num||0),0)+1;
@@ -12095,7 +12199,7 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frPrazoFoco&quot;).value=&quot;&quot;;document.getElementById(&quot;frDataLimite&quot;).value=&quot;&quot;;
     _frGanhoRows=[];preencherSelectIndicadores([]);_renderGanhoLinhas();
     document.getElementById(&quot;frPilar&quot;).value=&quot;&quot;;
-    document.getElementById(&quot;frCompart&quot;).value=&quot;&quot;;
+    var _uFr=usuarioAtualGov(); setFrCompart([], _uFr?_uFr.nome:&quot;&quot;);
     document.getElementById(&quot;mFrDel&quot;).style.display=&quot;none&quot;;
   }
   document.getElementById(&quot;modalFrente&quot;).classList.add(&quot;show&quot;);
@@ -12116,7 +12220,7 @@ function salvarFrente(){
     ganhos:_gs,indicadores:_nomes,
     ganho:(_pri?ganhoStrDe(_pri):&quot;&quot;),indicador:(_nomes[0]||&quot;&quot;),
     pilar:document.getElementById(&quot;frPilar&quot;).value,
-    compartilhado:(document.getElementById(&quot;frCompart&quot;).value||&quot;&quot;).split(&quot;,&quot;).map(s=>s.trim()).filter(Boolean)
+    compartilhado:getFrCompart()
   };
   const p=proj();const u=usuarioAtualGov();
   if(id){
