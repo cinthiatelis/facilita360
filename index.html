@@ -11695,6 +11695,24 @@ function _aplicaEscopoGov(lista){
   const alvo=nomes.map(_norm);const bate=v=>alvo.indexOf(_norm(v))>=0;
   return lista.filter(it=>bate(it&amp;&amp;it.dono)||_compart(it).some(x=>bate(x)));
 }
+/* Compartilhamento herdado: todo indicador vinculado a uma governança/frente
+   acompanha automaticamente as pessoas marcadas nas frentes desse projeto. */
+function _compartProjetoGov(nomeProjeto){
+  const p=DB.projects&amp;&amp;DB.projects[nomeProjeto];
+  if(!p)return [];
+  const nomes=[];
+  (p.frentes||[]).forEach(f=>_compart(f).forEach(n=>{if(n&amp;&amp;nomes.indexOf(n)&lt;0)nomes.push(n);}));
+  return nomes;
+}
+function sincronizarCompartilhamentoIndicadoresGov(nomeProjeto){
+  const compartilhados=_compartProjetoGov(nomeProjeto);
+  (GOV_INDS||[]).forEach(it=>{
+    if((it.projeto||&quot;&quot;)===nomeProjeto)it.compartilhado=compartilhados.slice();
+  });
+}
+function sincronizarTodosIndicadoresGov(){
+  Object.keys(DB.projects||{}).forEach(sincronizarCompartilhamentoIndicadoresGov);
+}
 /* indicadores visíveis ao usuário (respeita perfil + escopo) */
 function indicadoresVisiveis(){ return _aplicaEscopoGov(indicadores().filter(podeVerItem)); }
 function frentesFiltradas(){
@@ -12231,6 +12249,8 @@ function salvarFrente(){
     dados.dono=u?u.nome:&quot;&quot;;           /* 🆕 carimba o dono ao criar */
     p.frentes.push(Object.assign({id:uid(&quot;f&quot;),acoes:[]},dados));
   }
+  /* mantém os indicadores da governança com o mesmo compartilhamento das frentes */
+  sincronizarCompartilhamentoIndicadoresGov((p.meta&amp;&amp;p.meta.name)||DB.currentId||&quot;&quot;);
   saveDB();fecharModal(&quot;modalFrente&quot;);render();toast(&quot;Frente salva.&quot;,&quot;ok&quot;);
 }
 function excluirFrente(){
@@ -12331,7 +12351,7 @@ async function cloudCarregar(){
       return {id:r.id,nome:r.nome||&quot;&quot;,area:r.area||&quot;&quot;,unidade:r.unidade||&quot;&quot;,
         meta:(r.meta==null?null:r.meta),direcao:r.direcao||&quot;menor&quot;,visao:r.visao||&quot;fiscal&quot;,
         dados:(dj.meses||{}),dono:r.dono||&quot;&quot;,compartilhado:(dj.compartilhado||[]),projeto:(dj.projeto||&quot;&quot;),histMeses:(dj.histMeses==null?null:dj.histMeses),futMeses:(dj.futMeses==null?null:dj.futMeses),agg:(dj.agg||&quot;&quot;),periodo:(dj.periodo||&quot;&quot;)};
-    }).filter(podeVerItem);
+    });
     /* ---- frentes agrupadas por projeto (filtra visibilidade) ---- */
     DB={currentId:null,projects:{}};
     (rf.data||[]).forEach(r=>{
@@ -12348,6 +12368,11 @@ async function cloudCarregar(){
     if(Object.keys(DB.projects).length===0){
       DB.projects[&quot;Minha Governança&quot;]={meta:{name:&quot;Minha Governança&quot;},frentes:[],indicadores:GOV_INDS};
     }
+    /* Agora que as frentes visíveis já foram carregadas, herda o compartilhamento
+       e só então filtra os indicadores. Isso evita descartar o indicador antes de
+       descobrir que a frente foi compartilhada com o usuário. */
+    sincronizarTodosIndicadoresGov();
+    GOV_INDS=GOV_INDS.filter(it=>podeVerItem(it)||!!DB.projects[it.projeto]);
     Object.values(DB.projects).forEach(p=>{p.indicadores=GOV_INDS;});
     DB.currentId=Object.keys(DB.projects)[0];
     /* &#128994; indicadores antigos (sem frente) -> vinculados à 1ª frente p/ não sumirem */
@@ -12360,6 +12385,8 @@ async function cloudCarregar(){
 /* grava (upsert) só as linhas que o usuário PODE EDITAR — nunca sobrescreve as dos outros */
 async function cloudSalvar(){
   if(!sb)return;
+  /* garante que alterações de compartilhamento da frente subam junto nos indicadores */
+  sincronizarTodosIndicadoresGov();
   const u=usuarioAtualGov();
   try{
     const rows=[];
@@ -12695,7 +12722,7 @@ function salvarInd(){
     histMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indHist&quot;),10)||0):null),futMeses:(g(&quot;indVisao&quot;)===&quot;custom&quot;?(parseInt(g(&quot;indFut&quot;),10)||0):null),
     projeto:projeto,                                                                /* &#128994; só aparece nesta frente */
     dono:antigo?(antigo.dono||(u?u.nome:&quot;&quot;)):(u?u.nome:&quot;&quot;),                 /* &#127381; mantém/carimba o dono */
-    compartilhado:antigo?_compart(antigo):[]};
+    compartilhado:_compartProjetoGov(projeto)};
   if(id){const i=GOV_INDS.findIndex(x=>x.id===id);if(i>=0)GOV_INDS[i]=obj;else GOV_INDS.push(obj);}else GOV_INDS.push(obj);
   saveDB();fecharModal(&quot;modalInd&quot;);renderInd();toast(&quot;Indicador salvo.&quot;,&quot;ok&quot;);
 }
