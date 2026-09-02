@@ -11001,7 +11001,7 @@ header{background:#fff;border-bottom:1px solid var(--border);padding:16px 28px;d
 @media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
 .kpi::before{content:&quot;&quot;;position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac)}
-.kpi.sc::before{background:var(--sc)}.kpi.wn::before{background:var(--wn)}.kpi.dg::before{background:var(--dg)}.kpi.info::before{background:var(--info)}.kpi.pl::before{background:#8B5CF6}
+.kpi.sc::before{background:var(--sc)}.kpi.wn::before{background:var(--wn)}.kpi.dg::before{background:var(--dg)}.kpi.info::before{background:var(--info)}.kpi.pl::before{background:#8B5CF6}.kpi.purple::before{background:#8B5CF6}
 .kpi .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--soft);font-weight:700}
 .kpi .val{font-size:25px;font-weight:800;letter-spacing:-.6px;margin-top:5px}
 .kpi .sub{font-size:10.5px;color:var(--mute);margin-top:2px}
@@ -11016,6 +11016,48 @@ header{background:#fff;border-bottom:1px solid var(--border);padding:16px 28px;d
 .view-toggle button{background:transparent;border:0;padding:7px 13px;border-radius:6px;font:inherit;font-size:12px;font-weight:600;color:var(--soft);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
 .view-toggle button.active{background:#fff;color:var(--ac);box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .view-toggle svg{width:14px;height:14px}
+/* ===== TIMELINE (Gantt) Governança ===== */
+.gv-tl-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.gv-tl-modesel{display:inline-flex;background:#EEF1F6;border-radius:8px;padding:3px}
+.gv-tl-modesel button{background:transparent;border:0;padding:8px 15px;border-radius:6px;font:inherit;font-size:12.5px;font-weight:700;color:var(--soft);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.gv-tl-modesel button.active{background:#fff;color:var(--ac);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.gv-tl-modesel svg{width:14px;height:14px}
+.gv-tl-toolbar select{background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit;color:var(--text);outline:none}
+.gv-tl-toolbar select:focus{border-color:var(--ac)}
+.gv-tl-wrap{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px;overflow-x:auto}
+.gv-tl-head{display:grid;gap:10px;margin-bottom:8px;align-items:end;min-width:max-content}
+.gv-tl-months{display:grid;gap:3px}
+.gv-tl-head .mh{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;font-size:11px;padding:7px 4px;text-align:center;border-radius:6px;white-space:nowrap}
+.gv-tl-grp{border-top:1px solid #EEF2F7;padding:10px 0;min-width:max-content}
+.gv-tl-grp-name{font-size:10.5px;color:var(--ac);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:2px}
+.gv-tl-row{display:grid;gap:10px;align-items:center;margin-bottom:6px;min-width:max-content}
+.gv-tl-label{font-size:12px;color:var(--text);font-weight:600;line-height:1.25;padding-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gv-tl-label .sub{font-size:10px;color:var(--mute);font-weight:500}
+.gv-tl-track{position:relative;height:28px;background:#FAFBFD;border:1px solid #F0F3F8;border-radius:6px}
+.gv-tl-bar{position:absolute;top:2px;bottom:2px;border-radius:5px;display:flex;align-items:center;padding:0 9px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;min-width:22px;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:filter .15s,transform .1s}
+.gv-tl-bar:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.gv-tl-bar.st-programada{background:#F59E0B}
+.gv-tl-bar.st-andamento{background:#0EA5E9}
+.gv-tl-bar.st-concluida{background:#10B981}
+.gv-tl-bar.st-atrasada{background:#EF4444}
+.gv-tl-today{position:absolute;top:0;bottom:0;width:2px;background:var(--ac);box-shadow:0 0 6px rgba(218,41,28,.5);z-index:3;pointer-events:none}
+.gv-tl-legend{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--soft)}
+.gv-tl-legend .it{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.gv-tl-legend .sw{width:12px;height:12px;border-radius:3px}
+.gv-tl-empty{padding:44px 20px;text-align:center;color:var(--mute)}
+.gv-tl-empty .ico{font-size:40px;margin-bottom:8px}
+.gv-tl-empty .t{font-weight:700;color:var(--soft);font-size:15px;margin-bottom:4px}
+/* tooltip flutuante */
+#gvTlTip{position:fixed;z-index:9000;background:#0B1426;color:#fff;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.5;max-width:340px;min-width:220px;box-shadow:0 12px 34px rgba(0,0,0,.35);pointer-events:none;display:none;font-family:'Inter',system-ui,sans-serif}
+#gvTlTip h5{font-size:13px;font-weight:800;margin:0 0 8px;color:#fff;line-height:1.3;padding-right:6px}
+#gvTlTip .tr{margin-bottom:3px;color:#C7D0E0}
+#gvTlTip .tr b{color:#fff;font-weight:700}
+#gvTlTip .tr.gain b{color:#34D399}
+#gvTlTip .st-chip{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;margin-left:4px}
+#gvTlTip .st-chip.st-programada{background:rgba(245,158,11,.25);color:#FCD34D}
+#gvTlTip .st-chip.st-andamento{background:rgba(14,165,233,.25);color:#7DD3FC}
+#gvTlTip .st-chip.st-concluida{background:rgba(16,185,129,.25);color:#6EE7B7}
+#gvTlTip .st-chip.st-atrasada{background:rgba(239,68,68,.25);color:#FCA5A5}
 
 /* ===== FRENTE CARDS ===== */
 .frente{border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;background:#fff;box-shadow:var(--shadow);border-left:4px solid var(--mute)}
@@ -11048,6 +11090,11 @@ tr.gt-done .gt-frente,tr.gt-done .gt-sit{color:#8A94A6}
 .ganho-box{text-align:right}
 .ganho-box .g-val{font-size:16px;font-weight:800;color:var(--sc);line-height:1}
 .ganho-box .g-lbl{font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:.4px}
+.pct-box{text-align:right;min-width:66px}
+.pct-box .p-val{font-size:16px;font-weight:800;color:#0EA5E9;line-height:1}
+.pct-box .p-lbl{font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:.4px}
+.pct-box .p-bar{height:5px;background:#EEF2F7;border-radius:99px;overflow:hidden;margin-top:5px}
+.pct-box .p-bar>div{height:100%;background:linear-gradient(90deg,#0EA5E9,#38BDF8);border-radius:99px;transition:width .3s}
 .acoes-chip{font-size:11px;font-weight:700;color:var(--soft);background:#EEF2F7;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .frente-menu{background:none;border:0;color:var(--mute);cursor:pointer;padding:5px 8px;border-radius:6px;font-size:15px}
 .frente-menu:hover{color:var(--ac);background:rgba(218,41,28,.06)}
@@ -11152,11 +11199,20 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
 .msel-top input{flex:1;min-width:0}
 .msel-act{border:0;background:transparent;color:var(--ac);font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;padding:0}
 .msel-act:hover{text-decoration:underline}
-.msel-list{display:flex;flex-wrap:wrap;gap:8px;max-height:148px;overflow-y:auto}
-.msel-list label{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text);background:#fff;border:1px solid var(--border);padding:6px 10px;border-radius:7px;cursor:pointer;transition:all .15s}
-.msel-list label:hover{border-color:var(--ac)}
-.msel-list input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);cursor:pointer}
+.msel-list{display:flex;flex-direction:column;gap:5px;max-height:210px;overflow-y:auto}
+.msel-list label{display:flex;align-items:center;gap:9px;width:100%;font-size:12.5px;font-weight:600;color:var(--text);background:#fff;border:1px solid var(--border);padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
+.msel-list label:hover{border-color:var(--ac);background:#FEF6F5}
+.msel-list input[type=checkbox]{width:16px;height:16px;accent-color:var(--ac);cursor:pointer;flex-shrink:0}
 .msel-list .cb-empty{font-size:11.5px;color:var(--mute);padding:3px 2px}
+/* 🆕 lista suspensa (dropdown) */
+.msel-head{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 12px;cursor:pointer;transition:all .15s;min-height:44px}
+.msel-head:hover{border-color:var(--ac)}
+.msel.open .msel-head{border-color:var(--ac);box-shadow:0 0 0 3px rgba(218,41,28,.08)}
+.msel-head .msel-summary{flex:1;min-width:0;font-size:12.5px;color:var(--text);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.msel-head .msel-caret{color:var(--mute);flex-shrink:0;transition:transform .2s;width:16px;height:16px}
+.msel.open .msel-head .msel-caret{transform:rotate(180deg);color:var(--ac)}
+.msel-panel{display:none;margin-top:8px;border:1px solid var(--border);border-radius:9px;background:#FAFBFD;padding:10px}
+.msel.open .msel-panel{display:block}
 
 /* ===== TOAST ===== */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -11216,19 +11272,20 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
   <div class=&quot;content&quot;>
     <div id=&quot;ctxFrente&quot; style=&quot;display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 14px;background:#fff;border:1px solid var(--border);border-left:4px solid var(--ac);border-radius:10px;box-shadow:var(--shadow)&quot;></div>
     <div class=&quot;kpi-grid&quot;>
-      <div class=&quot;kpi&quot;><div class=&quot;lbl&quot;>Frentes</div><div class=&quot;val&quot; id=&quot;kFrentes&quot;>0</div><div class=&quot;sub&quot;>no projeto</div><div class=&quot;kpi-gain&quot; id=&quot;kFrentesG&quot;></div></div>
-      <div class=&quot;kpi pl&quot;><div class=&quot;lbl&quot;>Em planejamento</div><div class=&quot;val&quot; id=&quot;kPlanejamento&quot;>0</div><div class=&quot;sub&quot;>a iniciar</div><div class=&quot;kpi-gain&quot; id=&quot;kPlanejamentoG&quot;></div></div>
-      <div class=&quot;kpi info&quot;><div class=&quot;lbl&quot;>Em andamento</div><div class=&quot;val&quot; id=&quot;kAndamento&quot;>0</div><div class=&quot;sub&quot;>ativas</div><div class=&quot;kpi-gain&quot; id=&quot;kAndamentoG&quot;></div></div>
-      <div class=&quot;kpi wn&quot;><div class=&quot;lbl&quot;>Em risco</div><div class=&quot;val&quot; id=&quot;kRisco&quot;>0</div><div class=&quot;sub&quot;>atenção</div><div class=&quot;kpi-gain&quot; id=&quot;kRiscoG&quot;></div></div>
-      <div class=&quot;kpi dg&quot;><div class=&quot;lbl&quot;>Atrasadas</div><div class=&quot;val&quot; id=&quot;kAtrasado&quot;>0</div><div class=&quot;sub&quot;>ação imediata</div><div class=&quot;kpi-gain&quot; id=&quot;kAtrasadoG&quot;></div></div>
-      <div class=&quot;kpi sc&quot;><div class=&quot;lbl&quot;>Concluídas</div><div class=&quot;val&quot; id=&quot;kConcluido&quot;>0</div><div class=&quot;sub&quot;>entregues</div><div class=&quot;kpi-gain&quot; id=&quot;kConcluidoG&quot;></div></div>
+      <div class=&quot;kpi&quot;><div class=&quot;lbl&quot;>Frentes</div><div class=&quot;val&quot; id=&quot;kFrentes&quot;>0</div><div class=&quot;sub&quot;>no projeto</div></div>
+      <div class=&quot;kpi purple&quot;><div class=&quot;lbl&quot;>Total de ações</div><div class=&quot;val&quot; id=&quot;kAcoes&quot;>0</div><div class=&quot;sub&quot;>em todas as frentes</div></div>
+      <div class=&quot;kpi pl&quot;><div class=&quot;lbl&quot;>Programadas</div><div class=&quot;val&quot; id=&quot;kPlanejamento&quot;>0%</div><div class=&quot;sub&quot; id=&quot;kPlanejamentoSub&quot;>0 ações</div></div>
+      <div class=&quot;kpi info&quot;><div class=&quot;lbl&quot;>Em andamento</div><div class=&quot;val&quot; id=&quot;kAndamento&quot;>0%</div><div class=&quot;sub&quot; id=&quot;kAndamentoSub&quot;>0 ações</div></div>
+      <div class=&quot;kpi sc&quot;><div class=&quot;lbl&quot;>Concluídas</div><div class=&quot;val&quot; id=&quot;kConcluido&quot;>0%</div><div class=&quot;sub&quot; id=&quot;kConcluidoSub&quot;>0 ações</div></div>
+      <div class=&quot;kpi dg&quot;><div class=&quot;lbl&quot;>Atrasadas</div><div class=&quot;val&quot; id=&quot;kAtrasado&quot;>0%</div><div class=&quot;sub&quot; id=&quot;kAtrasadoSub&quot;>0 ações</div></div>
     </div>
+    <div id=&quot;resumoGanho&quot;></div>
 
     <div class=&quot;toolbar&quot;>
       <input type=&quot;text&quot; id=&quot;fBusca&quot; placeholder=&quot;🔍 Buscar frente...&quot; oninput=&quot;render()&quot; style=&quot;min-width:220px&quot;/>
       <select id=&quot;fStatus&quot; onchange=&quot;render()&quot;>
         <option value=&quot;&quot;>Todos os status</option>
-        <option>Em planejamento</option><option>Em Andamento</option><option>Em Risco</option><option>Atrasado</option><option>Concluído</option>
+        <option>Programada</option><option>Em andamento</option><option>Concluída</option><option>Atrasada</option>
       </select>
       <select id=&quot;fPilar&quot; onchange=&quot;render()&quot;><option value=&quot;&quot;>Todos os pilares</option></select>
       <select id=&quot;fResp&quot; onchange=&quot;render()&quot;><option value=&quot;&quot;>Todos os responsáveis</option></select>
@@ -11238,12 +11295,14 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <div class=&quot;view-toggle&quot;>
         <button id=&quot;vtCards&quot; class=&quot;active&quot; onclick=&quot;setView('cards')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><rect x=&quot;3&quot; y=&quot;3&quot; width=&quot;18&quot; height=&quot;7&quot; rx=&quot;1&quot;/><rect x=&quot;3&quot; y=&quot;14&quot; width=&quot;18&quot; height=&quot;7&quot; rx=&quot;1&quot;/></svg> Cards</button>
         <button id=&quot;vtTable&quot; onclick=&quot;setView('table')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><line x1=&quot;8&quot; y1=&quot;6&quot; x2=&quot;21&quot; y2=&quot;6&quot;/><line x1=&quot;8&quot; y1=&quot;12&quot; x2=&quot;21&quot; y2=&quot;12&quot;/><line x1=&quot;8&quot; y1=&quot;18&quot; x2=&quot;21&quot; y2=&quot;18&quot;/><line x1=&quot;3&quot; y1=&quot;6&quot; x2=&quot;3.01&quot; y2=&quot;6&quot;/><line x1=&quot;3&quot; y1=&quot;12&quot; x2=&quot;3.01&quot; y2=&quot;12&quot;/><line x1=&quot;3&quot; y1=&quot;18&quot; x2=&quot;3.01&quot; y2=&quot;18&quot;/></svg> Tabela</button>
+        <button id=&quot;vtTimeline&quot; onclick=&quot;setView('timeline')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><rect x=&quot;3&quot; y=&quot;4&quot; width=&quot;18&quot; height=&quot;18&quot; rx=&quot;2&quot;/><line x1=&quot;16&quot; y1=&quot;2&quot; x2=&quot;16&quot; y2=&quot;6&quot;/><line x1=&quot;8&quot; y1=&quot;2&quot; x2=&quot;8&quot; y2=&quot;6&quot;/><line x1=&quot;3&quot; y1=&quot;10&quot; x2=&quot;21&quot; y2=&quot;10&quot;/></svg> Timeline</button>
         <button id=&quot;vtInd&quot; onclick=&quot;setView('ind')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg> Indicador</button>
       </div>
     </div>
 
     <div id=&quot;viewCards&quot;></div>
     <div id=&quot;viewTable&quot; style=&quot;display:none&quot;></div>
+    <div id=&quot;viewTimeline&quot; style=&quot;display:none&quot;></div>
     <div id=&quot;viewInd&quot; style=&quot;display:none&quot;></div>
   </div>
 </main>
@@ -11256,24 +11315,39 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
       <input type=&quot;hidden&quot; id=&quot;frId&quot;/>
       <div class=&quot;grid2&quot;>
         <div class=&quot;field&quot;><label>Nº <span class=&quot;hint&quot;>(ordem)</span></label><input type=&quot;number&quot; id=&quot;frNum&quot; placeholder=&quot;1&quot;/></div>
-        <div class=&quot;field&quot;><label>Status</label><select id=&quot;frStatus&quot;><option>Em planejamento</option><option>Em Andamento</option><option>Em Risco</option><option>Atrasado</option><option>Concluído</option></select></div>
+        <div class=&quot;field&quot;><label>Status <span style=&quot;font-weight:400;text-transform:none;letter-spacing:0;color:var(--mute)&quot;>— automático, definido pelas ações</span></label><div id=&quot;frStatusAuto&quot; style=&quot;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #E5E9F0;border-radius:8px;background:#FAFBFD;font-size:12.5px;font-weight:700;color:#5A6478;min-height:42px&quot;>Programada</div></div>
         <div class=&quot;field full&quot;><label>Frente <span class=&quot;hint&quot;>— nome resumido da iniciativa/projeto</span></label><input id=&quot;frFrente&quot; placeholder=&quot;Ex: Upgrade GPON Goiânia&quot;/></div>
         <div class=&quot;field full&quot;><label>Situação <span class=&quot;hint&quot;>— cenário atual, ações em andamento e próximos passos</span></label><textarea id=&quot;frSituacao&quot; placeholder=&quot;Ex: Migração iniciada&amp;#10;3.200 clientes elegíveis&amp;#10;Comunicação prevista para 20/07&quot;></textarea></div>
         <div class=&quot;field&quot;><label>Responsável <span class=&quot;hint&quot;>— nome e área ( )</span></label><input id=&quot;frResp&quot; list=&quot;pessoasFacilitaGov&quot; placeholder=&quot;Buscar pessoa ou digitar novo nome&quot;/></div>
         <div class=&quot;field&quot;><label>Precisa de ajuda? <span class=&quot;hint&quot;>— preenchido nas ações (5W2H)</span></label><div id=&quot;frAjudaInfo&quot; style=&quot;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:42px;padding:9px 12px;border:1px dashed #E5E9F0;border-radius:8px;background:#FAFBFD;font-size:12.5px;color:#5A6478&quot;>—</div></div>
         <div class=&quot;field full&quot;><label>🔗 Compartilhar com <span class=&quot;hint&quot;>— delegue para UMA OU MAIS pessoas (todas poderão ver e editar esta frente)</span></label>
           <input type=&quot;hidden&quot; id=&quot;frCompart&quot;/>
-          <div class=&quot;msel&quot;>
-            <div class=&quot;msel-chips&quot; id=&quot;frCompartChips&quot;></div>
-            <div class=&quot;msel-top&quot;>
-              <input id=&quot;frCompartBusca&quot; autocomplete=&quot;off&quot; placeholder=&quot;Buscar pessoa e marcar abaixo (ou digite um nome e tecle Enter)&quot; oninput=&quot;renderFrCompartLista()&quot; onkeydown=&quot;frCompartKey(event)&quot;/>
-              <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartTodos()&quot;>Marcar todos</button>
-              <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartLimpar()&quot;>Limpar</button>
+          <div class=&quot;msel&quot; id=&quot;frCompartDD&quot;>
+            <div class=&quot;msel-head&quot; onclick=&quot;toggleMselDD('frCompartDD')&quot;>
+              <div class=&quot;msel-chips msel-summary&quot; id=&quot;frCompartChips&quot;></div>
+              <svg class=&quot;msel-caret&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><polyline points=&quot;6 9 12 15 18 9&quot;/></svg>
             </div>
-            <div class=&quot;msel-list&quot; id=&quot;frCompartLista&quot;></div>
+            <div class=&quot;msel-panel&quot;>
+              <div class=&quot;msel-top&quot;>
+                <input id=&quot;frCompartBusca&quot; autocomplete=&quot;off&quot; placeholder=&quot;Buscar pessoa e marcar abaixo (ou digite um nome e tecle Enter)&quot; oninput=&quot;renderFrCompartLista()&quot; onkeydown=&quot;frCompartKey(event)&quot;/>
+                <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartTodos()&quot;>Marcar todos</button>
+                <button type=&quot;button&quot; class=&quot;msel-act&quot; onclick=&quot;frCompartLimpar()&quot;>Limpar</button>
+              </div>
+              <div class=&quot;msel-list&quot; id=&quot;frCompartLista&quot;></div>
+            </div>
           </div>
         </div>
-        <div class=&quot;field full&quot;><label>Indicadores impactados <span class=&quot;hint&quot;>— marque um ou mais; o ganho é informado por indicador</span></label><div id=&quot;frIndsBox&quot; style=&quot;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1px solid #E5E9F0;border-radius:8px;background:#FAFBFD;max-height:150px;overflow:auto&quot;></div><input type=&quot;hidden&quot; id=&quot;frIndicador&quot;/></div>
+        <div class=&quot;field full&quot;><label>Indicadores impactados <span class=&quot;hint&quot;>— marque um ou mais; o ganho é informado por indicador</span></label>
+          <div class=&quot;msel&quot; id=&quot;frIndsDD&quot;>
+            <div class=&quot;msel-head&quot; onclick=&quot;toggleMselDD('frIndsDD')&quot;>
+              <div class=&quot;msel-summary&quot; id=&quot;frIndsSummary&quot;></div>
+              <svg class=&quot;msel-caret&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><polyline points=&quot;6 9 12 15 18 9&quot;/></svg>
+            </div>
+            <div class=&quot;msel-panel&quot;>
+              <div id=&quot;frIndsBox&quot; style=&quot;display:flex;flex-direction:column;gap:5px;max-height:210px;overflow:auto&quot;></div>
+            </div>
+          </div>
+          <input type=&quot;hidden&quot; id=&quot;frIndicador&quot;/></div>
         <div class=&quot;field full&quot;><label>Potencial Ganho <span class=&quot;hint&quot;>— informe o ganho de cada indicador marcado acima</span></label>
           <div id=&quot;frGanhoLista&quot; style=&quot;display:flex;flex-direction:column;gap:8px&quot;></div>
           <span class=&quot;hint&quot; id=&quot;frGanhoPrev&quot; style=&quot;margin-top:6px;color:var(--sc);font-weight:600&quot;></span>
@@ -11324,7 +11398,7 @@ table.gt-acoes td{padding:7px 9px;border-top:1px solid var(--border);vertical-al
         <div class=&quot;field full&quot;><label>Frente vinculada <span class=&quot;hint&quot;>— o indicador só aparece na frente selecionada</span></label><select id=&quot;indFrente&quot;></select></div>
         <div class=&quot;field full&quot;><label>Forma de visualização</label>
           <select id=&quot;indVisao&quot; onchange=&quot;montarMesesInd(true)&quot;>
-            <option value=&quot;fiscal&quot;>Ano fiscal (jan–dez do ano vigente · real + forecast)</option>
+            <option value=&quot;fiscal&quot;>Ano vigente (jan–dez · real + forecast)</option>
             <option value=&quot;custom&quot;>Personalizado (escolha histórico e futuro em meses)</option>
           </select>
         </div>
@@ -11394,7 +11468,7 @@ const PILAR_CONCEITO={
   &quot;Indicadores e Performance&quot;:&quot;Consolida medição, monitoramento e análise de desempenho operacional: quais indicadores acompanhar, forma de coleta, periodicidade e painéis. Mostra se está dando certo.&quot;,
   &quot;Capacidade e Atendimento de Campo&quot;:&quot;Garante que há recurso (gente, veículos, ferramentas, agenda) para executar atendimento em campo no prazo e com qualidade, além de planejar capacidade futura.&quot;
 };
-const STATUS_LIST=[&quot;Em planejamento&quot;,&quot;Em Andamento&quot;,&quot;Em Risco&quot;,&quot;Atrasado&quot;,&quot;Concluído&quot;];
+const STATUS_LIST=[&quot;Programada&quot;,&quot;Em andamento&quot;,&quot;Concluída&quot;,&quot;Atrasada&quot;];
 
 /* colunas 5W2H — idênticas ao módulo PDCA */
 const W5H2_COLS=[
@@ -11530,6 +11604,44 @@ function setGanhoKPI(elId,lista){
   const txt=fmtGanhoAcc(somarGanho(lista));
   el.textContent=txt?(&quot;Pot. ganho: &quot;+txt):&quot;&quot;;
 }
+/* 🆕 Resumo de ganho por indicador — consolida o potencial de todas as frentes visíveis,
+   agrupando por indicador (e por unidade). Mostra também o total geral por unidade. */
+function renderResumoGanho(lista){
+  const box=document.getElementById(&quot;resumoGanho&quot;);if(!box)return;
+  const mapa={};
+  (lista||[]).forEach(function(f){
+    ganhosFrente(f).forEach(function(g){
+      const st=ganhoStrDe(g);if(!st)return;
+      const pn=parseGanho(st);if(!pn)return;
+      const ind=(g.ind||&quot;Sem indicador&quot;).trim()||&quot;Sem indicador&quot;;
+      const k=ind+&quot;\u0001&quot;+pn.unit;
+      if(!mapa[k])mapa[k]={ind:ind,unit:pn.unit,total:0,frentes:{}};
+      mapa[k].total+=pn.n;
+      mapa[k].frentes[f.id]=1;
+    });
+  });
+  const itens=Object.keys(mapa).map(function(k){return mapa[k];})
+    .sort(function(a,b){return Math.abs(b.total)-Math.abs(a.total);});
+  if(itens.length===0){box.innerHTML=&quot;&quot;;return;}
+  const totGeral=somarGanho(lista);
+  const totTxt=fmtGanhoAcc(totGeral).replace(/^\+\s*/,&quot;&quot;);
+  const cards=itens.map(function(it){
+    const nFr=Object.keys(it.frentes).length;
+    return '<div style=&quot;flex:1;min-width:200px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--sc);border-radius:10px;padding:12px 14px&quot;>'
+      +'<div style=&quot;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis&quot; title=&quot;'+esc(it.ind)+'&quot;>'+esc(it.ind)+'</div>'
+      +'<div style=&quot;font-size:20px;font-weight:800;color:var(--sc);letter-spacing:-.4px;margin-top:4px&quot;>+ '+esc(fmtUnidade(it.total,it.unit))+'</div>'
+      +'<div style=&quot;font-size:10px;color:var(--mute);margin-top:2px&quot;>em '+nFr+' frente'+(nFr===1?&quot;&quot;:&quot;s&quot;)+'</div>'
+      +'</div>';
+  }).join(&quot;&quot;);
+  box.innerHTML='<div style=&quot;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:18px&quot;>'
+    +'<div style=&quot;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px&quot;>'
+    +'<svg viewBox=&quot;0 0 24 24&quot; width=&quot;16&quot; height=&quot;16&quot; fill=&quot;none&quot; stroke=&quot;#10B981&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg>'
+    +'<span style=&quot;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--soft)&quot;>Potencial de ganho por indicador</span>'
+    +(totTxt?'<span style=&quot;margin-left:auto;font-size:12px;color:var(--soft);font-weight:600&quot;>Total geral: <b style=&quot;color:var(--sc)&quot;>+ '+esc(totTxt)+'</b></span>':&quot;&quot;)
+    +'</div>'
+    +'<div style=&quot;display:flex;gap:12px;flex-wrap:wrap&quot;>'+cards+'</div>'
+    +'</div>';
+}
 
 /* ---------- DB ---------- */
 function loadDB(){
@@ -11598,7 +11710,71 @@ function excluirProjeto(){
 }
 
 /* ---------- helpers status/data ---------- */
-function stClass(s){s=(s||&quot;&quot;).toLowerCase();if(s.includes(&quot;planej&quot;))return&quot;planejamento&quot;;if(s.includes(&quot;atras&quot;))return&quot;atrasado&quot;;if(s.includes(&quot;risco&quot;))return&quot;risco&quot;;if(s.includes(&quot;conclu&quot;))return&quot;concluido&quot;;return&quot;andamento&quot;}
+function stClass(s){s=(s||&quot;&quot;).toLowerCase();if(s.includes(&quot;atras&quot;))return&quot;atrasado&quot;;if(s.includes(&quot;conclu&quot;))return&quot;concluido&quot;;if(s.includes(&quot;program&quot;)||s.includes(&quot;planej&quot;))return&quot;planejamento&quot;;if(s.includes(&quot;risco&quot;))return&quot;risco&quot;;return&quot;andamento&quot;}
+/* 🆕 ação atrasada: Data Fim vencida e não concluída */
+function acaoAtrasada(a){if(!a||!a.fim)return false;if((a.status||&quot;&quot;)===&quot;Concluída&quot;)return false;const hoje=new Date();hoje.setHours(0,0,0,0);return new Date(a.fim+&quot;T00:00:00&quot;)<hoje;}
+/* 🆕 status da frente DERIVADO das ações (Programada · Em andamento · Concluída · Atrasada) */
+function stFrente(f){
+  const ac=(f&amp;&amp;f.acoes)||[];
+  if(!ac.length)return &quot;Programada&quot;;
+  if(ac.some(acaoAtrasada))return &quot;Atrasada&quot;;
+  if(ac.every(function(a){return (a.status||&quot;&quot;)===&quot;Concluída&quot;;}))return &quot;Concluída&quot;;
+  if(ac.every(function(a){return (a.status||&quot;Programada&quot;)===&quot;Programada&quot;;}))return &quot;Programada&quot;;
+  return &quot;Em andamento&quot;;
+}
+/* 🆕 % de conclusão de uma ação */
+function pctAcao(a){if((a.status||&quot;&quot;)===&quot;Concluída&quot;)return 100;const p=parseFloat(a.pct);if(!isNaN(p))return Math.max(0,Math.min(100,p));return (a.status||&quot;&quot;)===&quot;Em andamento&quot;?50:0;}
+/* 🆕 % médio de conclusão da frente (0 se sem ações) */
+function pctFrente(f){const ac=(f&amp;&amp;f.acoes)||[];if(!ac.length)return 0;let s=0;ac.forEach(function(a){s+=pctAcao(a);});return Math.round(s/ac.length);}
+/* 🆕 atualiza badge + % + KPIs de uma frente sem redesenhar tudo (mantém card aberto) */
+function _refreshFrenteStatus(frId){
+  const f=proj().frentes.find(function(x){return x.id===frId;});if(!f)return;
+  const stTxt=stFrente(f);const cls=stClass(stTxt);const pct=pctFrente(f);
+  f.status=stTxt;
+  const card=document.getElementById(&quot;fr_&quot;+frId);
+  if(card){
+    card.className=card.className.replace(/st-[a-z]+/,&quot;st-&quot;+cls);
+    const badge=card.querySelector(&quot;.st-badge&quot;);if(badge){badge.className=&quot;st-badge &quot;+cls;badge.textContent=stTxt;}
+    const pv=card.querySelector(&quot;.pct-box .p-val&quot;);if(pv)pv.textContent=pct+&quot;%&quot;;
+    const pb=card.querySelector(&quot;.pct-box .p-bar>div&quot;);if(pb)pb.style.width=pct+&quot;%&quot;;
+  }
+  atualizarKPIsFrentes();
+}
+/* 🆕 recalcula os 6 cards + total de ações + resumo de ganho */
+/* 🆕 conta as AÇÕES de todas as frentes por status (Programada · Em andamento · Concluída · Atrasada) */
+function statsAcoes(all){
+  var t=0,prog=0,and=0,conc=0,atr=0;
+  (all||[]).forEach(function(f){
+    (f.acoes||[]).forEach(function(a){
+      t++;
+      if(acaoAtrasada(a)){atr++;}
+      else if((a.status||&quot;&quot;)===&quot;Concluída&quot;){conc++;}
+      else if((a.status||&quot;&quot;)===&quot;Em andamento&quot;){and++;}
+      else{prog++;}
+    });
+  });
+  return {total:t,prog:prog,and:and,conc:conc,atr:atr};
+}
+/* 🆕 pinta os cards: Total de ações (volume) + status em % (com nº de ações no subtítulo) */
+function pintarKPIsAcoes(all){
+  const s=statsAcoes(all);
+  const pct=function(n){return s.total?Math.round(n/s.total*100):0;};
+  const setv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  const setp=function(idVal,idSub,n){setv(idVal,pct(n)+&quot;%&quot;);setv(idSub,n+(n===1?&quot; ação&quot;:&quot; ações&quot;));};
+  setv(&quot;kAcoes&quot;,s.total);
+  setp(&quot;kPlanejamento&quot;,&quot;kPlanejamentoSub&quot;,s.prog);
+  setp(&quot;kAndamento&quot;,&quot;kAndamentoSub&quot;,s.and);
+  setp(&quot;kConcluido&quot;,&quot;kConcluidoSub&quot;,s.conc);
+  setp(&quot;kAtrasado&quot;,&quot;kAtrasadoSub&quot;,s.atr);
+}
+function atualizarKPIsFrentes(){
+  const p=proj();const all=(p&amp;&amp;p.frentes)||[];
+  all.forEach(function(f){f.status=stFrente(f);});
+  const set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set(&quot;kFrentes&quot;,all.length);
+  pintarKPIsAcoes(all);
+  if(typeof renderResumoGanho===&quot;function&quot;)renderResumoGanho(all);
+}
 function fmtData(d){if(!d)return&quot;—&quot;;const p=String(d).slice(0,10).split(&quot;-&quot;);return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
 function dateCls(d,status){
   if(!d)return&quot;&quot;;if((status||&quot;&quot;).toLowerCase().includes(&quot;conclu&quot;))return&quot;&quot;;
@@ -11614,9 +11790,11 @@ function setView(v){
   VIEW=v;
   document.getElementById(&quot;vtCards&quot;).classList.toggle(&quot;active&quot;,v===&quot;cards&quot;);
   document.getElementById(&quot;vtTable&quot;).classList.toggle(&quot;active&quot;,v===&quot;table&quot;);
+  var _vtt=document.getElementById(&quot;vtTimeline&quot;);if(_vtt)_vtt.classList.toggle(&quot;active&quot;,v===&quot;timeline&quot;);
   document.getElementById(&quot;vtInd&quot;).classList.toggle(&quot;active&quot;,v===&quot;ind&quot;);
   document.getElementById(&quot;viewCards&quot;).style.display=v===&quot;cards&quot;?&quot;block&quot;:&quot;none&quot;;
   document.getElementById(&quot;viewTable&quot;).style.display=v===&quot;table&quot;?&quot;block&quot;:&quot;none&quot;;
+  var _vt=document.getElementById(&quot;viewTimeline&quot;);if(_vt)_vt.style.display=v===&quot;timeline&quot;?&quot;block&quot;:&quot;none&quot;;
   document.getElementById(&quot;viewInd&quot;).style.display=v===&quot;ind&quot;?&quot;block&quot;:&quot;none&quot;;
   render();
 }
@@ -11735,6 +11913,7 @@ function render(){
   const selP=document.getElementById(&quot;fPilar&quot;);const cur=selP.value;
   selP.innerHTML='<option value=&quot;&quot;>Todos os pilares</option>'+PILARES.map(p=>`<option ${p===cur?&quot;selected&quot;:&quot;&quot;}>${esc(p)}</option>`).join(&quot;&quot;);
   const p=proj();const all=(p&amp;&amp;p.frentes)||[];
+  all.forEach(function(f){f.status=stFrente(f);});   /* 🆕 status da frente derivado das ações */
   // responsáveis filter options
   const selR=document.getElementById(&quot;fResp&quot;);
   if(selR){const curR=selR.value;const resps=[...new Set(all.map(f=>f.resp).filter(Boolean))].sort((a,b)=>a.localeCompare(b,&quot;pt&quot;));selR.innerHTML='<option value=&quot;&quot;>Todos os responsáveis</option>'+resps.map(r=>`<option ${r===curR?&quot;selected&quot;:&quot;&quot;}>${esc(r)}</option>`).join(&quot;&quot;);}
@@ -11744,20 +11923,11 @@ function render(){
   const gRi=all.filter(f=>stClass(f.status)===&quot;risco&quot;);
   const gAt=all.filter(f=>stClass(f.status)===&quot;atrasado&quot;);
   const gCo=all.filter(f=>stClass(f.status)===&quot;concluido&quot;);
-  // KPIs (contagem)
-  document.getElementById(&quot;kFrentes&quot;).textContent=all.length;
-  document.getElementById(&quot;kPlanejamento&quot;).textContent=gPl.length;
-  document.getElementById(&quot;kAndamento&quot;).textContent=gAn.length;
-  document.getElementById(&quot;kRisco&quot;).textContent=gRi.length;
-  document.getElementById(&quot;kAtrasado&quot;).textContent=gAt.length;
-  document.getElementById(&quot;kConcluido&quot;).textContent=gCo.length;
-  // KPIs (potencial de ganho somado por unidade)
-  setGanhoKPI(&quot;kFrentesG&quot;,all);
-  setGanhoKPI(&quot;kPlanejamentoG&quot;,gPl);
-  setGanhoKPI(&quot;kAndamentoG&quot;,gAn);
-  setGanhoKPI(&quot;kRiscoG&quot;,gRi);
-  setGanhoKPI(&quot;kAtrasadoG&quot;,gAt);
-  setGanhoKPI(&quot;kConcluidoG&quot;,gCo);
+  // KPIs: Frentes (volume) + Total de ações (volume) + status das AÇÕES em %
+  var e=document.getElementById(&quot;kFrentes&quot;);if(e)e.textContent=all.length;
+  pintarKPIsAcoes(all);
+  // 🆕 Resumo de ganho por indicador (embaixo dos cards)
+  renderResumoGanho(all);
   // barra de contexto: nome da frente ativa (item 7)
   const ctx=document.getElementById(&quot;ctxFrente&quot;);
   if(ctx){const nome=(p&amp;&amp;p.meta&amp;&amp;p.meta.name)||&quot;—&quot;;
@@ -11773,6 +11943,7 @@ function render(){
   }
   if(VIEW===&quot;cards&quot;)renderCards();
   else if(VIEW===&quot;ind&quot;)renderInd();
+  else if(VIEW===&quot;timeline&quot;)renderTimelineGov();
   else renderTable();
 }
 
@@ -11825,7 +11996,8 @@ function renderCards(){
           </div>
         </div>
         <div class=&quot;frente-right&quot;>
-          ${(function(){const t=fmtGanhosCompact(f);return t?`<div class=&quot;ganho-box&quot;><div class=&quot;g-val&quot; title=&quot;${esc(ganhosDetalheTxt(f))}&quot;>${t}</div><div class=&quot;g-lbl&quot;>Pot. ganho</div></div>`:&quot;&quot;;})()}
+          ${(function(){const t=fmtGanhosCompact(f);return t?`<div class=&quot;ganho-box&quot;><div class=&quot;g-val&quot; title=&quot;${esc(ganhosDetalheTxt(f))}&quot;>${t}</div><div class=&quot;g-lbl&quot;>Pot. ganho total</div></div>`:&quot;&quot;;})()}
+          <div class=&quot;pct-box&quot; title=&quot;Conclusão média das ações&quot;><div class=&quot;p-val&quot;>${pctFrente(f)}%</div><div class=&quot;p-lbl&quot;>Concluído</div><div class=&quot;p-bar&quot;><div style=&quot;width:${pctFrente(f)}%&quot;></div></div></div>
           <span class=&quot;st-badge ${st}&quot;>${esc(f.status||&quot;—&quot;)}</span>
           <span class=&quot;acoes-chip&quot;>${nAcoes} ${nAcoes===1?&quot;ação&quot;:&quot;ações&quot;}</span>
           <button class=&quot;frente-menu&quot; onclick=&quot;event.stopPropagation();abrirModalFrente('${f.id}')&quot; title=&quot;Editar frente&quot;>✎</button>
@@ -11896,10 +12068,12 @@ function addAcao(frId){
   saveDB();renderAcoes(frId);
   // atualiza contador de ações no header do card
   const chip=document.querySelector(`#fr_${frId} .acoes-chip`);if(chip)chip.textContent=f.acoes.length+&quot; ações&quot;;
+  _refreshFrenteStatus(frId);
 }
 function upAcao(frId,i,campo,val){
   const f=proj().frentes.find(x=>x.id===frId);if(!f||!f.acoes[i])return;
   f.acoes[i][campo]=val;
+  if(campo===&quot;status&quot;||campo===&quot;pct&quot;){_refreshFrenteStatus(frId);}   /* 🆕 status da frente segue as ações */
   if(campo===&quot;pct&quot;){const pct=Math.max(0,Math.min(100,parseFloat(val)||0));const bar=document.querySelector(`#acoes_${frId} tr:nth-child(${i+1}) .pct-bar>div`);if(bar)bar.style.width=pct+&quot;%&quot;;}
   /* 🆕 flag de ajuda: redesenha a linha (abre/fecha o QUEM?) e atualiza o selo da frente */
   if(campo===&quot;ajuda&quot;){if(!val)f.acoes[i].ajudaQuem=&quot;&quot;;renderAcoes(frId);_refreshAjudaBadge(frId);saveDB();return;}
@@ -11911,6 +12085,7 @@ function delAcao(frId,i){
   if(!confirm(&quot;Excluir esta ação?&quot;))return;
   f.acoes.splice(i,1);saveDB();renderAcoes(frId);_refreshAjudaBadge(frId);
   const chip=document.querySelector(`#fr_${frId} .acoes-chip`);if(chip)chip.textContent=f.acoes.length+(f.acoes.length===1?&quot; ação&quot;:&quot; ações&quot;);
+  _refreshFrenteStatus(frId);
 }
 
 /* ---------- TABLE VIEW ---------- */
@@ -12021,26 +12196,38 @@ function preencherSelectIndicadores(atuais){
   const hid=document.getElementById(&quot;frIndicador&quot;);if(hid)hid.value=sel[0]||&quot;&quot;;
   if(!nomes.length){
     box.innerHTML='<span style=&quot;font-size:12px;color:var(--mute)&quot;>Nenhum indicador cadastrado nesta frente ativa. Cadastre em <b>Indicadores</b> para lançar o ganho.</span>';
+    _frIndsSummary();
     return;
   }
   box.innerHTML=nomes.map(function(n){
     const on=sel.indexOf(n)>=0;
     const it=inds.find(function(i){return i.nome===n;});
     const un=it?(it.unidade?(&quot; · &quot;+esc(it.unidade)):&quot;&quot;):&quot; · não cadastrado&quot;;
-    return '<label style=&quot;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid '+(on?'#FCA5A5':'#E5E9F0')+';border-radius:20px;background:'+(on?'#FEF2F2':'#fff')+';cursor:pointer;font-size:12px;font-weight:600;color:#1A1F36&quot;>'
-      +'<input type=&quot;checkbox&quot; value=&quot;'+esc(n)+'&quot; '+(on?'checked':'')+' onchange=&quot;_toggleIndFrente(this)&quot; style=&quot;accent-color:#DA291C;cursor:pointer&quot;/>'
-      +esc(n)+'<span style=&quot;font-weight:500;color:var(--mute)&quot;>'+un+'</span></label>';
+    return '<label style=&quot;display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:1px solid '+(on?'#FCA5A5':'#E5E9F0')+';border-radius:8px;background:'+(on?'#FEF2F2':'#fff')+';cursor:pointer;font-size:12.5px;font-weight:600;color:#1A1F36&quot;>'
+      +'<input type=&quot;checkbox&quot; value=&quot;'+esc(n)+'&quot; '+(on?'checked':'')+' onchange=&quot;_toggleIndFrente(this)&quot; style=&quot;width:16px;height:16px;accent-color:#DA291C;cursor:pointer;flex-shrink:0&quot;/>'
+      +'<span style=&quot;flex:1&quot;>'+esc(n)+'</span><span style=&quot;font-weight:500;color:var(--mute)&quot;>'+un+'</span></label>';
   }).join(&quot;&quot;);
+  _frIndsSummary();
 }
 /* indicadores atualmente marcados */
 function _indsMarcados(){
   return Array.prototype.slice.call(document.querySelectorAll(&quot;#frIndsBox input[type=checkbox]&quot;))
     .filter(function(c){return c.checked;}).map(function(c){return c.value;});
 }
+/* 🆕 abre/fecha a lista suspensa (dropdown) */
+function toggleMselDD(id){var el=document.getElementById(id);if(el)el.classList.toggle(&quot;open&quot;);}
+/* 🆕 resumo dos indicadores marcados no cabeçalho do dropdown */
+function _frIndsSummary(){
+  const el=document.getElementById(&quot;frIndsSummary&quot;);if(!el)return;
+  const m=_indsMarcados();
+  if(!m.length){el.innerHTML='<span style=&quot;color:var(--mute)&quot;>Selecione um ou mais indicadores...</span>';return;}
+  el.innerHTML=m.map(function(n){return '<span class=&quot;msel-chip&quot; style=&quot;cursor:default&quot;>'+esc(n)+'</span>';}).join(&quot;&quot;);
+}
 function _toggleIndFrente(cb){
   const lb=cb.parentElement;
   if(lb){lb.style.borderColor=cb.checked?&quot;#FCA5A5&quot;:&quot;#E5E9F0&quot;;lb.style.background=cb.checked?&quot;#FEF2F2&quot;:&quot;#fff&quot;;}
   const hid=document.getElementById(&quot;frIndicador&quot;);if(hid)hid.value=(_indsMarcados()[0]||&quot;&quot;);
+  _frIndsSummary();
   _sincronizarGanhos();
 }
 /* 🆕 mantém UMA linha de ganho por indicador marcado, preservando o que já foi digitado */
@@ -12174,12 +12361,12 @@ function renderFrCompartLista(){
 function _frCompartChips(){
   const box=document.getElementById(&quot;frCompartChips&quot;); if(!box)return;
   if(!_FR_COMPART.length){
-    box.innerHTML='<span class=&quot;msel-none&quot;>Ninguém selecionado — a frente fica visível apenas para o dono e a gestão.</span>';
+    box.innerHTML='<span class=&quot;msel-none&quot;>Clique para selecionar — a frente fica visível apenas para o dono e a gestão.</span>';
     return;
   }
   box.innerHTML='<span class=&quot;msel-none&quot; style=&quot;align-self:center;margin-right:2px&quot;>'+_FR_COMPART.length+' selecionado(s):</span>'+
     _FR_COMPART.map(function(n){
-      return '<span class=&quot;msel-chip&quot;>'+esc(n)+'<button type=&quot;button&quot; title=&quot;Remover&quot; data-n=&quot;'+esc(n)+'&quot; onclick=&quot;removerFrCompart(this.dataset.n)&quot;>×</button></span>';
+      return '<span class=&quot;msel-chip&quot;>'+esc(n)+'<button type=&quot;button&quot; title=&quot;Remover&quot; data-n=&quot;'+esc(n)+'&quot; onclick=&quot;event.stopPropagation();removerFrCompart(this.dataset.n)&quot;>×</button></span>';
     }).join(&quot;&quot;);
 }
 function _frCompartRender(){
@@ -12189,6 +12376,7 @@ function _frCompartRender(){
 }
 function abrirModalFrente(id){
   document.getElementById(&quot;pilarInfo&quot;).classList.remove(&quot;show&quot;);
+  [&quot;frCompartDD&quot;,&quot;frIndsDD&quot;].forEach(function(dd){var el=document.getElementById(dd);if(el)el.classList.remove(&quot;open&quot;);});
   if(id){
     const f=proj().frentes.find(x=>x.id===id);if(!f)return;
     document.getElementById(&quot;mFrTitle&quot;).textContent=&quot;Editar frente&quot;;
@@ -12198,7 +12386,7 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frSituacao&quot;).value=f.situacao||&quot;&quot;;
     document.getElementById(&quot;frResp&quot;).value=f.resp||&quot;&quot;;
     _pintarAjudaInfo(f);
-    document.getElementById(&quot;frStatus&quot;).value=f.status||&quot;Em Andamento&quot;;
+    (function(){var _sa=document.getElementById(&quot;frStatusAuto&quot;);if(_sa)_sa.textContent=stFrente(f);})();
     document.getElementById(&quot;frPrazoFoco&quot;).value=f.prazoFoco||&quot;&quot;;
     document.getElementById(&quot;frDataLimite&quot;).value=f.dataLimite||&quot;&quot;;
     _frGanhoRows=ganhosFrente(f).map(function(g){return {ind:g.ind||&quot;&quot;,unit:g.unit||&quot;R$&quot;,val:g.val||&quot;&quot;};});
@@ -12213,7 +12401,7 @@ function abrirModalFrente(id){
     document.getElementById(&quot;frId&quot;).value=&quot;&quot;;
     document.getElementById(&quot;frNum&quot;).value=prox;
     document.getElementById(&quot;frFrente&quot;).value=&quot;&quot;;document.getElementById(&quot;frSituacao&quot;).value=&quot;&quot;;
-    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;_pintarAjudaInfo(null);document.getElementById(&quot;frStatus&quot;).value=&quot;Em Andamento&quot;;
+    document.getElementById(&quot;frResp&quot;).value=&quot;&quot;;_pintarAjudaInfo(null);(function(){var _sa=document.getElementById(&quot;frStatusAuto&quot;);if(_sa)_sa.textContent=&quot;Programada&quot;;})();
     document.getElementById(&quot;frPrazoFoco&quot;).value=&quot;&quot;;document.getElementById(&quot;frDataLimite&quot;).value=&quot;&quot;;
     _frGanhoRows=[];preencherSelectIndicadores([]);_renderGanhoLinhas();
     document.getElementById(&quot;frPilar&quot;).value=&quot;&quot;;
@@ -12233,7 +12421,7 @@ function salvarFrente(){
   const dados={
     num:parseInt(document.getElementById(&quot;frNum&quot;).value)||null,
     frente:nome,situacao:document.getElementById(&quot;frSituacao&quot;).value,
-    resp:document.getElementById(&quot;frResp&quot;).value,status:document.getElementById(&quot;frStatus&quot;).value,
+    resp:document.getElementById(&quot;frResp&quot;).value,status:&quot;Programada&quot;,
     prazoFoco:document.getElementById(&quot;frPrazoFoco&quot;).value,dataLimite:document.getElementById(&quot;frDataLimite&quot;).value,
     ganhos:_gs,indicadores:_nomes,
     ganho:(_pri?ganhoStrDe(_pri):&quot;&quot;),indicador:(_nomes[0]||&quot;&quot;),
@@ -12244,7 +12432,7 @@ function salvarFrente(){
   if(id){
     const f=p.frentes.find(x=>x.id===id);
     if(!podeEditarItem(f)){toast(&quot;Você não tem permissão para editar esta frente.&quot;,&quot;err&quot;);return;}
-    Object.assign(f,dados);
+    Object.assign(f,dados);f.status=stFrente(f);
   }else{
     dados.dono=u?u.nome:&quot;&quot;;           /* 🆕 carimba o dono ao criar */
     p.frentes.push(Object.assign({id:uid(&quot;f&quot;),acoes:[]},dados));
@@ -12612,7 +12800,7 @@ function montarMesesInd(preservar){
   const cr=document.getElementById(&quot;indCustomRange&quot;); if(cr) cr.style.display=(visao===&quot;custom&quot;)?&quot;grid&quot;:&quot;none&quot;;
   const meses=mesesParaVisao(visao);
   const fmt=v=>(v==null||isNaN(v))?&quot;&quot;:v;
-  document.getElementById(&quot;indMesesTit&quot;).textContent=&quot;Preenchimento mensal — &quot;+(visao===&quot;fiscal&quot;?&quot;Ano fiscal (jan–dez)&quot;:&quot;Período personalizado&quot;);
+  document.getElementById(&quot;indMesesTit&quot;).textContent=&quot;Preenchimento mensal — &quot;+(visao===&quot;fiscal&quot;?&quot;Ano vigente (jan–dez)&quot;:&quot;Período personalizado&quot;);
   wrap.innerHTML=meses.map(mo=>{
     const d=_indTmp[mo.key]||{};
     const isReal=mo.tipo===&quot;real&quot;;
@@ -12742,12 +12930,150 @@ function _spark(it){
   return '<span style=&quot;display:inline-flex;align-items:flex-end;gap:2px;height:24px&quot;>'+vals.map(x=>'<span style=&quot;width:4px;border-radius:2px;background:#DA291C;opacity:.55;height:'+(4+((x-mn)/rg)*20)+'px&quot;></span>').join(&quot;&quot;)+'</span>';
 }
 
+/* ============================================================
+   📆 TIMELINE (Gantt) — Governança · por Frente ou por Ações
+   ============================================================ */
+let GV_TL_MODE='frente';                                  /* frente | acoes */
+let GV_TL_F={status:'',pilar:'',resp:'',periodo:'all'};   /* filtros da timeline */
+let GV_TL_ITEMS=[];                                       /* dados p/ tooltip */
+const _GV_MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+function gvTlSetMode(m){GV_TL_MODE=m;renderTimelineGov();}
+function gvTlFilter(campo,val){GV_TL_F[campo]=val;renderTimelineGov();}
+function _gvStCls(s){s=(s||'').toLowerCase();if(s.indexOf('atras')>=0)return'st-atrasada';if(s.indexOf('conclu')>=0)return'st-concluida';if(s.indexOf('andam')>=0)return'st-andamento';return'st-programada';}
+function _gvMeses(a,b){const arr=[];let y=a.getFullYear(),m=a.getMonth();const ey=b.getFullYear(),em=b.getMonth();while(y<ey||(y===ey&amp;&amp;m<=em)){arr.push(new Date(y,m,1));m++;if(m>11){m=0;y++;}}return arr;}
+function _gvMLbl(d){return _GV_MN[d.getMonth()]+'/'+String(d.getFullYear()).slice(-2);}
+function _gvIdx(meses,d){for(let i=0;i<meses.length;i++){if(d.getFullYear()===meses[i].getFullYear()&amp;&amp;d.getMonth()===meses[i].getMonth()){const dim=new Date(meses[i].getFullYear(),meses[i].getMonth()+1,0).getDate();return i+(d.getDate()-1)/dim;}}if(d<meses[0])return 0;return meses.length-0.001;}
+/* datas da frente: início=Data Início, fim=Data Fim; fallback = min/max das ações */
+function _gvFrenteDatas(f){
+  let ini=f.prazoFoco||'',fim=f.dataLimite||'';
+  if(!ini||!fim){const ds=[],de=[];(f.acoes||[]).forEach(function(a){if(a.inicio)ds.push(a.inicio);if(a.fim)de.push(a.fim);});
+    if(!ini&amp;&amp;ds.length)ini=ds.slice().sort()[0];
+    if(!fim&amp;&amp;de.length)fim=de.slice().sort()[de.length-1];}
+  return {ini:ini,fim:fim};
+}
+/* tooltip flutuante */
+function _gvTip(){let el=document.getElementById('gvTlTip');if(!el){el=document.createElement('div');el.id='gvTlTip';document.body.appendChild(el);}return el;}
+function gvTlShow(ev,idx){const it=GV_TL_ITEMS[idx];if(!it)return;const el=_gvTip();el.innerHTML=it.tip;el.style.display='block';gvTlMove(ev);}
+function gvTlMove(ev){const el=document.getElementById('gvTlTip');if(!el||el.style.display!=='block')return;let x=ev.clientX+14,y=ev.clientY+14;const r=el.getBoundingClientRect();if(x+r.width>window.innerWidth-8)x=ev.clientX-r.width-14;if(y+r.height>window.innerHeight-8)y=ev.clientY-r.height-14;if(x<8)x=8;if(y<8)y=8;el.style.left=x+'px';el.style.top=y+'px';}
+function gvTlHide(){const el=document.getElementById('gvTlTip');if(el)el.style.display='none';}
+function _gvChip(txt){const c=_gvStCls(txt);return '<span class=&quot;st-chip '+c+'&quot;>'+esc(txt)+'</span>';}
+function renderTimelineGov(){
+  const box=document.getElementById(&quot;viewTimeline&quot;);if(!box)return;
+  const frentes=frentesFiltradas();
+  /* opções dos filtros (status conforme o modo) */
+  const stFrenteOpts=['Programada','Em andamento','Concluída','Atrasada'];
+  const stAcaoOpts=['Programada','Em andamento','Concluída','Atrasada'];
+  const stOpts=(GV_TL_MODE==='frente')?stFrenteOpts:stAcaoOpts;
+  const resps=[...new Set(frentes.map(function(f){return f.resp;}).filter(Boolean))].sort();
+  const optSel=function(arr,cur){return '<option value=&quot;&quot;>Todos</option>'+arr.map(function(o){return '<option '+(o===cur?'selected':'')+'>'+esc(o)+'</option>';}).join('');};
+  const pilOpts='<option value=&quot;&quot;>Todos os pilares</option>'+PILARES.map(function(pl){return '<option '+(pl===GV_TL_F.pilar?'selected':'')+'>'+esc(pl)+'</option>';}).join('');
+  const perOpts=[['all','Todo o período'],['last6next6','Últimos 6 + próximos 6 meses'],['ano','Ano vigente'],['next6','Próximos 6 meses']].map(function(o){return '<option value=&quot;'+o[0]+'&quot; '+(o[0]===GV_TL_F.periodo?'selected':'')+'>'+esc(o[1])+'</option>';}).join('');
+  const toolbar='<div class=&quot;gv-tl-toolbar&quot;>'
+    +'<div class=&quot;gv-tl-modesel&quot;>'
+    +'<button class=&quot;'+(GV_TL_MODE==='frente'?'active':'')+'&quot; onclick=&quot;gvTlSetMode(\'frente\')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M3 3v18h18&quot;/><path d=&quot;m19 9-5 5-4-4-3 3&quot;/></svg> Por frente</button>'
+    +'<button class=&quot;'+(GV_TL_MODE==='acoes'?'active':'')+'&quot; onclick=&quot;gvTlSetMode(\'acoes\')&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><line x1=&quot;8&quot; y1=&quot;6&quot; x2=&quot;21&quot; y2=&quot;6&quot;/><line x1=&quot;8&quot; y1=&quot;12&quot; x2=&quot;21&quot; y2=&quot;12&quot;/><line x1=&quot;8&quot; y1=&quot;18&quot; x2=&quot;21&quot; y2=&quot;18&quot;/><line x1=&quot;3&quot; y1=&quot;6&quot; x2=&quot;3.01&quot; y2=&quot;6&quot;/><line x1=&quot;3&quot; y1=&quot;12&quot; x2=&quot;3.01&quot; y2=&quot;12&quot;/><line x1=&quot;3&quot; y1=&quot;18&quot; x2=&quot;3.01&quot; y2=&quot;18&quot;/></svg> Por ações</button>'
+    +'</div>'
+    +'<select onchange=&quot;gvTlFilter(\'status\',this.value)&quot; title=&quot;Filtrar por status&quot;>'+optSel(stOpts,GV_TL_F.status)+'</select>'
+    +'<select onchange=&quot;gvTlFilter(\'pilar\',this.value)&quot; title=&quot;Filtrar por pilar&quot;>'+pilOpts+'</select>'
+    +'<select onchange=&quot;gvTlFilter(\'resp\',this.value)&quot; title=&quot;Filtrar por responsável&quot;>'+optSel(resps,GV_TL_F.resp)+'</select>'
+    +'<select onchange=&quot;gvTlFilter(\'periodo\',this.value)&quot; title=&quot;Período&quot;>'+perOpts+'</select>'
+    +'</div>';
+  /* monta os itens conforme o modo */
+  let itens=[];   /* {grupo, label, sub, ini, fim, cls, tip} */
+  if(GV_TL_MODE==='frente'){
+    frentes.forEach(function(f){
+      if(GV_TL_F.status&amp;&amp;f.status!==GV_TL_F.status)return;
+      if(GV_TL_F.pilar&amp;&amp;(f.pilar||'')!==GV_TL_F.pilar)return;
+      if(GV_TL_F.resp&amp;&amp;(f.resp||'')!==GV_TL_F.resp)return;
+      const dt=_gvFrenteDatas(f);if(!dt.ini||!dt.fim)return;
+      const pct=pctFrente(f);const gh=fmtGanhosCompact(f);const inds=indsFrente(f).join(', ');
+      const tip='<h5>'+esc(f.frente||'(sem nome)')+'</h5>'
+        +'<div class=&quot;tr&quot;><b>Status:</b>'+_gvChip(f.status)+'</div>'
+        +(f.resp?'<div class=&quot;tr&quot;><b>Responsável:</b> '+esc(f.resp)+'</div>':'')
+        +'<div class=&quot;tr&quot;><b>Período:</b> '+fmtData(dt.ini)+' → '+fmtData(dt.fim)+'</div>'
+        +(f.pilar?'<div class=&quot;tr&quot;><b>Pilar:</b> '+esc(f.pilar)+'</div>':'')
+        +(inds?'<div class=&quot;tr&quot;><b>Indicadores:</b> '+esc(inds)+'</div>':'')
+        +'<div class=&quot;tr&quot;><b>Concluído:</b> '+pct+'%</div>'
+        +(gh?'<div class=&quot;tr gain&quot;><b>Pot. ganho total:</b> '+esc(gh)+'</div>':'')
+        +'<div class=&quot;tr&quot;><b>Ações:</b> '+((f.acoes||[]).length)+'</div>';
+      itens.push({grupo:(f.pilar||'— Sem pilar —'),label:(f.num?('#'+f.num+' '):'')+((f.frente||'(sem nome)')),sub:(f.resp||''),ini:dt.ini,fim:dt.fim,cls:_gvStCls(f.status),tip:tip});
+    });
+  }else{
+    frentes.forEach(function(f){
+      (f.acoes||[]).forEach(function(a){
+        if(!a.inicio||!a.fim)return;
+        const stAc=acaoAtrasada(a)?'Atrasada':(a.status||'Programada');
+        if(GV_TL_F.status&amp;&amp;stAc!==GV_TL_F.status)return;
+        const pil=(a.pilar||f.pilar||'');
+        if(GV_TL_F.pilar&amp;&amp;pil!==GV_TL_F.pilar)return;
+        const who=(a.who||f.resp||'');
+        if(GV_TL_F.resp&amp;&amp;who!==GV_TL_F.resp)return;
+        const tip='<h5>'+esc(a.what||'(sem descrição)')+'</h5>'
+          +'<div class=&quot;tr&quot;><b>Status:</b>'+_gvChip(stAc)+'</div>'
+          +'<div class=&quot;tr&quot;><b>Frente:</b> '+esc(f.frente||'')+'</div>'
+          +(who?'<div class=&quot;tr&quot;><b>Responsável:</b> '+esc(who)+'</div>':'')
+          +'<div class=&quot;tr&quot;><b>Período:</b> '+fmtData(a.inicio)+' → '+fmtData(a.fim)+'</div>'
+          +(pil?'<div class=&quot;tr&quot;><b>Pilar:</b> '+esc(pil)+'</div>':'')
+          +(a.indicador?'<div class=&quot;tr&quot;><b>Indicador:</b> '+esc(a.indicador)+'</div>':'')
+          +(a.pct?'<div class=&quot;tr&quot;><b>Concluído:</b> '+esc(String(a.pct))+'%</div>':'')
+          +(a.ganho?'<div class=&quot;tr gain&quot;><b>Projeção de ganho:</b> '+esc(a.ganho)+'</div>':'');
+        itens.push({grupo:(pil||'— Sem pilar —'),label:(a.what||'(sem descrição)'),sub:esc(f.frente||''),ini:a.inicio,fim:a.fim,cls:_gvStCls(stAc),tip:tip});
+      });
+    });
+  }
+  /* período: recorta a janela */
+  let pStart=null,pEnd=null;const hoje=new Date();
+  if(GV_TL_F.periodo==='last6next6'){pStart=new Date(hoje.getFullYear(),hoje.getMonth()-6,1);pEnd=new Date(hoje.getFullYear(),hoje.getMonth()+6,1);}
+  else if(GV_TL_F.periodo==='ano'){pStart=new Date(hoje.getFullYear(),0,1);pEnd=new Date(hoje.getFullYear(),11,1);}
+  else if(GV_TL_F.periodo==='next6'){pStart=new Date(hoje.getFullYear(),hoje.getMonth(),1);pEnd=new Date(hoje.getFullYear(),hoje.getMonth()+6,1);}
+  if(pStart&amp;&amp;pEnd){itens=itens.filter(function(it){const di=new Date(it.ini+'T00:00:00'),df=new Date(it.fim+'T00:00:00');return df>=pStart&amp;&amp;di<=pEnd;});}
+  if(itens.length===0){
+    box.innerHTML=toolbar+'<div class=&quot;gv-tl-wrap&quot;><div class=&quot;gv-tl-empty&quot;><div class=&quot;ico&quot;>📆</div><div class=&quot;t&quot;>Nada para exibir na timeline</div><div style=&quot;font-size:12.5px&quot;>'+(GV_TL_MODE==='frente'?'Cadastre <b>Data Início</b> e <b>Data Fim</b> nas frentes (ou nas ações) para vê-las aqui.':'Cadastre <b>Início</b> e <b>Fim</b> nas ações para vê-las aqui.')+'</div></div></div>';
+    return;
+  }
+  /* eixo de meses */
+  let minD=null,maxD=null;
+  itens.forEach(function(it){const di=new Date(it.ini+'T00:00:00'),df=new Date(it.fim+'T00:00:00');if(!minD||di<minD)minD=di;if(!maxD||df>maxD)maxD=df;});
+  let mIni=new Date(minD.getFullYear(),minD.getMonth(),1),mFim=new Date(maxD.getFullYear(),maxD.getMonth(),1);
+  if(pStart&amp;&amp;mIni<pStart)mIni=new Date(pStart.getFullYear(),pStart.getMonth(),1);
+  if(pEnd&amp;&amp;mFim>pEnd)mFim=new Date(pEnd.getFullYear(),pEnd.getMonth(),1);
+  const meses=_gvMeses(mIni,mFim);
+  const cols='240px repeat('+meses.length+',minmax(64px,1fr))';
+  /* agrupa por pilar */
+  const grupos={};const ordem=[];
+  itens.forEach(function(it){if(!grupos[it.grupo]){grupos[it.grupo]=[];ordem.push(it.grupo);}grupos[it.grupo].push(it);});
+  GV_TL_ITEMS=[];
+  let h='<div class=&quot;gv-tl-wrap&quot;>';
+  h+='<div class=&quot;gv-tl-head&quot; style=&quot;grid-template-columns:'+cols+'&quot;><div></div>'+meses.map(function(m){return '<div class=&quot;mh&quot;>'+_gvMLbl(m)+'</div>';}).join('')+'</div>';
+  ordem.forEach(function(g){
+    h+='<div class=&quot;gv-tl-grp&quot;><div class=&quot;gv-tl-grp-name&quot;>'+esc(g)+' · '+grupos[g].length+'</div>';
+    grupos[g].forEach(function(it){
+      const s=_gvIdx(meses,new Date(it.ini+'T00:00:00')),e=_gvIdx(meses,new Date(it.fim+'T00:00:00'));
+      const left=(s/meses.length)*100;let width=Math.max((e-s+0.9)/meses.length*100,2.5);if(width>100-left)width=100-left;
+      const idx=GV_TL_ITEMS.length;GV_TL_ITEMS.push(it);
+      h+='<div class=&quot;gv-tl-row&quot; style=&quot;grid-template-columns:'+cols+'&quot;>'
+        +'<div class=&quot;gv-tl-label&quot;>'+esc(it.label)+(it.sub?' <span class=&quot;sub&quot;>· '+esc(it.sub)+'</span>':'')+'</div>'
+        +'<div style=&quot;grid-column:2 / span '+meses.length+';position:relative&quot;><div class=&quot;gv-tl-track&quot;><div class=&quot;gv-tl-bar '+it.cls+'&quot; style=&quot;left:'+left+'%;width:'+width+'%&quot; data-i=&quot;'+idx+'&quot; onmouseenter=&quot;gvTlShow(event,'+idx+')&quot; onmousemove=&quot;gvTlMove(event)&quot; onmouseleave=&quot;gvTlHide()&quot;>'+esc(it.label)+'</div></div></div>'
+        +'</div>';
+    });
+    h+='</div>';
+  });
+  h+='<div class=&quot;gv-tl-legend&quot;>'
+    +'<span class=&quot;it&quot;><span class=&quot;sw&quot; style=&quot;background:#F59E0B&quot;></span>Programada</span>'
+    +'<span class=&quot;it&quot;><span class=&quot;sw&quot; style=&quot;background:#0EA5E9&quot;></span>Em andamento</span>'
+    +'<span class=&quot;it&quot;><span class=&quot;sw&quot; style=&quot;background:#10B981&quot;></span>Concluída</span>'
+    +'<span class=&quot;it&quot;><span class=&quot;sw&quot; style=&quot;background:#EF4444&quot;></span>Atrasada</span>'
+    +'</div>';
+  h+='</div>';
+  box.innerHTML=toolbar+h;
+}
+
 /* ---------- VIEW INDICADOR ---------- */
 function renderInd(){
   const box=document.getElementById(&quot;viewInd&quot;);if(!box)return;
   const inds=indicadoresVisiveis();
   const dirLbl=d=>d===&quot;maior&quot;?&quot;Maior é melhor&quot;:&quot;Menor é melhor&quot;;
-  const visLbl=v=>v===&quot;m12&quot;?&quot;M-12&quot;:v===&quot;m6&quot;?&quot;M-6&quot;:&quot;Ano fiscal&quot;;
+  const visLbl=v=>v===&quot;m12&quot;?&quot;M-12&quot;:v===&quot;m6&quot;?&quot;M-6&quot;:&quot;Ano vigente&quot;;
   let linhas;
   if(!inds.length){
     linhas=`<tr><td colspan=&quot;8&quot;><div class=&quot;empty&quot; style=&quot;padding:26px&quot;><div class=&quot;t&quot;>Nenhum indicador cadastrado.</div><div style=&quot;font-size:12.5px&quot;>Clique em <b>+ Novo indicador</b> para começar.</div></div></td></tr>`;
@@ -12769,7 +13095,7 @@ function renderInd(){
     <div class=&quot;gt-tblwrap&quot; style=&quot;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px&quot;>
       <table style=&quot;width:100%;border-collapse:collapse;font-size:12.5px&quot;>
         <thead><tr style=&quot;background:#F7F8FC;text-align:left&quot;>
-          <th style=&quot;padding:12px 16px 12px 24px;width:30%;min-width:240px&quot;>Indicador</th><th style=&quot;padding:12px 16px&quot;>Área</th><th style=&quot;padding:12px 16px;width:100px&quot;>Unidade</th><th style=&quot;padding:12px 16px;width:100px&quot;>Meta</th><th style=&quot;padding:12px 16px;width:150px&quot;>Direção</th><th style=&quot;padding:12px 16px;width:140px&quot;>Visualização</th><th style=&quot;padding:12px 16px;width:130px&quot;>Ano fiscal</th><th style=&quot;padding:12px 16px;width:52px&quot;></th>
+          <th style=&quot;padding:12px 16px 12px 24px;width:30%;min-width:240px&quot;>Indicador</th><th style=&quot;padding:12px 16px&quot;>Área</th><th style=&quot;padding:12px 16px;width:100px&quot;>Unidade</th><th style=&quot;padding:12px 16px;width:100px&quot;>Meta</th><th style=&quot;padding:12px 16px;width:150px&quot;>Direção</th><th style=&quot;padding:12px 16px;width:140px&quot;>Visualização</th><th style=&quot;padding:12px 16px;width:130px&quot;>Ano vigente</th><th style=&quot;padding:12px 16px;width:52px&quot;></th>
         </tr></thead>
         <tbody>${linhas}</tbody>
       </table>
@@ -12795,7 +13121,7 @@ function renderInd(){
           <div style=&quot;display:flex;align-items:center;gap:7px&quot;>
             <label style=&quot;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.4px&quot;>Período</label>
             <select id=&quot;wfPeriodo&quot; onchange=&quot;wfSetPeriodo(this.value)&quot; style=&quot;background:#fff;border:1px solid var(--border);padding:8px 11px;border-radius:8px;font:inherit;font-size:12.5px;font-family:inherit&quot;>
-              <option value=&quot;fiscal&quot;>Ano fiscal (jan–dez)</option>
+              <option value=&quot;fiscal&quot;>Ano vigente (jan–dez)</option>
               <option value=&quot;indicador&quot;>Período do indicador</option>
             </select>
           </div>
@@ -12865,7 +13191,7 @@ function desenharWaterfall(){
   const reduc=frentesImp.map(f=>({nome:f.frente||&quot;Frente&quot;,val:ganhoNumIndicador(f,_wfSel)})).filter(r=>r.val>0);
   // eixo X com códigos curtos: Base · F1..Fn · Final (nomes completos vão na legenda abaixo)
   const labels=[&quot;Base&quot;];
-  const fullLabels=[&quot;Ano fiscal (real + forecast)&quot;];
+  const fullLabels=[&quot;Ano vigente (real + forecast)&quot;];
   const data=[[0,base]];
   const colors=[&quot;#334155&quot;];
   const info=[{txt:fmtCompact(base)+unid}];
